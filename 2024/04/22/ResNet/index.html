@@ -27,14 +27,14 @@
         
         <meta name="description" content="Welcome to my sekai">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ResNet论文解读：突破深度神经网络训练瓶颈的里程碑">
+<meta property="og:title" content="深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑">
 <meta property="og:url" content="http://onef1shy.github.io/2024/04/22/ResNet/index.html">
 <meta property="og:site_name" content="Onefishy&#39;s Blog">
 <meta property="og:description" content="Welcome to my sekai">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://onef1shy.github.io/images/redefine-og.webp">
 <meta property="article:published_time" content="2024-04-22T06:30:00.000Z">
-<meta property="article:modified_time" content="2025-03-13T19:07:36.312Z">
+<meta property="article:modified_time" content="2025-03-14T03:53:26.371Z">
 <meta property="article:author" content="Onefishy">
 <meta property="article:tag" content="论文笔记">
 <meta property="article:tag" content="残差网络">
@@ -51,7 +51,7 @@
     
     <title>
         
-            ResNet论文解读：突破深度神经网络训练瓶颈的里程碑 | Onefishy&#39;s Blog
+            深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑 | Onefishy&#39;s Blog
         
     </title>
 
@@ -711,7 +711,7 @@ mjx-container[display="true"] + br {
 		<div class="article-title relative w-full">
 			
 			<div class="w-full flex items-center pt-6 justify-start">
-				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">ResNet论文解读：突破深度神经网络训练瓶颈的里程碑</h1>
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑</h1>
 			</div>
 			
 		</div>
@@ -739,8 +739,8 @@ mjx-container[display="true"] + br {
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-03-14 03:07:36</span>
-            <span class="mobile">2025-03-14 03:07:36</span>
+            <span class="desktop">2025-03-14 11:53:26</span>
+            <span class="mobile">2025-03-14 11:53:26</span>
             <span class="hover-info">更新</span>
         </span>
     
@@ -1061,14 +1061,14 @@ pp. 550-558.</p>
 		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
 			<div class="article-copyright-info-container">
     <ul>
-        <li><strong>标题:</strong> ResNet论文解读：突破深度神经网络训练瓶颈的里程碑</li>
+        <li><strong>标题:</strong> 深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑</li>
         <li><strong>作者:</strong> Onefishy</li>
         <li><strong>创建于
                 :</strong> 2024-04-22 14:30:00</li>
         
             <li>
                 <strong>更新于
-                    :</strong> 2025-03-14 03:07:36
+                    :</strong> 2025-03-14 11:53:26
             </li>
         
         <li>
@@ -1204,7 +1204,7 @@ pp. 550-558.</p>
 		<div class="post-toc-wrap">
 	<div class="post-toc">
 		<div class="toc-title">目录</div>
-		<div class="page-title">ResNet论文解读：突破深度神经网络训练瓶颈的里程碑</div>
+		<div class="page-title">深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑</div>
 		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E8%83%8C%E6%99%AF%E4%B8%8E%E5%8A%A8%E6%9C%BA"><span class="nav-text">1. 论文背景与动机</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E7%BD%91%E7%BB%9C%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-text">1.1 深度网络的优势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E7%BD%91%E7%BB%9C%E7%9A%84%E9%80%80%E5%8C%96%E9%97%AE%E9%A2%98"><span class="nav-text">1.2 深度网络的退化问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E5%8A%A8%E6%9C%BA"><span class="nav-text">1.3 研究动机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AE%8B%E5%B7%AE%E5%AD%A6%E4%B9%A0%E6%A1%86%E6%9E%B6"><span class="nav-text">2. 残差学习框架</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="nav-text">2.1 核心思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AE%8B%E5%B7%AE%E5%9D%97%E7%BB%93%E6%9E%84"><span class="nav-text">2.2 残差块结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%B3%E8%B7%83%E8%BF%9E%E6%8E%A5%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-text">2.3 跳跃连接的类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84"><span class="nav-text">3. 网络架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="nav-text">3.1 整体架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%B7%B1%E5%BA%A6%E7%9A%84resnet%E5%8F%98%E4%BD%93"><span class="nav-text">3.2 不同深度的ResNet变体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%E4%B8%8E%E5%88%86%E6%9E%90"><span class="nav-text">4. 实验结果与分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#imagenet%E5%88%86%E7%B1%BB%E7%BB%93%E6%9E%9C"><span class="nav-text">4.1 ImageNet分类结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cifar-10%E5%AE%9E%E9%AA%8C"><span class="nav-text">4.2 CIFAR-10实验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%E7%BB%93%E6%9E%9C"><span class="nav-text">4.3 目标检测结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%AE%8B%E5%B7%AE%E8%BF%9E%E6%8E%A5%E6%9C%89%E6%95%88"><span class="nav-text">5. 为什么残差连接有效？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E4%B8%AD%E7%9A%84%E5%AE%9E%E9%AA%8C%E8%AF%81%E6%8D%AE"><span class="nav-text">5.1 论文中的实验证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A9%E5%B1%95%E6%80%9D%E8%80%83%E7%90%86%E8%AE%BA%E8%A7%A3%E9%87%8A"><span class="nav-text">5.2 扩展思考：理论解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E6%80%9D%E8%80%83"><span class="nav-text">6. 总结与思考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-text">参考文献</span></a></li></ol>
 
 	</div>
