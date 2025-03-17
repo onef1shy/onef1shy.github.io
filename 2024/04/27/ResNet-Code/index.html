@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="Onefishy">
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+        
+        
+        
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://onef1shy.github.io/2024/04/27/resnet-code/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="Welcome to my sekai">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类">
+<meta property="og:url" content="http://onef1shy.github.io/2024/04/27/ResNet-Code/index.html">
+<meta property="og:site_name" content="Onefishy&#39;s Blog">
+<meta property="og:description" content="Welcome to my sekai">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://onef1shy.github.io/images/redefine-og.webp">
+<meta property="article:published_time" content="2024-04-27T02:30:00.000Z">
+<meta property="article:modified_time" content="2025-03-17T13:36:26.948Z">
+<meta property="article:author" content="Onefishy">
+<meta property="article:tag" content="残差网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://onef1shy.github.io/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/redefine-favicon.png" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/redefine-favicon.png">
+    <meta name="theme-color" content="#6B8DFF">
+    <link rel="shortcut icon" href="/images/redefine-favicon.png">
+    <!--- Page Info-->
+    
+    <title>
+        
+            深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类 | Onefishy&#39;s Blog
+        
+    </title>
+
+    <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/fonts/Chillax/chillax.css">
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/css/build/tailwind.css">
+    
+
+    <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/fonts/GeistMono/geist-mono.css">
+    <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/fonts/Geist/geist.css">
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+        <script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/libs/anime.min.js" ></script>
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"onef1shy.github.io","root":"/","language":"zh-CN","path":"search.xml"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.8,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":false,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":["生まれてよかった..."]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa","author":true,"link":true,"license":"CC BY-NC-SA 4.0","license_link":"https://creativecommons.org/licenses/by-nc-sa/4.0/"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#6B8DFF","secondary":"#8A9FFF","default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":true,"family":"'Noto Sans SC', 'Helvetica Neue', Helvetica, Arial, sans-serif","url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":true},"scroll_progress":{"bar":true,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":true,"custom_message":"Onefishy's Blog"},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":"Welcome to my sekai"},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-wqery6.png","dark":"/images/wallhaven-wqery6.png"},"title":"Welcome to my sekai","subtitle":{"text":["風をまとい、光を追う✨","無垢なる浪漫..(ˊᗜˋ)/♡"],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#2c3e50","dark":"#2c3e50"},"text_style":{"title_size":"3.5rem","subtitle_size":"1.5rem","line_height":2,"text_shadow":false,"font_weight":600},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"style":"default","links":{"github":"https://github.com/onef1shy","instagram":null,"zhihu":null,"twitter":null,"email":"mailto:onefishy@163.com","bilibili":"https://space.bilibili.com/364646464"},"qrs":{"weixin":"/images/about/wechat-qr.png","qq":"/images/about/qq-qr.png"},"position":"right","layout":"horizontal","mobile":true}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"},"katex":{"enable":false},"mathjax":{"enable":true,"version":"latest"},"typed":{"enable":true,"version":"2.0.12"},"pangu":{"enable":true,"version":"4.0.7"}},"version":"2.8.2","navbar":{"auto_hide":false,"color":{"left":"rgba(255, 255, 255, 0.9)","right":"rgba(255, 255, 255, 0.9)","transparency":10},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"文章":{"path":"/archives","icon":"fa-regular fa-archive"},"标签":{"path":"/tags","icon":"fa-regular fa-tags"},"分类":{"path":"/categories","icon":"fa-regular fa-folder"},"关于":{"path":"/about","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true},"blur":false,"style":{"text_color":"#2c3e50","text_weight":600}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2024/02/10 00:00:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/fontawesome/fontawesome.min.css">
+    <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/fontawesome/brands.min.css">
+    <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/fontawesome/solid.min.css">
+    <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/fontawesome/regular.min.css">
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+	<span class="scroll-progress-bar"></span>
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<style>
+    :root {
+        --preloader-background-color: #fff;
+        --preloader-text-color: #000;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --preloader-background-color: #202124;
+            --preloader-text-color: #fff;
+        }
+    }
+
+    @media (prefers-color-scheme: light) {
+        :root {
+            --preloader-background-color: #fff;
+            --preloader-text-color: #000;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .ml13 {
+            font-size: 2.6rem !important; /* Adjust this value as needed */
+        }
+    }
+
+    .preloader {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem; /* Tailwind 'gap-4' is 1rem */
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        padding: 12px;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh; /* 'h-screen' is 100% of the viewport height */
+        background-color: var(--preloader-background-color);
+        z-index: 1100; /* 'z-[1100]' sets the z-index */
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .ml13 {
+        font-size: 3.2rem;
+        /* text-transform: uppercase; */
+        color: var(--preloader-text-color);
+        letter-spacing: -1px;
+        font-weight: 500;
+        font-family: 'Chillax-Variable', sans-serif;
+        text-align: center;
+    }
+
+    .ml13 .word {
+        display: inline-flex;
+        flex-wrap: wrap;
+        white-space: nowrap;
+    }
+
+    .ml13 .letter {
+        display: inline-block;
+        line-height: 1em;
+    }
+</style>
+
+<div class="preloader">
+    <h2 class="ml13">
+        Onefishy&#39;s Blog
+    </h2>
+    <script>
+        var textWrapper = document.querySelector('.ml13');
+        // Split text into words
+        var words = textWrapper.textContent.trim().split(' ');
+
+        // Clear the existing content
+        textWrapper.innerHTML = '';
+
+        // Wrap each word and its letters in spans
+        words.forEach(function(word) {
+            var wordSpan = document.createElement('span');
+            wordSpan.classList.add('word');
+            wordSpan.innerHTML = word.replace(/\S/g, "<span class='letter'>$&</span>");
+            textWrapper.appendChild(wordSpan);
+            textWrapper.appendChild(document.createTextNode(' ')); // Add space between words
+        });
+
+        var animation = anime.timeline({ loop: true })
+            .add({
+                targets: '.ml13 .letter',
+                translateY: [20, 0],
+                translateZ: 0,
+                opacity: [0, 1],
+                filter: ['blur(5px)', 'blur(0px)'],
+                easing: "easeOutExpo",
+                duration: 1200,
+                delay: (el, i) => 300 + 20 * i,
+            })
+            .add({
+                targets: '.ml13 .letter',
+                translateY: [0, -20],
+                opacity: [1, 0],
+                filter: ['blur(0px)', 'blur(5px)'],
+                easing: "easeInExpo",
+                duration: 1000,
+                delay: (el, i) => 15 * i,
+                complete: function() {
+                    hidePreloader();
+                }
+            }, '-=700');
+
+
+        let themeStatus = JSON.parse(localStorage.getItem('REDEFINE-THEME-STATUS'))?.isDark;
+
+        // If the theme status is not found in local storage, check the preferred color scheme
+        if (themeStatus === undefined || themeStatus === null) {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                themeStatus = 'dark';
+            } else {
+                themeStatus = 'light';
+            }
+        }
+
+        // Now you can use the themeStatus variable in your code
+        if (themeStatus) {
+            document.documentElement.style.setProperty('--preloader-background-color', '#202124');
+            document.documentElement.style.setProperty('--preloader-text-color', '#fff');
+        } else {
+            document.documentElement.style.setProperty('--preloader-background-color', '#fff');
+            document.documentElement.style.setProperty('--preloader-text-color', '#000');
+        }
+
+        window.addEventListener('load', function () {
+            setTimeout(hidePreloader, 5000); // Call hidePreloader after 5000 milliseconds if not already called by animation
+        });
+
+        function hidePreloader() {
+            var preloader = document.querySelector('.preloader');
+            preloader.style.opacity = '0';
+            setTimeout(function () {
+                preloader.style.display = 'none';
+            }, 200);
+        }
+    </script>
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                Onefishy&#39;s Blog
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    文章
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/tags"
+                                        >
+                                    <i class="fa-regular fa-tags fa-fw"></i>
+                                    标签
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/about"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    关于
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                文章
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/tags"
+                        >
+                            <span>
+                                标签
+                            </span>
+                            
+                                <i class="fa-regular fa-tags fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/about"
+                        >
+                            <span>
+                                关于
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">8</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">4</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">7</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/redefine-avatar.png">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">Onefishy</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">生まれてよかった...</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2024-04-27 10:30</span>
+        <span class="mobile">2024-04-27 10:30</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-03-17 21:36:26</span>
+            <span class="mobile">2025-03-17 21:36:26</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/">项目实践</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E6%AE%8B%E5%B7%AE%E7%BD%91%E7%BB%9C/">残差网络</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h1 id="深度残差网络resnet代码实现详解pytorch复现cifar-10图像分类">深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</h1>
+<blockquote>
+<p>本文是<a href="/2024/04/22/ResNet/">《深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑》</a>的姊妹篇，专注于ResNet的代码实现。建议先阅读论文解读文章，了解ResNet的理论基础和核心思想，再学习本文的代码实现部分。</p>
+</blockquote>
+<p>在上一篇文章中，我们详细解读了何恺明等人提出的深度残差网络(ResNet)论文。本文将聚焦于ResNet的代码实现，通过PyTorch框架在CIFAR-10数据集上复现论文中的模型结构和实验结果。</p>
+<h2 id="项目概述">1. 项目概述</h2>
+<p>本项目旨在精确复现2016年发表的原始ResNet论文中的方法和结果，实现了多种深度的ResNet变体，包括标准ResNet
+(ResNet18/34/50/101/152) 和专为CIFAR-10设计的变体
+(ResNet20/32/44/56/110/1202)。</p>
+<p>项目的主要文件包括： - <code>resnet.py</code>: 定义ResNet模型架构 -
+<code>train.py</code>: 训练和评估脚本 - <code>run.sh</code>:
+训练脚本示例</p>
+<h2 id="残差块实现">2. 残差块实现</h2>
+<p>ResNet的核心是残差块(Residual Block)，它通过跳跃连接(shortcut
+connection)解决了深度网络的退化问题。我们实现了两种类型的残差块：基本残差块和瓶颈残差块。</p>
+<h3 id="基本残差块basicblock">2.1 基本残差块(BasicBlock)</h3>
+<p>基本残差块用于ResNet18/34等较浅的网络，结构为：两个3×3卷积层加上跳跃连接。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BasicBlock</span>(nn.Module):</span><br><span class="line">    <span class="string">"""基本残差块，用于ResNet18/34等较浅的网络"""</span></span><br><span class="line">    expansion = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, out_channels, stride=<span class="number">1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(BasicBlock, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="comment"># 原始论文中的基本残差块结构：</span></span><br><span class="line">        <span class="comment"># conv -&gt; BN -&gt; ReLU -&gt; conv -&gt; BN -&gt; 加上shortcut -&gt; ReLU</span></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=stride, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(out_channels)</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=<span class="number">1</span>, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn2 = nn.BatchNorm2d(out_channels)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.shortcut = nn.Sequential()</span><br><span class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> in_channels != out_channels * <span class="variable language_">self</span>.expansion:</span><br><span class="line">            <span class="variable language_">self</span>.shortcut = nn.Sequential(</span><br><span class="line">                nn.Conv2d(in_channels, out_channels * <span class="variable language_">self</span>.expansion, kernel_size=<span class="number">1</span>,</span><br><span class="line">                          stride=stride, bias=<span class="literal">False</span>),</span><br><span class="line">                nn.BatchNorm2d(out_channels * <span class="variable language_">self</span>.expansion)</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = <span class="variable language_">self</span>.bn2(<span class="variable language_">self</span>.conv2(out))</span><br><span class="line">        out += <span class="variable language_">self</span>.shortcut(x)  <span class="comment"># 关键的残差连接</span></span><br><span class="line">        out = F.relu(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure></div>
+<p>代码解析： 1. <code>expansion = 1</code>:
+表示输出通道数与指定的<code>out_channels</code>相同，没有扩展 2.
+两个3×3卷积层，每层后跟批量归一化(Batch Normalization) 3.
+<code>shortcut</code>连接：当输入和输出维度不匹配时(stride≠1或通道数不同)，使用1×1卷积进行维度调整
+4.
+前向传播中的<code>out += self.shortcut(x)</code>实现了残差连接，将输入直接加到卷积层的输出上</p>
+<h3 id="瓶颈残差块bottleneck">2.2 瓶颈残差块(Bottleneck)</h3>
+<p>瓶颈残差块用于ResNet50/101/152等较深的网络，结构为：1×1卷积降维 →
+3×3卷积 → 1×1卷积升维。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Bottleneck</span>(nn.Module):</span><br><span class="line">    <span class="string">"""瓶颈残差块，用于ResNet50/101/152等较深的网络"""</span></span><br><span class="line">    expansion = <span class="number">4</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, out_channels, stride=<span class="number">1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(Bottleneck, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(in_channels, out_channels,</span><br><span class="line">                               kernel_size=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(out_channels)</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=stride, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn2 = nn.BatchNorm2d(out_channels)</span><br><span class="line">        <span class="variable language_">self</span>.conv3 = nn.Conv2d(out_channels, out_channels * <span class="variable language_">self</span>.expansion,</span><br><span class="line">                               kernel_size=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn3 = nn.BatchNorm2d(out_channels * <span class="variable language_">self</span>.expansion)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.shortcut = nn.Sequential()</span><br><span class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> in_channels != out_channels * <span class="variable language_">self</span>.expansion:</span><br><span class="line">            <span class="variable language_">self</span>.shortcut = nn.Sequential(</span><br><span class="line">                nn.Conv2d(in_channels, out_channels * <span class="variable language_">self</span>.expansion,</span><br><span class="line">                          kernel_size=<span class="number">1</span>, stride=stride, bias=<span class="literal">False</span>),</span><br><span class="line">                nn.BatchNorm2d(out_channels * <span class="variable language_">self</span>.expansion)</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn2(<span class="variable language_">self</span>.conv2(out)))</span><br><span class="line">        out = <span class="variable language_">self</span>.bn3(<span class="variable language_">self</span>.conv3(out))</span><br><span class="line">        out += <span class="variable language_">self</span>.shortcut(x)  <span class="comment"># 残差连接</span></span><br><span class="line">        out = F.relu(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure></div>
+<p>代码解析： 1. <code>expansion = 4</code>:
+表示输出通道数是指定<code>out_channels</code>的4倍 2. 三个卷积层： -
+1×1卷积降维：减少通道数，降低计算复杂度 - 3×3卷积：主要的特征提取 -
+1×1卷积升维：恢复/扩展通道数 3.
+瓶颈设计大大减少了参数量和计算复杂度，同时保持了性能</p>
+<h2 id="resnet网络架构">3. ResNet网络架构</h2>
+<p>我们实现了两种ResNet变体：标准ResNet和CIFAR-10专用ResNet。</p>
+<h3 id="标准resnet">3.1 标准ResNet</h3>
+<p>标准ResNet架构适用于ImageNet等大型数据集，但我们也可以将其应用于CIFAR-10。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ResNet</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, block, num_blocks, num_classes=<span class="number">10</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(ResNet, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.in_channels = <span class="number">64</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># CIFAR-10使用3x3卷积，步长为1</span></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(<span class="number">3</span>, <span class="number">64</span>, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=<span class="number">1</span>, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(<span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 构建残差层</span></span><br><span class="line">        <span class="variable language_">self</span>.layer1 = <span class="variable language_">self</span>._make_layer(block, <span class="number">64</span>, num_blocks[<span class="number">0</span>], stride=<span class="number">1</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer2 = <span class="variable language_">self</span>._make_layer(block, <span class="number">128</span>, num_blocks[<span class="number">1</span>], stride=<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer3 = <span class="variable language_">self</span>._make_layer(block, <span class="number">256</span>, num_blocks[<span class="number">2</span>], stride=<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer4 = <span class="variable language_">self</span>._make_layer(block, <span class="number">512</span>, num_blocks[<span class="number">3</span>], stride=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 全连接层</span></span><br><span class="line">        <span class="variable language_">self</span>.fc = nn.Linear(<span class="number">512</span> * block.expansion, num_classes)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_make_layer</span>(<span class="params">self, block, out_channels, num_blocks, stride</span>):</span><br><span class="line">        strides = [stride] + [<span class="number">1</span>] * (num_blocks - <span class="number">1</span>)</span><br><span class="line">        layers = []</span><br><span class="line">        <span class="keyword">for</span> stride <span class="keyword">in</span> strides:</span><br><span class="line">            layers.append(block(<span class="variable language_">self</span>.in_channels, out_channels, stride))</span><br><span class="line">            <span class="variable language_">self</span>.in_channels = out_channels * block.expansion</span><br><span class="line">        <span class="keyword">return</span> nn.Sequential(*layers)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = <span class="variable language_">self</span>.layer1(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer2(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer3(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer4(out)</span><br><span class="line">        out = F.avg_pool2d(out, <span class="number">4</span>)</span><br><span class="line">        out = out.view(out.size(<span class="number">0</span>), -<span class="number">1</span>)</span><br><span class="line">        out = <span class="variable language_">self</span>.fc(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure></div>
+<p>代码解析： 1.
+初始层：3×3卷积，64个滤波器，步长为1（与ImageNet版本不同，ImageNet使用7×7卷积，步长为2）
+2. 四个阶段的残差层，通道数分别为64、128、256、512 3.
+<code>_make_layer</code>方法：构建每个阶段的残差块序列，第一个块可能改变步长和通道数，后续块保持相同的通道数和步长1
+4. 全局平均池化和全连接层用于最终分类</p>
+<h3 id="cifar-10专用resnet">3.2 CIFAR-10专用ResNet</h3>
+<p>CIFAR-10专用ResNet变体严格按照原始论文中的设计，更适合CIFAR-10这样的小型数据集。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CifarResNet</span>(nn.Module):</span><br><span class="line">    <span class="string">"""专为CIFAR-10设计的ResNet变体，结构与原始论文一致"""</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, block, num_blocks, num_classes=<span class="number">10</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(CifarResNet, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="comment"># 原始论文中CIFAR-10的ResNet结构：</span></span><br><span class="line">        <span class="comment"># 第一层：3x3卷积，16个滤波器</span></span><br><span class="line">        <span class="comment"># 然后是3个阶段，每个阶段有n个残差块</span></span><br><span class="line">        <span class="comment"># 第一阶段：16个滤波器</span></span><br><span class="line">        <span class="comment"># 第二阶段：32个滤波器，第一个残差块步长为2</span></span><br><span class="line">        <span class="comment"># 第三阶段：64个滤波器，第一个残差块步长为2</span></span><br><span class="line">        <span class="comment"># 最后是全局平均池化和全连接层</span></span><br><span class="line">        <span class="variable language_">self</span>.in_channels = <span class="number">16</span></span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(<span class="number">3</span>, <span class="number">16</span>, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=<span class="number">1</span>, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(<span class="number">16</span>)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.layer1 = <span class="variable language_">self</span>._make_layer(block, <span class="number">16</span>, num_blocks[<span class="number">0</span>], stride=<span class="number">1</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer2 = <span class="variable language_">self</span>._make_layer(block, <span class="number">32</span>, num_blocks[<span class="number">1</span>], stride=<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer3 = <span class="variable language_">self</span>._make_layer(block, <span class="number">64</span>, num_blocks[<span class="number">2</span>], stride=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.fc = nn.Linear(<span class="number">64</span> * block.expansion, num_classes)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_make_layer</span>(<span class="params">self, block, out_channels, num_blocks, stride</span>):</span><br><span class="line">        strides = [stride] + [<span class="number">1</span>] * (num_blocks - <span class="number">1</span>)</span><br><span class="line">        layers = []</span><br><span class="line">        <span class="keyword">for</span> stride <span class="keyword">in</span> strides:</span><br><span class="line">            layers.append(block(<span class="variable language_">self</span>.in_channels, out_channels, stride))</span><br><span class="line">            <span class="variable language_">self</span>.in_channels = out_channels * block.expansion</span><br><span class="line">        <span class="keyword">return</span> nn.Sequential(*layers)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = <span class="variable language_">self</span>.layer1(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer2(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer3(out)</span><br><span class="line">        <span class="comment"># 原始论文中，CIFAR-10图像大小为32x32</span></span><br><span class="line">        <span class="comment"># 经过3个阶段，每个阶段的第一个block有stride=2（除了第一阶段），所以尺寸变为32-&gt;32-&gt;16-&gt;8</span></span><br><span class="line">        <span class="comment"># 因此最终特征图大小为8x8，需要使用8x8的平均池化</span></span><br><span class="line">        out = F.avg_pool2d(out, <span class="number">8</span>)</span><br><span class="line">        out = out.view(out.size(<span class="number">0</span>), -<span class="number">1</span>)</span><br><span class="line">        out = <span class="variable language_">self</span>.fc(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure></div>
+<p>代码解析： 1. 初始层：3×3卷积，16个滤波器（比标准ResNet少） 2.
+三个阶段的残差层，通道数分别为16、32、64（比标准ResNet少） 3.
+每个阶段的残差块数量由<code>num_blocks</code>参数决定，决定了网络的深度
+4.
+最终使用8×8的全局平均池化，因为CIFAR-10图像经过网络后的特征图大小为8×8</p>
+<h2 id="不同深度的resnet变体">4. 不同深度的ResNet变体</h2>
+<p>我们实现了多种不同深度的ResNet变体，包括标准ResNet和CIFAR-10专用ResNet。</p>
+<h3 id="标准resnet变体">4.1 标准ResNet变体</h3>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet18</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(BasicBlock, [<span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet34</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(BasicBlock, [<span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet50</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(Bottleneck, [<span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet101</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(Bottleneck, [<span class="number">3</span>, <span class="number">4</span>, <span class="number">23</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet152</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(Bottleneck, [<span class="number">3</span>, <span class="number">8</span>, <span class="number">36</span>, <span class="number">3</span>], num_classes)</span><br></pre></td></tr></table></figure></div>
+<p>这些函数创建不同深度的标准ResNet模型： -
+ResNet18/34使用基本残差块(BasicBlock) -
+ResNet50/101/152使用瓶颈残差块(Bottleneck) -
+列表[a,b,c,d]指定了四个阶段中每个阶段的残差块数量</p>
+<h3 id="cifar-10专用resnet变体">4.2 CIFAR-10专用ResNet变体</h3>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet20</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet20"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet32</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet32"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">5</span>, <span class="number">5</span>, <span class="number">5</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet44</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet44"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">7</span>, <span class="number">7</span>, <span class="number">7</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet56</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet56"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">9</span>, <span class="number">9</span>, <span class="number">9</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet110</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet110"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">18</span>, <span class="number">18</span>, <span class="number">18</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet1202</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet1202"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">200</span>, <span class="number">200</span>, <span class="number">200</span>], num_classes)</span><br></pre></td></tr></table></figure></div>
+<p>这些函数创建不同深度的CIFAR-10专用ResNet模型： -
+所有CIFAR-10专用模型都使用基本残差块(BasicBlock) -
+列表[a,b,c]指定了三个阶段中每个阶段的残差块数量 -
+总层数计算：2(初始卷积+最终FC) +
+6n(每个残差块2层，共3n个残差块)，例如ResNet20中n=3，所以总层数为2+6×3=20</p>
+<h2 id="训练与数据处理">5. 训练与数据处理</h2>
+<p>训练脚本(<code>train.py</code>)实现了模型的训练、评估和可视化。以下是关键部分的代码解析：</p>
+<h3 id="数据预处理">5.1 数据预处理</h3>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Data preprocessing</span></span><br><span class="line">transform_train = transforms.Compose([</span><br><span class="line">    <span class="comment"># 原始论文中的数据增强：4像素padding后随机裁剪到32x32</span></span><br><span class="line">    transforms.RandomCrop(<span class="number">32</span>, padding=<span class="number">4</span>),</span><br><span class="line">    <span class="comment"># 随机水平翻转</span></span><br><span class="line">    transforms.RandomHorizontalFlip(),</span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    <span class="comment"># 使用CIFAR-10的均值和标准差进行归一化</span></span><br><span class="line">    transforms.Normalize((<span class="number">0.4914</span>, <span class="number">0.4822</span>, <span class="number">0.4465</span>),</span><br><span class="line">                         (<span class="number">0.2023</span>, <span class="number">0.1994</span>, <span class="number">0.2010</span>)),</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">transform_test = transforms.Compose([</span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    <span class="comment"># 测试集只需要归一化，不需要数据增强</span></span><br><span class="line">    transforms.Normalize((<span class="number">0.4914</span>, <span class="number">0.4822</span>, <span class="number">0.4465</span>),</span><br><span class="line">                         (<span class="number">0.2023</span>, <span class="number">0.1994</span>, <span class="number">0.2010</span>)),</span><br><span class="line">])</span><br></pre></td></tr></table></figure></div>
+<p>数据预处理遵循原始论文中的设置： 1.
+训练集：4像素填充后随机裁剪到32×32、随机水平翻转、归一化 2.
+测试集：只进行归一化，不使用数据增强 3.
+归一化使用CIFAR-10数据集的均值和标准差</p>
+<h3 id="学习率调度">5.2 学习率调度</h3>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 学习率调度：原始论文中在32k和48k迭代时将学习率除以10</span></span><br><span class="line"><span class="comment"># 对于批量大小128，这相当于约82和123个epoch</span></span><br><span class="line">scheduler = optim.lr_scheduler.MultiStepLR(</span><br><span class="line">    optimizer, milestones=[<span class="number">82</span>, <span class="number">123</span>], gamma=<span class="number">0.1</span>)</span><br></pre></td></tr></table></figure></div>
+<p>学习率调度遵循原始论文中的设置： 1. 初始学习率为0.1 2.
+在训练过程中的特定时间点（原论文中为32k和48k迭代）将学习率除以10 3.
+对于CIFAR-10数据集（50k训练样本）和批量大小128，这相当于约82和123个epoch</p>
+<h2 id="实验结果与分析">6. 实验结果与分析</h2>
+<p>通过运行训练脚本，我们可以复现原始论文中的实验结果。以下是一些关键观察：</p>
+<ol type="1">
+<li><p><strong>深度与性能</strong>：在一定范围内，网络深度的增加通常会带来性能提升。例如，ResNet56通常比ResNet20表现更好。</p></li>
+<li><p><strong>过深网络的过拟合</strong>：对于CIFAR-10这样的小型数据集，过深的网络（如ResNet1202）可能会导致过拟合，性能不如较浅的网络。</p></li>
+<li><p><strong>残差连接的有效性</strong>：通过比较有无残差连接的网络，可以明显看到残差连接使得训练非常深的网络成为可能，有效解决了深度网络的梯度消失问题。</p></li>
+<li><p><strong>标准ResNet
+vs. CIFAR专用ResNet</strong>：CIFAR专用的ResNet变体通常在CIFAR-10上表现更好，因为它们的设计更适合小型图像。</p></li>
+</ol>
+<h2 id="总结">7. 总结</h2>
+<p>通过这个项目，我们成功复现了何恺明等人提出的深度残差网络(ResNet)，并在CIFAR-10数据集上验证了其有效性。代码实现遵循了原始论文中的设计原则，包括网络架构、残差块结构、数据预处理和训练策略。</p>
+<p>ResNet的核心创新——残差连接——使得训练超深网络成为可能，解决了深度神经网络的退化问题。这一简单而优雅的设计已经成为现代深度学习架构的基石，影响了后续众多网络的设计。</p>
+<p>通过亲自实现和训练ResNet，我们不仅加深了对这一经典架构的理解，也体验了深度学习研究中复现和验证的重要性。希望这个项目能够帮助更多人理解ResNet的工作原理和实现细节。</p>
+<h2 id="参考资料">参考资料</h2>
+<p>[1] He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016). Deep Residual
+Learning for Image Recognition. In Proceedings of the IEEE Conference on
+Computer Vision and Pattern Recognition (CVPR), pp. 770-778.</p>
+<p>[2] PyTorch官方文档: https://pytorch.org/docs/stable/index.html</p>
+<p>[3] CIFAR-10数据集: https://www.cs.toronto.edu/~kriz/cifar.html</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> 深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</li>
+        <li><strong>作者:</strong> Onefishy</li>
+        <li><strong>创建于
+                :</strong> 2024-04-27 10:30:00</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-03-17 21:36:26
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://onef1shy.github.io/2024/04/27/ResNet-Code/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E6%AE%8B%E5%B7%AE%E7%BD%91%E7%BB%9C/">#残差网络</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2024/07/20/Google_Scholar_Crawler/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item">从0到1：构建智能化Google Scholar文献爬虫</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2024/04/22/ResNet/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item">深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="gitalk-container"></div>
+    <script data-swup-reload-script
+            src="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.8.0/gitalk.min.js"></script>
+    <script data-swup-reload-script>
+
+        function loadGitalk() {
+            let __gitalk__pathname = decodeURI(location.pathname);
+            const __gitalk__pathnameLength = __gitalk__pathname.length;
+            const __gitalk__pathnameMaxLength = 50;
+            if (__gitalk__pathnameLength > __gitalk__pathnameMaxLength) {
+                __gitalk__pathname = __gitalk__pathname.substring(0, __gitalk__pathnameMaxLength - 3) + '...';
+            }
+
+            try {
+                Gitalk && new Gitalk({
+                    clientID: 'Ov23liq2fiQzooWJAry8',
+                    clientSecret: '2d86e55d52819ff01c5cb7033ed5d70f60320a4d',
+                    repo: 'gitalk',
+                    owner: 'onef1shy',
+                    admin: ['onef1shy'],
+                    id: __gitalk__pathname,
+                    language: 'zh-CN',
+                    proxy: 'https://strong-caramel-969805.netlify.app/github_access_token'
+                }).render('gitalk-container');
+
+            } catch (e) {
+                window.Gitalk = null;
+            }
+        }
+
+        if ('true') {
+            const loadGitalkTimeout = setTimeout(() => {
+                loadGitalk();
+                clearTimeout(loadGitalkTimeout);
+            }, 1000);
+        } else {
+            window.addEventListener('DOMContentLoaded', loadGitalk);
+        }
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E6%AE%8B%E5%B7%AE%E7%BD%91%E7%BB%9Cresnet%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%E8%AF%A6%E8%A7%A3pytorch%E5%A4%8D%E7%8E%B0cifar-10%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB"><span class="nav-text">深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0"><span class="nav-text">1. 项目概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AE%8B%E5%B7%AE%E5%9D%97%E5%AE%9E%E7%8E%B0"><span class="nav-text">2. 残差块实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%AE%8B%E5%B7%AE%E5%9D%97basicblock"><span class="nav-text">2.1 基本残差块(BasicBlock)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%93%B6%E9%A2%88%E6%AE%8B%E5%B7%AE%E5%9D%97bottleneck"><span class="nav-text">2.2 瓶颈残差块(Bottleneck)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#resnet%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84"><span class="nav-text">3. ResNet网络架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E5%87%86resnet"><span class="nav-text">3.1 标准ResNet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cifar-10%E4%B8%93%E7%94%A8resnet"><span class="nav-text">3.2 CIFAR-10专用ResNet</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%B7%B1%E5%BA%A6%E7%9A%84resnet%E5%8F%98%E4%BD%93"><span class="nav-text">4. 不同深度的ResNet变体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E5%87%86resnet%E5%8F%98%E4%BD%93"><span class="nav-text">4.1 标准ResNet变体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cifar-10%E4%B8%93%E7%94%A8resnet%E5%8F%98%E4%BD%93"><span class="nav-text">4.2 CIFAR-10专用ResNet变体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86"><span class="nav-text">5. 训练与数据处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-text">5.1 数据预处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%8E%87%E8%B0%83%E5%BA%A6"><span class="nav-text">5.2 学习率调度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%E4%B8%8E%E5%88%86%E6%9E%90"><span class="nav-text">6. 实验结果与分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">7. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-text">参考资料</span></a></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2024</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">Onefishy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 7 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.2</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+<script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/libs/Swup.min.js" ></script><script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/libs/SwupSlideTheme.min.js" ></script><script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/libs/SwupScriptsPlugin.min.js" ></script><script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/libs/SwupProgressPlugin.min.js" ></script><script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/libs/SwupScrollPlugin.min.js" ></script><script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/libs/SwupPreloadPlugin.min.js" ></script>
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	<script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/imageViewer.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/utils.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/main.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/layouts/navbarShrink.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/scrollTopBottom.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/lightDarkSwitch.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/layouts/categoryList.js" ></script>
+
+
+    <script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/localSearch.js" ></script>
+
+
+
+    <script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/codeBlock.js" ></script>
+
+
+
+    <script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/layouts/lazyload.js" ></script>
+
+
+
+    <script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/runtime.js" ></script>
+    <script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/libs/odometer.min.js" ></script>
+    <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/assets/odometer-theme-minimal.css">
+
+
+
+  <script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/libs/Typed.min.js" ></script>
+  <script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/plugins/typed.js" ></script>
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    <script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/plugins/mermaid.js" ></script>
+
+
+
+
+
+
+
+
+    <script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/tocToggle.js" data-swup-reload-script></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/layouts/toc.js" data-swup-reload-script></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/plugins/tabs.js" data-swup-reload-script></script>
+
+
+<script  src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/libs/moment-with-locales.min.js" data-swup-reload-script></script>
+<script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/layouts/essays.js" data-swup-reload-script></script>
+
+
+
+
+	
+</body>
+
+</html>

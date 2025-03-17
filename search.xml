@@ -58,6 +58,187 @@ Album页面</a></p>
       </tags>
   </entry>
   <entry>
+    <title>从0到1：构建智能化Google Scholar文献爬虫</title>
+    <url>/2024/07/20/Google_Scholar_Crawler/</url>
+    <content><![CDATA[<h2 id="缘起">缘起</h2>
+<p>Google
+Scholar（谷歌学术）作为全球最大的学术搜索引擎之一，已经成为科研工作者不可或缺的文献检索工具。它不仅收录了海量的学术文献，更重要的是构建了完整的文献引用关系网络，这对于理解研究脉络、追踪学术前沿具有重要意义。</p>
+<p>在学术研究中，我们经常需要： 1. 追踪某个研究领域的发展历程 2.
+分析高影响力论文的引用关系 3. 了解某位学者的研究方向和成果 4.
+发现研究热点和创新点</p>
+<p>然而，手动在Google
+Scholar上检索和整理这些信息是一项耗时的工作。特别是当需要分析大量论文的引用关系时，人工操作不仅效率低下，还容易出错。这促使我思考：能否开发一个自动化工具，来高效完成这些任务？</p>
+<p>于是，这个Google
+Scholar爬虫项目应运而生。这个工具旨在自动化文献信息的采集和整理过程，帮助研究者更专注于学术内容本身的分析和创新。</p>
+<h2 id="核心技术实现">核心技术实现</h2>
+<h3 id="系统架构设计">1. 系统架构设计</h3>
+<p>在开发这个爬虫之前，我们需要解决几个关键问题： -
+如何模拟真实用户的浏览行为？ - 如何处理Google Scholar的反爬机制？ -
+如何高效地存储和组织数据？</p>
+<p>基于这些考虑，我们设计了以下系统架构：</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Gather</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">        <span class="comment"># 初始化Chrome浏览器选项</span></span><br><span class="line">        option = Options()</span><br><span class="line">        <span class="comment"># option.add_argument(&#x27;--headless&#x27;)  # 可选：启用无头模式</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 使用webdriver_manager自动管理ChromeDriver</span></span><br><span class="line">        service = Service(ChromeDriverManager().install())</span><br><span class="line">        <span class="variable language_">self</span>.driver = webdriver.Chrome(</span><br><span class="line">            service=service, options=option)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 初始化数据存储</span></span><br><span class="line">        <span class="variable language_">self</span>.Passage_name = []  <span class="comment"># 存储文章名称</span></span><br><span class="line">        <span class="variable language_">self</span>.Cited_by = []     <span class="comment"># 存储被引用次数</span></span><br><span class="line">        <span class="variable language_">self</span>.src = []          <span class="comment"># 存储链接</span></span><br><span class="line">        <span class="variable language_">self</span>.name = <span class="string">&quot;&quot;</span>         <span class="comment"># 存储作者名称</span></span><br></pre></td></tr></table></figure></div>
+<p>这段代码中的每个组件都有其特定用途：</p>
+<ol type="1">
+<li><strong>浏览器自动化（Selenium WebDriver）</strong>
+<ul>
+<li>选择Selenium而不是requests的原因是Google
+Scholar大量使用JavaScript动态加载内容</li>
+<li><code>webdriver_manager</code>自动下载和管理ChromeDriver，避免版本不匹配问题</li>
+<li>支持无头模式（headless），适合在服务器环境运行</li>
+</ul></li>
+<li><strong>数据结构设计</strong>
+<ul>
+<li>使用列表存储文章信息，便于动态增长</li>
+<li>分别存储文章名称、引用次数和链接，保持数据的关联性</li>
+<li>实时更新作者信息，确保数据的完整性</li>
+</ul></li>
+</ol>
+<h3 id="验证码突破方案">2. 验证码突破方案</h3>
+<p>Google
+Scholar使用reCAPTCHA作为反爬虫机制，这是一个难点。经过多次尝试，我们发现了一个巧妙的解决方案：利用reCAPTCHA的音频验证功能。</p>
+<p>整个验证码突破流程如下：</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">pass_recaptha</span>(<span class="params">self</span>):</span><br><span class="line">    <span class="comment"># 第一步：定位并切换到验证码iframe</span></span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">15</span>, <span class="number">0.5</span>).until(</span><br><span class="line">        EC.visibility_of_element_located((By.XPATH,</span><br><span class="line">                                          <span class="string">&#x27;//*[@id=&quot;gs_captcha_c&quot;]/div/div/iframe&#x27;</span>)))</span><br><span class="line">    <span class="variable language_">self</span>.driver.switch_to.frame(<span class="variable language_">self</span>.driver.find_element(By.XPATH,</span><br><span class="line">                                                         <span class="string">&#x27;//*[@id=&quot;gs_captcha_c&quot;]/div/div/iframe&#x27;</span>))</span><br></pre></td></tr></table></figure></div>
+<p>这里使用了<code>WebDriverWait</code>而不是固定延时，原因是： -
+页面加载速度受网络影响，固定延时不可靠 -
+动态等待可以在元素出现时立即进行下一步 - 超时机制可以及时发现异常</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="comment"># 第二步：切换到音频验证模式</span></span><br><span class="line">    <span class="variable language_">self</span>.driver.switch_to.default_content()</span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">15</span>, <span class="number">0.5</span>).until(</span><br><span class="line">        EC.visibility_of_element_located((By.XPATH, <span class="string">&#x27;/html/body/div[2]/div[4]/iframe&#x27;</span>)))</span><br><span class="line">    <span class="variable language_">self</span>.driver.switch_to.frame(<span class="variable language_">self</span>.driver.find_element(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;/html/body/div[2]/div[4]/iframe&#x27;</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 第三步：获取音频文件</span></span><br><span class="line">    button = <span class="variable language_">self</span>.driver.find_element(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;recaptcha-audio-button&quot;]&#x27;</span>)</span><br><span class="line">    button.click()</span><br><span class="line">    msg_url = <span class="variable language_">self</span>.driver.find_element(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;rc-audio&quot;]/div[7]/a&#x27;</span>).get_attribute(<span class="string">&quot;href&quot;</span>)</span><br></pre></td></tr></table></figure></div>
+<p>音频验证的优势： - 相比图像验证码，音频内容更容易识别 -
+Google对音频验证的限制相对较少 - 可以利用成熟的语音识别API</p>
+<h3 id="音频识别实现">3. 音频识别实现</h3>
+<p>音频识别使用腾讯云的语音识别服务，这个选择基于以下考虑： -
+支持英文音频识别 - API调用简单稳定 - 识别准确率高</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">upload</span>(<span class="params">self, msg_url</span>):</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment"># 步骤1：配置腾讯云认证</span></span><br><span class="line">        cred = credential.Credential(<span class="variable language_">self</span>.SecretId, <span class="variable language_">self</span>.SecretKey)</span><br><span class="line">        httpProfile = HttpProfile()</span><br><span class="line">        httpProfile.endpoint = <span class="string">&quot;asr.tencentcloudapi.com&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 步骤2：创建识别任务</span></span><br><span class="line">        client = asr_client.AsrClient(cred, <span class="string">&quot;&quot;</span>, clientProfile)</span><br><span class="line">        req = models.CreateRecTaskRequest()</span><br><span class="line">        params = &#123;</span><br><span class="line">            <span class="string">&quot;EngineModelType&quot;</span>: <span class="string">&quot;16k_en&quot;</span>,  <span class="comment"># 选择英文识别引擎</span></span><br><span class="line">            <span class="string">&quot;ChannelNum&quot;</span>: <span class="number">1</span>,              <span class="comment"># 单声道音频</span></span><br><span class="line">            <span class="string">&quot;ResTextFormat&quot;</span>: <span class="number">0</span>,           <span class="comment"># 文本格式</span></span><br><span class="line">            <span class="string">&quot;SourceType&quot;</span>: <span class="number">0</span>,              <span class="comment"># URL方式上传</span></span><br><span class="line">            <span class="string">&quot;Url&quot;</span>: msg_url</span><br><span class="line">        &#125;</span><br><span class="line">        req.from_json_string(json.dumps(params))</span><br></pre></td></tr></table></figure></div>
+<p>识别过程的关键点： 1. 选择合适的识别引擎（16k采样率英文模型） 2.
+使用URL方式上传，避免音频文件下载和本地存储 3.
+异步任务处理，避免程序阻塞</p>
+<h3 id="数据采集实现">4. 数据采集实现</h3>
+<p>数据采集分为两个主要步骤：获取文章列表和收集引用信息。这里的难点是如何准确定位和提取所需信息。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">JumpInfo</span>(<span class="params">self</span>):</span><br><span class="line">    <span class="comment"># 步骤1：等待页面加载完成</span></span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">3</span>).until(EC.presence_of_element_located(</span><br><span class="line">        (By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[2]/a&#x27;</span>)))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 步骤2：定位关键元素</span></span><br><span class="line">    Passage_name = <span class="variable language_">self</span>.driver.find_elements(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[1]/a&#x27;</span>)</span><br><span class="line">    Cited_by = <span class="variable language_">self</span>.driver.find_elements(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[2]/a&#x27;</span>)</span><br></pre></td></tr></table></figure></div>
+<p>XPath定位的优势： - 相比CSS选择器更灵活 - 可以准确定位层级关系 -
+支持复杂的条件筛选</p>
+<p>对于引用信息的收集，我们采用分页处理：</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">collectInfo</span>(<span class="params">self, <span class="built_in">id</span></span>):</span><br><span class="line">    base_url = <span class="variable language_">self</span>.src[<span class="built_in">id</span>]</span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> <span class="built_in">range</span>(<span class="variable language_">self</span>.page_no):</span><br><span class="line">        <span class="comment"># 构造分页URL</span></span><br><span class="line">        extend = <span class="string">f&#x27;&amp;start=<span class="subst">&#123;num*<span class="number">10</span>&#125;</span>&#x27;</span></span><br><span class="line">        url = base_url+extend</span><br><span class="line">        HTML = <span class="variable language_">self</span>.get_html(url)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 提取引用文章信息</span></span><br><span class="line">        cite_page_name = HTML.xpath(<span class="string">&#x27;//h3/a&#x27;</span>)</span><br><span class="line">        cite_page_src = HTML.xpath(<span class="string">&#x27;//h3/a/@href&#x27;</span>)</span><br><span class="line">        cite_aut_name = HTML.xpath(</span><br><span class="line">            <span class="string">&#x27;//*[@id=&quot;gs_res_ccl_mid&quot;]/div/div/div[1]&#x27;</span>)</span><br></pre></td></tr></table></figure></div>
+<p>数据解析的关键技术： 1. 使用XPath提取结构化数据 2.
+智能分割作者和出版信息 3. 实时保存避免数据丢失</p>
+<p>每条引用信息的处理都经过精心设计： <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 解析作者和出版信息</span></span><br><span class="line">split_index = aut_name.find(<span class="string">&#x27; - &#x27;</span>)</span><br><span class="line"><span class="keyword">if</span> split_index != -<span class="number">1</span>:</span><br><span class="line">    authors = aut_name[:split_index].strip()</span><br><span class="line">    publication_info = aut_name[split_index + <span class="number">3</span>:].strip()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 格式化输出</span></span><br><span class="line"><span class="variable language_">self</span>.file.write(<span class="string">f&quot;\tCited_By_Passage: <span class="subst">&#123;page_name.text&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Author: <span class="subst">&#123;authors&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Journal: <span class="subst">&#123;publication_info&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure></div></p>
+<p>这种结构化的存储格式有以下优势： - 便于后续数据分析 -
+可以轻松转换为其他格式 - 保持了数据的层级关系</p>
+<h2 id="踩过的坑">踩过的坑</h2>
+<p>在开发过程中遇到了一些典型的问题，这里详细分享一下解决思路，希望能帮助到同样遇到这些问题的朋友。</p>
+<h3 id="页面元素定位问题">1. 页面元素定位问题</h3>
+<p>这是使用Selenium最常遇到的问题。最初的代码是这样的：
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">time.sleep(<span class="number">3</span>)  <span class="comment"># 固定等待3秒</span></span><br><span class="line">element = driver.find_element(By.XPATH, <span class="string">&#x27;...&#x27;</span>)</span><br></pre></td></tr></table></figure></div></p>
+<p>这种方式在实际运行中经常出现<code>NoSuchElementException</code>错误，原因是：
+- 网络速度不同，页面加载时间不固定 - 3秒可能太短，元素还没加载出来 -
+有时候3秒又太长，浪费等待时间</p>
+<p>改进后的代码： <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 最多等待15秒，每0.5秒检查一次</span></span><br><span class="line">WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">15</span>, <span class="number">0.5</span>).until(</span><br><span class="line">    EC.visibility_of_element_located((By.XPATH, <span class="string">&#x27;...&#x27;</span>))</span><br><span class="line">)</span><br></pre></td></tr></table></figure></div></p>
+<p>这样的好处是： - 元素出现就立即操作，不用等待固定时间 -
+超时会抛出明确的异常，便于处理 - 程序运行更加稳定和高效</p>
+<h3 id="验证码处理难题">2. 验证码处理难题</h3>
+<p>Google Scholar的验证码机制是一大难点。它提供了两种验证方式：</p>
+<ol type="1">
+<li>传统的图片验证码：需要识别图片中的文字或选择特定图片</li>
+<li>音频验证码：播放一段语音，输入听到的内容</li>
+</ol>
+<p>最初我们考虑过图片验证码的方案，但存在以下问题： -
+Google会动态调整验证码的难度 - 需要处理复杂的图片选择任务</p>
+<p>最终选择音频验证方案的原因： - 语音内容相对清晰，便于识别 -
+可以利用成熟的语音识别API - 实现逻辑相对简单：下载音频 -&gt; 识别文字
+-&gt; 填写结果</p>
+<h3 id="数据存储和处理">3. 数据存储和处理</h3>
+<p>数据存储看似简单，但要考虑实用性。最初的存储方式是直接写入文本：
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">file.write(<span class="string">f&quot;<span class="subst">&#123;title&#125;</span> - <span class="subst">&#123;author&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure></div></p>
+<p>这种方式带来的问题： - 数据格式不统一，难以解析 -
+无法方便地提取特定信息 - 不利于后续的数据分析</p>
+<p>改进后采用了结构化的存储格式： <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="variable language_">self</span>.file.write(<span class="string">f&quot;\tCited_By_Passage: <span class="subst">&#123;page_name.text&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Author: <span class="subst">&#123;authors&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Journal: <span class="subst">&#123;publication_info&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure></div></p>
+<p>这样改进的好处： - 数据结构清晰，易于理解 -
+可以轻松转换为JSON或CSV格式 - 方便后续进行数据分析和可视化</p>
+<h2 id="未来优化方向">未来优化方向</h2>
+<ol type="1">
+<li><strong>并发优化</strong>
+<ul>
+<li>实现多线程数据采集</li>
+<li>添加代理IP池支持</li>
+<li>优化请求频率控制</li>
+</ul></li>
+<li><strong>数据分析功能</strong>
+<ul>
+<li>添加引用网络分析</li>
+<li>实现作者关系图谱</li>
+<li>支持数据可视化导出</li>
+</ul></li>
+</ol>
+<h2 id="完整代码">完整代码</h2>
+<p>完整的项目代码已经上传到GitHub：<a class="link" 
+ href="https://github.com/onef1shy/Google-Scholar" >GitHub -
+Google-Scholar</a></p>
+<p>如果这个项目对您有帮助，欢迎给仓库点个star⭐️。如有任何问题或建议，也欢迎在评论区留言交流。</p>
+]]></content>
+      <categories>
+        <category>技术随笔</category>
+      </categories>
+      <tags>
+        <tag>爬虫实战</tag>
+        <tag>科研工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Love Choice 💝</title>
+    <url>/2025/02/14/Love_Choice/</url>
+    <content><![CDATA[<h2 id="一个特别的告白页面">💕 一个特别的告白页面</h2>
+<p>还在为如何表达爱意而烦恼吗？这个充满创意的交互式告白页面也许能给你一些灵感！它不仅有着温馨浪漫的设计，还加入了俏皮可爱的交互效果
+——
+当对方想要点击”不要”时，按钮会调皮地逃走；而”可以”按钮则会越变越大，仿佛在说”选我选我”！这样独特的表白方式，一定能让你的心意传达得更加特别～
+🌟</p>
+<h3 id="页面特色">🎨 页面特色</h3>
+<ul>
+<li>可爱的动画表情</li>
+<li>粉色温馨背景</li>
+<li>简单而温暖的告白文字</li>
+<li>互动式的选择按钮</li>
+</ul>
+<h3 id="如何使用">💌 如何使用</h3>
+<p>当你点击下面的链接，你将看到一个超级可爱的小人儿，它会问你一个重要的问题：</p>
+<blockquote>
+<p>“可以成为我的恋人吗？”</p>
+</blockquote>
+<p>你可以选择： - 点击 “可以” - 会看到开心的表情 🥰 - 点击 “不要” -
+别担心，还会有惊喜哦 😉</p>
+<h3 id="快来体验">🌟 快来体验</h3>
+<p>点击下面的链接，开启一段甜蜜的告白之旅吧：</p>
+<p><a href="https://onef1shy.github.io/Love_Choice">打开Love
+Choice页面</a></p>
+<figure>
+<img 
+
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://raw.githubusercontent.com/onef1shy/Love_Choice/main/images/heart.png"
+                     
+alt="告白页面预览" 
+                >
+<figcaption aria-hidden="true">告白页面预览</figcaption>
+</figure>
+<blockquote>
+<p>💡 小提示：无论选择哪个按钮，都会有意想不到的可爱反应哦~</p>
+</blockquote>
+<h3 id="源代码">📦 源代码</h3>
+<p>如果你也想部署这个可爱的告白页面，可以访问<a class="link" 
+ href="https://github.com/onef1shy/Love_Choice" >GitHub仓库</a>获取源代码。如果这个项目对你有帮助，欢迎点个
+⭐Star 支持一下哦～ 你的每个 Star 都是我创作的动力！</p>
+<blockquote>
+<p>💝 让我们一起传播爱的浪漫吧～</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>灵感工坊</category>
+      </categories>
+      <tags>
+        <tag>网页</tag>
+        <tag>小游戏</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>卷积神经网络(CNN)综述：从起源到现代架构的演进</title>
     <url>/2024/03/01/CNN/</url>
     <content><![CDATA[<h2 id="卷积神经网络的起源与发展">1. 卷积神经网络的起源与发展</h2>
@@ -969,184 +1150,112 @@ pattern recognition (pp. 7132-7141).</p>
       </tags>
   </entry>
   <entry>
-    <title>Love Choice 💝</title>
-    <url>/2025/02/14/Love_Choice/</url>
-    <content><![CDATA[<h2 id="一个特别的告白页面">💕 一个特别的告白页面</h2>
-<p>还在为如何表达爱意而烦恼吗？这个充满创意的交互式告白页面也许能给你一些灵感！它不仅有着温馨浪漫的设计，还加入了俏皮可爱的交互效果
-——
-当对方想要点击”不要”时，按钮会调皮地逃走；而”可以”按钮则会越变越大，仿佛在说”选我选我”！这样独特的表白方式，一定能让你的心意传达得更加特别～
-🌟</p>
-<h3 id="页面特色">🎨 页面特色</h3>
-<ul>
-<li>可爱的动画表情</li>
-<li>粉色温馨背景</li>
-<li>简单而温暖的告白文字</li>
-<li>互动式的选择按钮</li>
-</ul>
-<h3 id="如何使用">💌 如何使用</h3>
-<p>当你点击下面的链接，你将看到一个超级可爱的小人儿，它会问你一个重要的问题：</p>
+    <title>深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</title>
+    <url>/2024/04/27/ResNet-Code/</url>
+    <content><![CDATA[<h1 id="深度残差网络resnet代码实现详解pytorch复现cifar-10图像分类">深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</h1>
 <blockquote>
-<p>“可以成为我的恋人吗？”</p>
+<p>本文是<a href="/2024/04/22/ResNet/">《深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑》</a>的姊妹篇，专注于ResNet的代码实现。建议先阅读论文解读文章，了解ResNet的理论基础和核心思想，再学习本文的代码实现部分。</p>
 </blockquote>
-<p>你可以选择： - 点击 “可以” - 会看到开心的表情 🥰 - 点击 “不要” -
-别担心，还会有惊喜哦 😉</p>
-<h3 id="快来体验">🌟 快来体验</h3>
-<p>点击下面的链接，开启一段甜蜜的告白之旅吧：</p>
-<p><a href="https://onef1shy.github.io/Love_Choice">打开Love
-Choice页面</a></p>
-<figure>
-<img 
-
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://raw.githubusercontent.com/onef1shy/Love_Choice/main/images/heart.png"
-                     
-alt="告白页面预览" 
-                >
-<figcaption aria-hidden="true">告白页面预览</figcaption>
-</figure>
-<blockquote>
-<p>💡 小提示：无论选择哪个按钮，都会有意想不到的可爱反应哦~</p>
-</blockquote>
-<h3 id="源代码">📦 源代码</h3>
-<p>如果你也想部署这个可爱的告白页面，可以访问<a class="link" 
- href="https://github.com/onef1shy/Love_Choice" >GitHub仓库</a>获取源代码。如果这个项目对你有帮助，欢迎点个
-⭐Star 支持一下哦～ 你的每个 Star 都是我创作的动力！</p>
-<blockquote>
-<p>💝 让我们一起传播爱的浪漫吧～</p>
-</blockquote>
+<p>在上一篇文章中，我们详细解读了何恺明等人提出的深度残差网络(ResNet)论文。本文将聚焦于ResNet的代码实现，通过PyTorch框架在CIFAR-10数据集上复现论文中的模型结构和实验结果。</p>
+<h2 id="项目概述">1. 项目概述</h2>
+<p>本项目旨在精确复现2016年发表的原始ResNet论文中的方法和结果，实现了多种深度的ResNet变体，包括标准ResNet
+(ResNet18/34/50/101/152) 和专为CIFAR-10设计的变体
+(ResNet20/32/44/56/110/1202)。</p>
+<p>项目的主要文件包括： - <code>resnet.py</code>: 定义ResNet模型架构 -
+<code>train.py</code>: 训练和评估脚本 - <code>run.sh</code>:
+训练脚本示例</p>
+<h2 id="残差块实现">2. 残差块实现</h2>
+<p>ResNet的核心是残差块(Residual Block)，它通过跳跃连接(shortcut
+connection)解决了深度网络的退化问题。我们实现了两种类型的残差块：基本残差块和瓶颈残差块。</p>
+<h3 id="基本残差块basicblock">2.1 基本残差块(BasicBlock)</h3>
+<p>基本残差块用于ResNet18/34等较浅的网络，结构为：两个3×3卷积层加上跳跃连接。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BasicBlock</span>(nn.Module):</span><br><span class="line">    <span class="string">"""基本残差块，用于ResNet18/34等较浅的网络"""</span></span><br><span class="line">    expansion = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, out_channels, stride=<span class="number">1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(BasicBlock, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="comment"># 原始论文中的基本残差块结构：</span></span><br><span class="line">        <span class="comment"># conv -&gt; BN -&gt; ReLU -&gt; conv -&gt; BN -&gt; 加上shortcut -&gt; ReLU</span></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=stride, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(out_channels)</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=<span class="number">1</span>, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn2 = nn.BatchNorm2d(out_channels)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.shortcut = nn.Sequential()</span><br><span class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> in_channels != out_channels * <span class="variable language_">self</span>.expansion:</span><br><span class="line">            <span class="variable language_">self</span>.shortcut = nn.Sequential(</span><br><span class="line">                nn.Conv2d(in_channels, out_channels * <span class="variable language_">self</span>.expansion, kernel_size=<span class="number">1</span>,</span><br><span class="line">                          stride=stride, bias=<span class="literal">False</span>),</span><br><span class="line">                nn.BatchNorm2d(out_channels * <span class="variable language_">self</span>.expansion)</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = <span class="variable language_">self</span>.bn2(<span class="variable language_">self</span>.conv2(out))</span><br><span class="line">        out += <span class="variable language_">self</span>.shortcut(x)  <span class="comment"># 关键的残差连接</span></span><br><span class="line">        out = F.relu(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure></div>
+<p>代码解析： 1. <code>expansion = 1</code>:
+表示输出通道数与指定的<code>out_channels</code>相同，没有扩展 2.
+两个3×3卷积层，每层后跟批量归一化(Batch Normalization) 3.
+<code>shortcut</code>连接：当输入和输出维度不匹配时(stride≠1或通道数不同)，使用1×1卷积进行维度调整
+4.
+前向传播中的<code>out += self.shortcut(x)</code>实现了残差连接，将输入直接加到卷积层的输出上</p>
+<h3 id="瓶颈残差块bottleneck">2.2 瓶颈残差块(Bottleneck)</h3>
+<p>瓶颈残差块用于ResNet50/101/152等较深的网络，结构为：1×1卷积降维 →
+3×3卷积 → 1×1卷积升维。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Bottleneck</span>(nn.Module):</span><br><span class="line">    <span class="string">"""瓶颈残差块，用于ResNet50/101/152等较深的网络"""</span></span><br><span class="line">    expansion = <span class="number">4</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, out_channels, stride=<span class="number">1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(Bottleneck, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(in_channels, out_channels,</span><br><span class="line">                               kernel_size=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(out_channels)</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=stride, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn2 = nn.BatchNorm2d(out_channels)</span><br><span class="line">        <span class="variable language_">self</span>.conv3 = nn.Conv2d(out_channels, out_channels * <span class="variable language_">self</span>.expansion,</span><br><span class="line">                               kernel_size=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn3 = nn.BatchNorm2d(out_channels * <span class="variable language_">self</span>.expansion)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.shortcut = nn.Sequential()</span><br><span class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> in_channels != out_channels * <span class="variable language_">self</span>.expansion:</span><br><span class="line">            <span class="variable language_">self</span>.shortcut = nn.Sequential(</span><br><span class="line">                nn.Conv2d(in_channels, out_channels * <span class="variable language_">self</span>.expansion,</span><br><span class="line">                          kernel_size=<span class="number">1</span>, stride=stride, bias=<span class="literal">False</span>),</span><br><span class="line">                nn.BatchNorm2d(out_channels * <span class="variable language_">self</span>.expansion)</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn2(<span class="variable language_">self</span>.conv2(out)))</span><br><span class="line">        out = <span class="variable language_">self</span>.bn3(<span class="variable language_">self</span>.conv3(out))</span><br><span class="line">        out += <span class="variable language_">self</span>.shortcut(x)  <span class="comment"># 残差连接</span></span><br><span class="line">        out = F.relu(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure></div>
+<p>代码解析： 1. <code>expansion = 4</code>:
+表示输出通道数是指定<code>out_channels</code>的4倍 2. 三个卷积层： -
+1×1卷积降维：减少通道数，降低计算复杂度 - 3×3卷积：主要的特征提取 -
+1×1卷积升维：恢复/扩展通道数 3.
+瓶颈设计大大减少了参数量和计算复杂度，同时保持了性能</p>
+<h2 id="resnet网络架构">3. ResNet网络架构</h2>
+<p>我们实现了两种ResNet变体：标准ResNet和CIFAR-10专用ResNet。</p>
+<h3 id="标准resnet">3.1 标准ResNet</h3>
+<p>标准ResNet架构适用于ImageNet等大型数据集，但我们也可以将其应用于CIFAR-10。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ResNet</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, block, num_blocks, num_classes=<span class="number">10</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(ResNet, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.in_channels = <span class="number">64</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># CIFAR-10使用3x3卷积，步长为1</span></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(<span class="number">3</span>, <span class="number">64</span>, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=<span class="number">1</span>, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(<span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 构建残差层</span></span><br><span class="line">        <span class="variable language_">self</span>.layer1 = <span class="variable language_">self</span>._make_layer(block, <span class="number">64</span>, num_blocks[<span class="number">0</span>], stride=<span class="number">1</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer2 = <span class="variable language_">self</span>._make_layer(block, <span class="number">128</span>, num_blocks[<span class="number">1</span>], stride=<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer3 = <span class="variable language_">self</span>._make_layer(block, <span class="number">256</span>, num_blocks[<span class="number">2</span>], stride=<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer4 = <span class="variable language_">self</span>._make_layer(block, <span class="number">512</span>, num_blocks[<span class="number">3</span>], stride=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 全连接层</span></span><br><span class="line">        <span class="variable language_">self</span>.fc = nn.Linear(<span class="number">512</span> * block.expansion, num_classes)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_make_layer</span>(<span class="params">self, block, out_channels, num_blocks, stride</span>):</span><br><span class="line">        strides = [stride] + [<span class="number">1</span>] * (num_blocks - <span class="number">1</span>)</span><br><span class="line">        layers = []</span><br><span class="line">        <span class="keyword">for</span> stride <span class="keyword">in</span> strides:</span><br><span class="line">            layers.append(block(<span class="variable language_">self</span>.in_channels, out_channels, stride))</span><br><span class="line">            <span class="variable language_">self</span>.in_channels = out_channels * block.expansion</span><br><span class="line">        <span class="keyword">return</span> nn.Sequential(*layers)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = <span class="variable language_">self</span>.layer1(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer2(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer3(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer4(out)</span><br><span class="line">        out = F.avg_pool2d(out, <span class="number">4</span>)</span><br><span class="line">        out = out.view(out.size(<span class="number">0</span>), -<span class="number">1</span>)</span><br><span class="line">        out = <span class="variable language_">self</span>.fc(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure></div>
+<p>代码解析： 1.
+初始层：3×3卷积，64个滤波器，步长为1（与ImageNet版本不同，ImageNet使用7×7卷积，步长为2）
+2. 四个阶段的残差层，通道数分别为64、128、256、512 3.
+<code>_make_layer</code>方法：构建每个阶段的残差块序列，第一个块可能改变步长和通道数，后续块保持相同的通道数和步长1
+4. 全局平均池化和全连接层用于最终分类</p>
+<h3 id="cifar-10专用resnet">3.2 CIFAR-10专用ResNet</h3>
+<p>CIFAR-10专用ResNet变体严格按照原始论文中的设计，更适合CIFAR-10这样的小型数据集。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CifarResNet</span>(nn.Module):</span><br><span class="line">    <span class="string">"""专为CIFAR-10设计的ResNet变体，结构与原始论文一致"""</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, block, num_blocks, num_classes=<span class="number">10</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(CifarResNet, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="comment"># 原始论文中CIFAR-10的ResNet结构：</span></span><br><span class="line">        <span class="comment"># 第一层：3x3卷积，16个滤波器</span></span><br><span class="line">        <span class="comment"># 然后是3个阶段，每个阶段有n个残差块</span></span><br><span class="line">        <span class="comment"># 第一阶段：16个滤波器</span></span><br><span class="line">        <span class="comment"># 第二阶段：32个滤波器，第一个残差块步长为2</span></span><br><span class="line">        <span class="comment"># 第三阶段：64个滤波器，第一个残差块步长为2</span></span><br><span class="line">        <span class="comment"># 最后是全局平均池化和全连接层</span></span><br><span class="line">        <span class="variable language_">self</span>.in_channels = <span class="number">16</span></span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(<span class="number">3</span>, <span class="number">16</span>, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=<span class="number">1</span>, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(<span class="number">16</span>)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.layer1 = <span class="variable language_">self</span>._make_layer(block, <span class="number">16</span>, num_blocks[<span class="number">0</span>], stride=<span class="number">1</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer2 = <span class="variable language_">self</span>._make_layer(block, <span class="number">32</span>, num_blocks[<span class="number">1</span>], stride=<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer3 = <span class="variable language_">self</span>._make_layer(block, <span class="number">64</span>, num_blocks[<span class="number">2</span>], stride=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.fc = nn.Linear(<span class="number">64</span> * block.expansion, num_classes)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_make_layer</span>(<span class="params">self, block, out_channels, num_blocks, stride</span>):</span><br><span class="line">        strides = [stride] + [<span class="number">1</span>] * (num_blocks - <span class="number">1</span>)</span><br><span class="line">        layers = []</span><br><span class="line">        <span class="keyword">for</span> stride <span class="keyword">in</span> strides:</span><br><span class="line">            layers.append(block(<span class="variable language_">self</span>.in_channels, out_channels, stride))</span><br><span class="line">            <span class="variable language_">self</span>.in_channels = out_channels * block.expansion</span><br><span class="line">        <span class="keyword">return</span> nn.Sequential(*layers)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = <span class="variable language_">self</span>.layer1(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer2(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer3(out)</span><br><span class="line">        <span class="comment"># 原始论文中，CIFAR-10图像大小为32x32</span></span><br><span class="line">        <span class="comment"># 经过3个阶段，每个阶段的第一个block有stride=2（除了第一阶段），所以尺寸变为32-&gt;32-&gt;16-&gt;8</span></span><br><span class="line">        <span class="comment"># 因此最终特征图大小为8x8，需要使用8x8的平均池化</span></span><br><span class="line">        out = F.avg_pool2d(out, <span class="number">8</span>)</span><br><span class="line">        out = out.view(out.size(<span class="number">0</span>), -<span class="number">1</span>)</span><br><span class="line">        out = <span class="variable language_">self</span>.fc(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure></div>
+<p>代码解析： 1. 初始层：3×3卷积，16个滤波器（比标准ResNet少） 2.
+三个阶段的残差层，通道数分别为16、32、64（比标准ResNet少） 3.
+每个阶段的残差块数量由<code>num_blocks</code>参数决定，决定了网络的深度
+4.
+最终使用8×8的全局平均池化，因为CIFAR-10图像经过网络后的特征图大小为8×8</p>
+<h2 id="不同深度的resnet变体">4. 不同深度的ResNet变体</h2>
+<p>我们实现了多种不同深度的ResNet变体，包括标准ResNet和CIFAR-10专用ResNet。</p>
+<h3 id="标准resnet变体">4.1 标准ResNet变体</h3>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet18</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(BasicBlock, [<span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet34</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(BasicBlock, [<span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet50</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(Bottleneck, [<span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet101</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(Bottleneck, [<span class="number">3</span>, <span class="number">4</span>, <span class="number">23</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet152</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(Bottleneck, [<span class="number">3</span>, <span class="number">8</span>, <span class="number">36</span>, <span class="number">3</span>], num_classes)</span><br></pre></td></tr></table></figure></div>
+<p>这些函数创建不同深度的标准ResNet模型： -
+ResNet18/34使用基本残差块(BasicBlock) -
+ResNet50/101/152使用瓶颈残差块(Bottleneck) -
+列表[a,b,c,d]指定了四个阶段中每个阶段的残差块数量</p>
+<h3 id="cifar-10专用resnet变体">4.2 CIFAR-10专用ResNet变体</h3>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet20</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet20"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet32</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet32"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">5</span>, <span class="number">5</span>, <span class="number">5</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet44</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet44"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">7</span>, <span class="number">7</span>, <span class="number">7</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet56</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet56"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">9</span>, <span class="number">9</span>, <span class="number">9</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet110</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet110"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">18</span>, <span class="number">18</span>, <span class="number">18</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet1202</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">"""CIFAR-10专用的ResNet1202"""</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">200</span>, <span class="number">200</span>, <span class="number">200</span>], num_classes)</span><br></pre></td></tr></table></figure></div>
+<p>这些函数创建不同深度的CIFAR-10专用ResNet模型： -
+所有CIFAR-10专用模型都使用基本残差块(BasicBlock) -
+列表[a,b,c]指定了三个阶段中每个阶段的残差块数量 -
+总层数计算：2(初始卷积+最终FC) +
+6n(每个残差块2层，共3n个残差块)，例如ResNet20中n=3，所以总层数为2+6×3=20</p>
+<h2 id="训练与数据处理">5. 训练与数据处理</h2>
+<p>训练脚本(<code>train.py</code>)实现了模型的训练、评估和可视化。以下是关键部分的代码解析：</p>
+<h3 id="数据预处理">5.1 数据预处理</h3>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Data preprocessing</span></span><br><span class="line">transform_train = transforms.Compose([</span><br><span class="line">    <span class="comment"># 原始论文中的数据增强：4像素padding后随机裁剪到32x32</span></span><br><span class="line">    transforms.RandomCrop(<span class="number">32</span>, padding=<span class="number">4</span>),</span><br><span class="line">    <span class="comment"># 随机水平翻转</span></span><br><span class="line">    transforms.RandomHorizontalFlip(),</span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    <span class="comment"># 使用CIFAR-10的均值和标准差进行归一化</span></span><br><span class="line">    transforms.Normalize((<span class="number">0.4914</span>, <span class="number">0.4822</span>, <span class="number">0.4465</span>),</span><br><span class="line">                         (<span class="number">0.2023</span>, <span class="number">0.1994</span>, <span class="number">0.2010</span>)),</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">transform_test = transforms.Compose([</span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    <span class="comment"># 测试集只需要归一化，不需要数据增强</span></span><br><span class="line">    transforms.Normalize((<span class="number">0.4914</span>, <span class="number">0.4822</span>, <span class="number">0.4465</span>),</span><br><span class="line">                         (<span class="number">0.2023</span>, <span class="number">0.1994</span>, <span class="number">0.2010</span>)),</span><br><span class="line">])</span><br></pre></td></tr></table></figure></div>
+<p>数据预处理遵循原始论文中的设置： 1.
+训练集：4像素填充后随机裁剪到32×32、随机水平翻转、归一化 2.
+测试集：只进行归一化，不使用数据增强 3.
+归一化使用CIFAR-10数据集的均值和标准差</p>
+<h3 id="学习率调度">5.2 学习率调度</h3>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 学习率调度：原始论文中在32k和48k迭代时将学习率除以10</span></span><br><span class="line"><span class="comment"># 对于批量大小128，这相当于约82和123个epoch</span></span><br><span class="line">scheduler = optim.lr_scheduler.MultiStepLR(</span><br><span class="line">    optimizer, milestones=[<span class="number">82</span>, <span class="number">123</span>], gamma=<span class="number">0.1</span>)</span><br></pre></td></tr></table></figure></div>
+<p>学习率调度遵循原始论文中的设置： 1. 初始学习率为0.1 2.
+在训练过程中的特定时间点（原论文中为32k和48k迭代）将学习率除以10 3.
+对于CIFAR-10数据集（50k训练样本）和批量大小128，这相当于约82和123个epoch</p>
+<h2 id="实验结果与分析">6. 实验结果与分析</h2>
+<p>通过运行训练脚本，我们可以复现原始论文中的实验结果。以下是一些关键观察：</p>
+<ol type="1">
+<li><p><strong>深度与性能</strong>：在一定范围内，网络深度的增加通常会带来性能提升。例如，ResNet56通常比ResNet20表现更好。</p></li>
+<li><p><strong>过深网络的过拟合</strong>：对于CIFAR-10这样的小型数据集，过深的网络（如ResNet1202）可能会导致过拟合，性能不如较浅的网络。</p></li>
+<li><p><strong>残差连接的有效性</strong>：通过比较有无残差连接的网络，可以明显看到残差连接使得训练非常深的网络成为可能，有效解决了深度网络的梯度消失问题。</p></li>
+<li><p><strong>标准ResNet
+vs. CIFAR专用ResNet</strong>：CIFAR专用的ResNet变体通常在CIFAR-10上表现更好，因为它们的设计更适合小型图像。</p></li>
+</ol>
+<h2 id="总结">7. 总结</h2>
+<p>通过这个项目，我们成功复现了何恺明等人提出的深度残差网络(ResNet)，并在CIFAR-10数据集上验证了其有效性。代码实现遵循了原始论文中的设计原则，包括网络架构、残差块结构、数据预处理和训练策略。</p>
+<p>ResNet的核心创新——残差连接——使得训练超深网络成为可能，解决了深度神经网络的退化问题。这一简单而优雅的设计已经成为现代深度学习架构的基石，影响了后续众多网络的设计。</p>
+<p>通过亲自实现和训练ResNet，我们不仅加深了对这一经典架构的理解，也体验了深度学习研究中复现和验证的重要性。希望这个项目能够帮助更多人理解ResNet的工作原理和实现细节。</p>
+<h2 id="参考资料">参考资料</h2>
+<p>[1] He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016). Deep Residual
+Learning for Image Recognition. In Proceedings of the IEEE Conference on
+Computer Vision and Pattern Recognition (CVPR), pp. 770-778.</p>
+<p>[2] PyTorch官方文档: https://pytorch.org/docs/stable/index.html</p>
+<p>[3] CIFAR-10数据集: https://www.cs.toronto.edu/~kriz/cifar.html</p>
 ]]></content>
       <categories>
-        <category>灵感工坊</category>
+        <category>项目实践</category>
       </categories>
       <tags>
-        <tag>网页</tag>
-        <tag>小游戏</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>从0到1：构建智能化Google Scholar文献爬虫的心路历程</title>
-    <url>/2024/07/20/Google_Scholar_Crawler/</url>
-    <content><![CDATA[<h2 id="缘起">缘起</h2>
-<p>Google
-Scholar（谷歌学术）作为全球最大的学术搜索引擎之一，已经成为科研工作者不可或缺的文献检索工具。它不仅收录了海量的学术文献，更重要的是构建了完整的文献引用关系网络，这对于理解研究脉络、追踪学术前沿具有重要意义。</p>
-<p>在学术研究中，我们经常需要： 1. 追踪某个研究领域的发展历程 2.
-分析高影响力论文的引用关系 3. 了解某位学者的研究方向和成果 4.
-发现研究热点和创新点</p>
-<p>然而，手动在Google
-Scholar上检索和整理这些信息是一项耗时的工作。特别是当需要分析大量论文的引用关系时，人工操作不仅效率低下，还容易出错。这促使我思考：能否开发一个自动化工具，来高效完成这些任务？</p>
-<p>于是，这个Google
-Scholar爬虫项目应运而生。这个工具旨在自动化文献信息的采集和整理过程，帮助研究者更专注于学术内容本身的分析和创新。</p>
-<h2 id="核心技术实现">核心技术实现</h2>
-<h3 id="系统架构设计">1. 系统架构设计</h3>
-<p>在开发这个爬虫之前，我们需要解决几个关键问题： -
-如何模拟真实用户的浏览行为？ - 如何处理Google Scholar的反爬机制？ -
-如何高效地存储和组织数据？</p>
-<p>基于这些考虑，我们设计了以下系统架构：</p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Gather</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">        <span class="comment"># 初始化Chrome浏览器选项</span></span><br><span class="line">        option = Options()</span><br><span class="line">        <span class="comment"># option.add_argument(&#x27;--headless&#x27;)  # 可选：启用无头模式</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 使用webdriver_manager自动管理ChromeDriver</span></span><br><span class="line">        service = Service(ChromeDriverManager().install())</span><br><span class="line">        <span class="variable language_">self</span>.driver = webdriver.Chrome(</span><br><span class="line">            service=service, options=option)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 初始化数据存储</span></span><br><span class="line">        <span class="variable language_">self</span>.Passage_name = []  <span class="comment"># 存储文章名称</span></span><br><span class="line">        <span class="variable language_">self</span>.Cited_by = []     <span class="comment"># 存储被引用次数</span></span><br><span class="line">        <span class="variable language_">self</span>.src = []          <span class="comment"># 存储链接</span></span><br><span class="line">        <span class="variable language_">self</span>.name = <span class="string">&quot;&quot;</span>         <span class="comment"># 存储作者名称</span></span><br></pre></td></tr></table></figure></div>
-<p>这段代码中的每个组件都有其特定用途：</p>
-<ol type="1">
-<li><strong>浏览器自动化（Selenium WebDriver）</strong>
-<ul>
-<li>选择Selenium而不是requests的原因是Google
-Scholar大量使用JavaScript动态加载内容</li>
-<li><code>webdriver_manager</code>自动下载和管理ChromeDriver，避免版本不匹配问题</li>
-<li>支持无头模式（headless），适合在服务器环境运行</li>
-</ul></li>
-<li><strong>数据结构设计</strong>
-<ul>
-<li>使用列表存储文章信息，便于动态增长</li>
-<li>分别存储文章名称、引用次数和链接，保持数据的关联性</li>
-<li>实时更新作者信息，确保数据的完整性</li>
-</ul></li>
-</ol>
-<h3 id="验证码突破方案">2. 验证码突破方案</h3>
-<p>Google
-Scholar使用reCAPTCHA作为反爬虫机制，这是一个难点。经过多次尝试，我们发现了一个巧妙的解决方案：利用reCAPTCHA的音频验证功能。</p>
-<p>整个验证码突破流程如下：</p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">pass_recaptha</span>(<span class="params">self</span>):</span><br><span class="line">    <span class="comment"># 第一步：定位并切换到验证码iframe</span></span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">15</span>, <span class="number">0.5</span>).until(</span><br><span class="line">        EC.visibility_of_element_located((By.XPATH,</span><br><span class="line">                                          <span class="string">&#x27;//*[@id=&quot;gs_captcha_c&quot;]/div/div/iframe&#x27;</span>)))</span><br><span class="line">    <span class="variable language_">self</span>.driver.switch_to.frame(<span class="variable language_">self</span>.driver.find_element(By.XPATH,</span><br><span class="line">                                                         <span class="string">&#x27;//*[@id=&quot;gs_captcha_c&quot;]/div/div/iframe&#x27;</span>))</span><br></pre></td></tr></table></figure></div>
-<p>这里使用了<code>WebDriverWait</code>而不是固定延时，原因是： -
-页面加载速度受网络影响，固定延时不可靠 -
-动态等待可以在元素出现时立即进行下一步 - 超时机制可以及时发现异常</p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="comment"># 第二步：切换到音频验证模式</span></span><br><span class="line">    <span class="variable language_">self</span>.driver.switch_to.default_content()</span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">15</span>, <span class="number">0.5</span>).until(</span><br><span class="line">        EC.visibility_of_element_located((By.XPATH, <span class="string">&#x27;/html/body/div[2]/div[4]/iframe&#x27;</span>)))</span><br><span class="line">    <span class="variable language_">self</span>.driver.switch_to.frame(<span class="variable language_">self</span>.driver.find_element(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;/html/body/div[2]/div[4]/iframe&#x27;</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 第三步：获取音频文件</span></span><br><span class="line">    button = <span class="variable language_">self</span>.driver.find_element(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;recaptcha-audio-button&quot;]&#x27;</span>)</span><br><span class="line">    button.click()</span><br><span class="line">    msg_url = <span class="variable language_">self</span>.driver.find_element(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;rc-audio&quot;]/div[7]/a&#x27;</span>).get_attribute(<span class="string">&quot;href&quot;</span>)</span><br></pre></td></tr></table></figure></div>
-<p>音频验证的优势： - 相比图像验证码，音频内容更容易识别 -
-Google对音频验证的限制相对较少 - 可以利用成熟的语音识别API</p>
-<h3 id="音频识别实现">3. 音频识别实现</h3>
-<p>音频识别使用腾讯云的语音识别服务，这个选择基于以下考虑： -
-支持英文音频识别 - API调用简单稳定 - 识别准确率高</p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">upload</span>(<span class="params">self, msg_url</span>):</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment"># 步骤1：配置腾讯云认证</span></span><br><span class="line">        cred = credential.Credential(<span class="variable language_">self</span>.SecretId, <span class="variable language_">self</span>.SecretKey)</span><br><span class="line">        httpProfile = HttpProfile()</span><br><span class="line">        httpProfile.endpoint = <span class="string">&quot;asr.tencentcloudapi.com&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 步骤2：创建识别任务</span></span><br><span class="line">        client = asr_client.AsrClient(cred, <span class="string">&quot;&quot;</span>, clientProfile)</span><br><span class="line">        req = models.CreateRecTaskRequest()</span><br><span class="line">        params = &#123;</span><br><span class="line">            <span class="string">&quot;EngineModelType&quot;</span>: <span class="string">&quot;16k_en&quot;</span>,  <span class="comment"># 选择英文识别引擎</span></span><br><span class="line">            <span class="string">&quot;ChannelNum&quot;</span>: <span class="number">1</span>,              <span class="comment"># 单声道音频</span></span><br><span class="line">            <span class="string">&quot;ResTextFormat&quot;</span>: <span class="number">0</span>,           <span class="comment"># 文本格式</span></span><br><span class="line">            <span class="string">&quot;SourceType&quot;</span>: <span class="number">0</span>,              <span class="comment"># URL方式上传</span></span><br><span class="line">            <span class="string">&quot;Url&quot;</span>: msg_url</span><br><span class="line">        &#125;</span><br><span class="line">        req.from_json_string(json.dumps(params))</span><br></pre></td></tr></table></figure></div>
-<p>识别过程的关键点： 1. 选择合适的识别引擎（16k采样率英文模型） 2.
-使用URL方式上传，避免音频文件下载和本地存储 3.
-异步任务处理，避免程序阻塞</p>
-<h3 id="数据采集实现">4. 数据采集实现</h3>
-<p>数据采集分为两个主要步骤：获取文章列表和收集引用信息。这里的难点是如何准确定位和提取所需信息。</p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">JumpInfo</span>(<span class="params">self</span>):</span><br><span class="line">    <span class="comment"># 步骤1：等待页面加载完成</span></span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">3</span>).until(EC.presence_of_element_located(</span><br><span class="line">        (By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[2]/a&#x27;</span>)))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 步骤2：定位关键元素</span></span><br><span class="line">    Passage_name = <span class="variable language_">self</span>.driver.find_elements(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[1]/a&#x27;</span>)</span><br><span class="line">    Cited_by = <span class="variable language_">self</span>.driver.find_elements(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[2]/a&#x27;</span>)</span><br></pre></td></tr></table></figure></div>
-<p>XPath定位的优势： - 相比CSS选择器更灵活 - 可以准确定位层级关系 -
-支持复杂的条件筛选</p>
-<p>对于引用信息的收集，我们采用分页处理：</p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">collectInfo</span>(<span class="params">self, <span class="built_in">id</span></span>):</span><br><span class="line">    base_url = <span class="variable language_">self</span>.src[<span class="built_in">id</span>]</span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> <span class="built_in">range</span>(<span class="variable language_">self</span>.page_no):</span><br><span class="line">        <span class="comment"># 构造分页URL</span></span><br><span class="line">        extend = <span class="string">f&#x27;&amp;start=<span class="subst">&#123;num*<span class="number">10</span>&#125;</span>&#x27;</span></span><br><span class="line">        url = base_url+extend</span><br><span class="line">        HTML = <span class="variable language_">self</span>.get_html(url)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 提取引用文章信息</span></span><br><span class="line">        cite_page_name = HTML.xpath(<span class="string">&#x27;//h3/a&#x27;</span>)</span><br><span class="line">        cite_page_src = HTML.xpath(<span class="string">&#x27;//h3/a/@href&#x27;</span>)</span><br><span class="line">        cite_aut_name = HTML.xpath(</span><br><span class="line">            <span class="string">&#x27;//*[@id=&quot;gs_res_ccl_mid&quot;]/div/div/div[1]&#x27;</span>)</span><br></pre></td></tr></table></figure></div>
-<p>数据解析的关键技术： 1. 使用XPath提取结构化数据 2.
-智能分割作者和出版信息 3. 实时保存避免数据丢失</p>
-<p>每条引用信息的处理都经过精心设计： <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 解析作者和出版信息</span></span><br><span class="line">split_index = aut_name.find(<span class="string">&#x27; - &#x27;</span>)</span><br><span class="line"><span class="keyword">if</span> split_index != -<span class="number">1</span>:</span><br><span class="line">    authors = aut_name[:split_index].strip()</span><br><span class="line">    publication_info = aut_name[split_index + <span class="number">3</span>:].strip()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 格式化输出</span></span><br><span class="line"><span class="variable language_">self</span>.file.write(<span class="string">f&quot;\tCited_By_Passage: <span class="subst">&#123;page_name.text&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Author: <span class="subst">&#123;authors&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Journal: <span class="subst">&#123;publication_info&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure></div></p>
-<p>这种结构化的存储格式有以下优势： - 便于后续数据分析 -
-可以轻松转换为其他格式 - 保持了数据的层级关系</p>
-<h2 id="踩过的坑">踩过的坑</h2>
-<p>在开发过程中遇到了一些典型的问题，这里详细分享一下解决思路，希望能帮助到同样遇到这些问题的朋友。</p>
-<h3 id="页面元素定位问题">1. 页面元素定位问题</h3>
-<p>这是使用Selenium最常遇到的问题。最初的代码是这样的：
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">time.sleep(<span class="number">3</span>)  <span class="comment"># 固定等待3秒</span></span><br><span class="line">element = driver.find_element(By.XPATH, <span class="string">&#x27;...&#x27;</span>)</span><br></pre></td></tr></table></figure></div></p>
-<p>这种方式在实际运行中经常出现<code>NoSuchElementException</code>错误，原因是：
-- 网络速度不同，页面加载时间不固定 - 3秒可能太短，元素还没加载出来 -
-有时候3秒又太长，浪费等待时间</p>
-<p>改进后的代码： <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 最多等待15秒，每0.5秒检查一次</span></span><br><span class="line">WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">15</span>, <span class="number">0.5</span>).until(</span><br><span class="line">    EC.visibility_of_element_located((By.XPATH, <span class="string">&#x27;...&#x27;</span>))</span><br><span class="line">)</span><br></pre></td></tr></table></figure></div></p>
-<p>这样的好处是： - 元素出现就立即操作，不用等待固定时间 -
-超时会抛出明确的异常，便于处理 - 程序运行更加稳定和高效</p>
-<h3 id="验证码处理难题">2. 验证码处理难题</h3>
-<p>Google Scholar的验证码机制是一大难点。它提供了两种验证方式：</p>
-<ol type="1">
-<li>传统的图片验证码：需要识别图片中的文字或选择特定图片</li>
-<li>音频验证码：播放一段语音，输入听到的内容</li>
-</ol>
-<p>最初我们考虑过图片验证码的方案，但存在以下问题： -
-Google会动态调整验证码的难度 - 需要处理复杂的图片选择任务</p>
-<p>最终选择音频验证方案的原因： - 语音内容相对清晰，便于识别 -
-可以利用成熟的语音识别API - 实现逻辑相对简单：下载音频 -&gt; 识别文字
--&gt; 填写结果</p>
-<h3 id="数据存储和处理">3. 数据存储和处理</h3>
-<p>数据存储看似简单，但要考虑实用性。最初的存储方式是直接写入文本：
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">file.write(<span class="string">f&quot;<span class="subst">&#123;title&#125;</span> - <span class="subst">&#123;author&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure></div></p>
-<p>这种方式带来的问题： - 数据格式不统一，难以解析 -
-无法方便地提取特定信息 - 不利于后续的数据分析</p>
-<p>改进后采用了结构化的存储格式： <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="variable language_">self</span>.file.write(<span class="string">f&quot;\tCited_By_Passage: <span class="subst">&#123;page_name.text&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Author: <span class="subst">&#123;authors&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Journal: <span class="subst">&#123;publication_info&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure></div></p>
-<p>这样改进的好处： - 数据结构清晰，易于理解 -
-可以轻松转换为JSON或CSV格式 - 方便后续进行数据分析和可视化</p>
-<h2 id="未来优化方向">未来优化方向</h2>
-<ol type="1">
-<li><strong>并发优化</strong>
-<ul>
-<li>实现多线程数据采集</li>
-<li>添加代理IP池支持</li>
-<li>优化请求频率控制</li>
-</ul></li>
-<li><strong>数据分析功能</strong>
-<ul>
-<li>添加引用网络分析</li>
-<li>实现作者关系图谱</li>
-<li>支持数据可视化导出</li>
-</ul></li>
-</ol>
-<h2 id="完整代码">完整代码</h2>
-<p>完整的项目代码已经上传到GitHub：<a class="link" 
- href="https://github.com/onef1shy/Google-Scholar" >GitHub -
-Google-Scholar</a></p>
-<p>如果这个项目对您有帮助，欢迎给仓库点个star⭐️。如有任何问题或建议，也欢迎在评论区留言交流。</p>
-]]></content>
-      <categories>
-        <category>技术随笔</category>
-      </categories>
-      <tags>
-        <tag>爬虫实战</tag>
-        <tag>科研工具</tag>
+        <tag>残差网络</tag>
       </tags>
   </entry>
   <entry>
@@ -1573,6 +1682,9 @@ connection)将输入直接添加到输出。</p>
 <p>从ResNet发表至今，深度学习领域已经涌现出许多基于残差连接的改进和变体，如DenseNet、ResNeXt等。这些网络在不同任务上都取得了显著的成功，进一步证明了残差学习的普适性和有效性。</p>
 <p>作为计算机视觉领域的里程碑工作，ResNet不仅解决了一个具体的技术问题，更为深度学习的发展指明了方向。它告诉我们，有时候解决复杂问题的关键不在于设计更复杂的模型，而在于找到一种更简单、更优雅的方式来重新定义问题本身。</p>
 <p>如果你对ResNet或其他深度学习架构有任何想法或疑问，欢迎在评论区留言讨论。</p>
+<blockquote>
+<p><strong>延伸阅读</strong>：如果你对ResNet的代码实现感兴趣，可以阅读我的后续文章<a href="/2024/04/27/ResNet-Code/">《深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类》</a>，其中详细介绍了如何使用PyTorch框架复现ResNet模型，并在CIFAR-10数据集上进行训练和评估。</p>
+</blockquote>
 <h2 id="参考文献">参考文献</h2>
 <p>[1] He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016). Deep Residual
 Learning for Image Recognition. In Proceedings of the IEEE Conference on
