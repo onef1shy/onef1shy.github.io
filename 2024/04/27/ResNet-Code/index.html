@@ -27,14 +27,14 @@
         
         <meta name="description" content="Welcome to my sekai">
 <meta property="og:type" content="article">
-<meta property="og:title" content="深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类">
+<meta property="og:title" content="深度残差网络(ResNet)代码详解：PyTorch复现CIFAR-10图像分类">
 <meta property="og:url" content="http://onef1shy.github.io/2024/04/27/ResNet-Code/index.html">
 <meta property="og:site_name" content="Onefishy&#39;s Blog">
 <meta property="og:description" content="Welcome to my sekai">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://onef1shy.github.io/images/redefine-og.webp">
 <meta property="article:published_time" content="2024-04-27T02:30:00.000Z">
-<meta property="article:modified_time" content="2025-03-17T13:36:26.948Z">
+<meta property="article:modified_time" content="2025-03-18T16:56:15.611Z">
 <meta property="article:author" content="Onefishy">
 <meta property="article:tag" content="残差网络">
 <meta name="twitter:card" content="summary">
@@ -50,7 +50,7 @@
     
     <title>
         
-            深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类 | Onefishy&#39;s Blog
+            深度残差网络(ResNet)代码详解：PyTorch复现CIFAR-10图像分类 | Onefishy&#39;s Blog
         
     </title>
 
@@ -643,7 +643,7 @@ mjx-container[display="true"] + br {
 		<div class="article-title relative w-full">
 			
 			<div class="w-full flex items-center pt-6 justify-start">
-				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</h1>
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">深度残差网络(ResNet)代码详解：PyTorch复现CIFAR-10图像分类</h1>
 			</div>
 			
 		</div>
@@ -671,8 +671,8 @@ mjx-container[display="true"] + br {
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-03-17 21:36:26</span>
-            <span class="mobile">2025-03-17 21:36:26</span>
+            <span class="desktop">2025-03-19 00:56:15</span>
+            <span class="mobile">2025-03-19 00:56:15</span>
             <span class="hover-info">更新</span>
         </span>
     
@@ -726,8 +726,7 @@ mjx-container[display="true"] + br {
 
 
 		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-			<h1 id="深度残差网络resnet代码实现详解pytorch复现cifar-10图像分类">深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</h1>
-<blockquote>
+			<blockquote>
 <p>本文是<a href="/2024/04/22/ResNet/">《深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑》</a>的姊妹篇，专注于ResNet的代码实现。建议先阅读论文解读文章，了解ResNet的理论基础和核心思想，再学习本文的代码实现部分。</p>
 </blockquote>
 <p>在上一篇文章中，我们详细解读了何恺明等人提出的深度残差网络(ResNet)论文。本文将聚焦于ResNet的代码实现，通过PyTorch框架在CIFAR-10数据集上复现论文中的模型结构和实验结果。</p>
@@ -805,25 +804,107 @@ ResNet50/101/152使用瓶颈残差块(Bottleneck) -
 <p>学习率调度遵循原始论文中的设置： 1. 初始学习率为0.1 2.
 在训练过程中的特定时间点（原论文中为32k和48k迭代）将学习率除以10 3.
 对于CIFAR-10数据集（50k训练样本）和批量大小128，这相当于约82和123个epoch</p>
+<figure>
+<img lazyload="" src="/images/loading.svg" data-src="/images/ResNet_Code/resnet_lr_curve.png" alt="学习率调整曲线">
+<figcaption aria-hidden="true">学习率调整曲线</figcaption>
+</figure>
 <h2 id="实验结果与分析">6. 实验结果与分析</h2>
-<p>通过运行训练脚本，我们可以复现原始论文中的实验结果。以下是一些关键观察：</p>
+<p>通过运行训练脚本，我们复现了原始论文中的实验结果并进行了扩展实验。以下是按照不同维度的分析：</p>
+<h3 id="训练过程特征">6.1 训练过程特征</h3>
+<p>以ResNet20和ResNet110为例，观察其训练曲线的特征：</p>
+<p><img lazyload="" src="/images/loading.svg" data-src="/images/ResNet_Code/resnet20_loss_acc.png" alt="ResNet20训练曲线"> <img lazyload="" src="/images/loading.svg" data-src="/images/ResNet_Code/resnet110_loss_acc.png" alt="ResNet110训练曲线"></p>
+<p>关键观察： 1.
+<strong>学习率影响</strong>：在学习率下降点（约第82和123个epoch）处，所有模型的训练和测试曲线都有明显的下降，验证了学习率调度的有效性
+2.
+<strong>深浅网络差异</strong>：深层网络（ResNet110）比浅层网络（ResNet20）达到更低的训练损失，但测试准确率提升有限
+3.
+<strong>收敛特性</strong>：ResNet110收敛需要更多轮次，但最终能达到更低的训练损失</p>
+<h3 id="网络深度与性能关系">6.2 网络深度与性能关系</h3>
+<p>下图比较了CIFAR专用ResNet不同深度模型在CIFAR-10测试集上的准确率：</p>
+<figure>
+<img lazyload="" src="/images/loading.svg" data-src="/images/ResNet_Code/depth_comparison.png" alt="不同深度ResNet性能比较">
+<figcaption aria-hidden="true">不同深度ResNet性能比较</figcaption>
+</figure>
+<p>独特发现： 1.
+<strong>增深收益递减</strong>：网络深度从20增加到56时，测试准确率有明显提升（91.61%
+→ 93.05%） 2.
+<strong>过深反效果</strong>：网络深度从56增加到110时，准确率略有下降（93.05%
+→ 92.71%） 3.
+<strong>极深网络表现</strong>：ResNet1202（1202层）的准确率为93.61%，虽然比ResNet56高，但提升幅度不成比例</p>
+<p>这一发现与原论文结论一致：对于CIFAR-10这样的小型数据集，单纯增加深度并不一定带来持续的性能提升。</p>
+<h3 id="架构效率对比">6.3 架构效率对比</h3>
+<p>我们对比了标准ResNet和CIFAR专用ResNet两种架构设计在不同维度上的效率：</p>
+<h4 id="参数效率与模型性能">6.3.1 参数效率与模型性能</h4>
+<figure>
+<img lazyload="" src="/images/loading.svg" data-src="/images/ResNet_Code/standard_vs_cifar_comparison.png" alt="模型大小与准确率比较">
+<figcaption aria-hidden="true">模型大小与准确率比较</figcaption>
+</figure>
+<p>从参数量与性能的角度发现： 1.
+<strong>CIFAR专用设计特点</strong>：CIFAR专用ResNet（蓝色圆点）参数量远小于标准ResNet（红色方块），体现了针对小型数据集的轻量化设计思想
+2.
+<strong>宽度vs深度策略</strong>：标准ResNet通过增加通道宽度获得更强表征能力，而CIFAR专用ResNet则侧重于增加深度
+3.
+<strong>最佳参数平衡点</strong>：ResNet34达到最佳性能（94.84%），之后继续增加参数（如ResNet50）反而导致准确率下降</p>
+<h4 id="计算效率与训练成本">6.3.2 计算效率与训练成本</h4>
+<figure>
+<img lazyload="" src="/images/loading.svg" data-src="/images/ResNet_Code/training_time_comparison.png" alt="训练时间与准确率比较">
+<figcaption aria-hidden="true">训练时间与准确率比较</figcaption>
+</figure>
+<p>从训练时间与性能角度发现： 1.
+<strong>计算成本差异</strong>：训练时间从ResNet20的26分钟到ResNet1202的15小时不等，但性能提升并不成比例
+2.
+<strong>架构设计影响</strong>：相似参数量的网络，标准ResNet架构比CIFAR专用架构有更好的性能/时间比
+3.
+<strong>极限性价比</strong>：ResNet34的40分钟训练时间达到最高准确率，是性价比最高的选择</p>
+<h3 id="类别识别能力分析">6.4 类别识别能力分析</h3>
+<p>通过混淆矩阵比较ResNet20和ResNet34的类别识别能力：</p>
+<p><img lazyload="" src="/images/loading.svg" data-src="/images/ResNet_Code/resnet20_confusion_matrix.png" alt="ResNet20混淆矩阵"> <img lazyload="" src="/images/loading.svg" data-src="/images/ResNet_Code/resnet34_confusion_matrix.png" alt="ResNet34混淆矩阵"></p>
+<p>独特发现： 1.
+<strong>困难类别共性</strong>：两种架构都在相同类别对（如”猫”和”狗”）上遇到困难，说明这些类别本身存在语义重叠
+2.
+<strong>架构差异体现</strong>：标准ResNet在困难类别上的优势更明显，这可能源于其更强的特征提取能力
+3.
+<strong>数据集特性</strong>：“青蛙”和”船”类别两种架构都表现较好，而”猫”类别普遍较差，反映了数据集中类别的固有难度差异</p>
+<h3 id="具体样本分析">6.5 具体样本分析</h3>
+<p>比较ResNet20和ResNet34对相同测试样本的预测能力：</p>
+<p><img lazyload="" src="/images/loading.svg" data-src="/images/ResNet_Code/resnet20_predictions.png" alt="ResNet20预测示例"> <img lazyload="" src="/images/loading.svg" data-src="/images/ResNet_Code/resnet34_predictions.png" alt="ResNet34预测示例"></p>
+<p>关键发现： 1.
+<strong>细节识别差异</strong>：ResNet34在细节丰富或背景复杂的图像上表现更好
+2.
+<strong>错误模式差异</strong>：两种架构的错误模式有所不同，ResNet34更善于处理需要更细微特征区分的图像
+3.
+<strong>特征表达能力</strong>：标准ResNet架构在小目标识别和复杂场景理解上展现出明显优势</p>
+<h2 id="总结与发现">7. 总结与发现</h2>
+<p>本项目复现了ResNet在CIFAR-10上的表现，对比了标准和专用架构，得出以下关键结论：</p>
 <ol type="1">
-<li><p><strong>深度与性能</strong>：在一定范围内，网络深度的增加通常会带来性能提升。例如，ResNet56通常比ResNet20表现更好。</p></li>
-<li><p><strong>过深网络的过拟合</strong>：对于CIFAR-10这样的小型数据集，过深的网络（如ResNet1202）可能会导致过拟合，性能不如较浅的网络。</p></li>
-<li><p><strong>残差连接的有效性</strong>：通过比较有无残差连接的网络，可以明显看到残差连接使得训练非常深的网络成为可能，有效解决了深度网络的梯度消失问题。</p></li>
-<li><p><strong>标准ResNet
-vs. CIFAR专用ResNet</strong>：CIFAR专用的ResNet变体通常在CIFAR-10上表现更好，因为它们的设计更适合小型图像。</p></li>
+<li><p><strong>残差连接突破</strong>：成功训练1202层深网络，验证了残差连接解决深度网络退化问题的有效性</p></li>
+<li><p><strong>架构设计重于深度</strong>：标准ResNet
+(ResNet34)以94.84%的准确率超过所有CIFAR专用变体，说明合理的架构设计比单纯增加深度更重要</p></li>
+<li><p><strong>参数与性能权衡</strong>：</p>
+<ul>
+<li>CIFAR专用ResNet：轻量级（&lt;1M参数），适合资源受限场景</li>
+<li>标准ResNet：参数更多但性能更高，ResNet34最佳（21.3M参数）</li>
+<li>过度参数化风险：ResNet50（23.5M）性能不如ResNet34，表明小数据集上存在过参数化问题</li>
+</ul></li>
+<li><p><strong>实用选择建议</strong>：</p>
+<ul>
+<li>最高性能：ResNet34 (94.84%)</li>
+<li>最佳参数效率：ResNet56 (93.05%/0.86M)</li>
+<li>最快训练：ResNet20 (26分钟)</li>
+</ul></li>
+<li><p><strong>深度与性能非线性关系</strong>：增加深度收益递减，甚至反向（ResNet56→110），说明网络深度存在最优点</p></li>
 </ol>
-<h2 id="总结">7. 总结</h2>
-<p>通过这个项目，我们成功复现了何恺明等人提出的深度残差网络(ResNet)，并在CIFAR-10数据集上验证了其有效性。代码实现遵循了原始论文中的设计原则，包括网络架构、残差块结构、数据预处理和训练策略。</p>
-<p>ResNet的核心创新——残差连接——使得训练超深网络成为可能，解决了深度神经网络的退化问题。这一简单而优雅的设计已经成为现代深度学习架构的基石，影响了后续众多网络的设计。</p>
-<p>通过亲自实现和训练ResNet，我们不仅加深了对这一经典架构的理解，也体验了深度学习研究中复现和验证的重要性。希望这个项目能够帮助更多人理解ResNet的工作原理和实现细节。</p>
-<h2 id="参考资料">参考资料</h2>
-<p>[1] He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016). Deep Residual
-Learning for Image Recognition. In Proceedings of the IEEE Conference on
-Computer Vision and Pattern Recognition (CVPR), pp. 770-778.</p>
-<p>[2] PyTorch官方文档: https://pytorch.org/docs/stable/index.html</p>
-<p>[3] CIFAR-10数据集: https://www.cs.toronto.edu/~kriz/cifar.html</p>
+<p>这些发现为深度网络架构设计和性能权衡提供了实用指导，也验证了ResNet作为深度学习里程碑的地位。</p>
+<h2 id="完整代码">完整代码</h2>
+<p>完整的项目代码已经上传到GitHub：<a class="link" target="_blank" rel="noopener" href="https://github.com/onef1shy/CIFAR10_ResNet">CIFAR10_ResNet</a></p>
+<p>项目包含：</p>
+<ul>
+<li>完整的模型实现</li>
+<li>训练和测试代码</li>
+<li>可视化工具</li>
+<li>详细的文档说明</li>
+</ul>
+<p>如果这个项目对您有帮助，欢迎给仓库点个star⭐️。如有任何问题或建议，也欢迎在评论区留言交流。</p>
 
 		</div>
 
@@ -831,14 +912,14 @@ Computer Vision and Pattern Recognition (CVPR), pp. 770-778.</p>
 		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
 			<div class="article-copyright-info-container">
     <ul>
-        <li><strong>标题:</strong> 深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</li>
+        <li><strong>标题:</strong> 深度残差网络(ResNet)代码详解：PyTorch复现CIFAR-10图像分类</li>
         <li><strong>作者:</strong> Onefishy</li>
         <li><strong>创建于
                 :</strong> 2024-04-27 10:30:00</li>
         
             <li>
                 <strong>更新于
-                    :</strong> 2025-03-17 21:36:26
+                    :</strong> 2025-03-19 00:56:15
             </li>
         
         <li>
@@ -970,8 +1051,8 @@ Computer Vision and Pattern Recognition (CVPR), pp. 770-778.</p>
 		<div class="post-toc-wrap">
 	<div class="post-toc">
 		<div class="toc-title">目录</div>
-		<div class="page-title">深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</div>
-		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E6%AE%8B%E5%B7%AE%E7%BD%91%E7%BB%9Cresnet%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%E8%AF%A6%E8%A7%A3pytorch%E5%A4%8D%E7%8E%B0cifar-10%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB"><span class="nav-text">深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0"><span class="nav-text">1. 项目概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AE%8B%E5%B7%AE%E5%9D%97%E5%AE%9E%E7%8E%B0"><span class="nav-text">2. 残差块实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%AE%8B%E5%B7%AE%E5%9D%97basicblock"><span class="nav-text">2.1 基本残差块(BasicBlock)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%93%B6%E9%A2%88%E6%AE%8B%E5%B7%AE%E5%9D%97bottleneck"><span class="nav-text">2.2 瓶颈残差块(Bottleneck)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#resnet%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84"><span class="nav-text">3. ResNet网络架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E5%87%86resnet"><span class="nav-text">3.1 标准ResNet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cifar-10%E4%B8%93%E7%94%A8resnet"><span class="nav-text">3.2 CIFAR-10专用ResNet</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%B7%B1%E5%BA%A6%E7%9A%84resnet%E5%8F%98%E4%BD%93"><span class="nav-text">4. 不同深度的ResNet变体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E5%87%86resnet%E5%8F%98%E4%BD%93"><span class="nav-text">4.1 标准ResNet变体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cifar-10%E4%B8%93%E7%94%A8resnet%E5%8F%98%E4%BD%93"><span class="nav-text">4.2 CIFAR-10专用ResNet变体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86"><span class="nav-text">5. 训练与数据处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-text">5.1 数据预处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%8E%87%E8%B0%83%E5%BA%A6"><span class="nav-text">5.2 学习率调度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%E4%B8%8E%E5%88%86%E6%9E%90"><span class="nav-text">6. 实验结果与分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">7. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-text">参考资料</span></a></li></ol></li></ol>
+		<div class="page-title">深度残差网络(ResNet)代码详解：PyTorch复现CIFAR-10图像分类</div>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0"><span class="nav-text">1. 项目概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AE%8B%E5%B7%AE%E5%9D%97%E5%AE%9E%E7%8E%B0"><span class="nav-text">2. 残差块实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%AE%8B%E5%B7%AE%E5%9D%97basicblock"><span class="nav-text">2.1 基本残差块(BasicBlock)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%93%B6%E9%A2%88%E6%AE%8B%E5%B7%AE%E5%9D%97bottleneck"><span class="nav-text">2.2 瓶颈残差块(Bottleneck)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#resnet%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84"><span class="nav-text">3. ResNet网络架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E5%87%86resnet"><span class="nav-text">3.1 标准ResNet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cifar-10%E4%B8%93%E7%94%A8resnet"><span class="nav-text">3.2 CIFAR-10专用ResNet</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%B7%B1%E5%BA%A6%E7%9A%84resnet%E5%8F%98%E4%BD%93"><span class="nav-text">4. 不同深度的ResNet变体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E5%87%86resnet%E5%8F%98%E4%BD%93"><span class="nav-text">4.1 标准ResNet变体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cifar-10%E4%B8%93%E7%94%A8resnet%E5%8F%98%E4%BD%93"><span class="nav-text">4.2 CIFAR-10专用ResNet变体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86"><span class="nav-text">5. 训练与数据处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-text">5.1 数据预处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%8E%87%E8%B0%83%E5%BA%A6"><span class="nav-text">5.2 学习率调度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%E4%B8%8E%E5%88%86%E6%9E%90"><span class="nav-text">6. 实验结果与分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E8%BF%87%E7%A8%8B%E7%89%B9%E5%BE%81"><span class="nav-text">6.1 训练过程特征</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%B7%B1%E5%BA%A6%E4%B8%8E%E6%80%A7%E8%83%BD%E5%85%B3%E7%B3%BB"><span class="nav-text">6.2 网络深度与性能关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E6%95%88%E7%8E%87%E5%AF%B9%E6%AF%94"><span class="nav-text">6.3 架构效率对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%88%AB%E8%AF%86%E5%88%AB%E8%83%BD%E5%8A%9B%E5%88%86%E6%9E%90"><span class="nav-text">6.4 类别识别能力分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90"><span class="nav-text">6.5 具体样本分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E5%8F%91%E7%8E%B0"><span class="nav-text">7. 总结与发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-text">完整代码</span></a></li></ol>
 
 	</div>
 </div>
