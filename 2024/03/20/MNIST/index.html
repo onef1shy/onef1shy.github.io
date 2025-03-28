@@ -21,7 +21,7 @@
   <meta name="keywords" content="academic, blog, research, technology, computer vision, data mining">
 
 
-<title>Home | Zeyu Yan</title>
+<title>深度学习入门：用CNN玩转MNIST手写数字识别 | Zeyu Yan</title>
 
 
 
@@ -523,13 +523,17 @@
 
     <!-- toc -->
     
+  <!-- tocbot -->
+<nav class="post-toc toc text-sm w-40 relative top-32 right-4 opacity-70 hidden lg:block" style="position: fixed !important;"></nav>
+
+
 <section class="px-6 max-w-prose mx-auto md:px-0">
   <!-- Post header before content -->
   <header class="py-4">
     <div class="flex flex-col gap-2 pt-4 md:pt-6">
       <!-- Title -->
       <div id="article-title" class="leading-snug">
-        <p class="text-3xl font-bold text-[var(--c-100)] mb-4">Home</p>
+        <p class="text-3xl font-bold text-[var(--c-100)] mb-4">深度学习入门：用CNN玩转MNIST手写数字识别</p>
       </div>
       <!-- Meta data -->
       <div>
@@ -539,7 +543,7 @@
             <!-- Dates -->
             <div class="flex items-center gap-1">
               <iconify-icon width="18" icon="mingcute:add-circle-fill" ></iconify-icon>
-              Created: <time class="w-max">2025-03-28</time>
+              Created: <time class="w-max">2024-03-20</time>
             </div>
             <div class="flex items-center gap-1">
               <iconify-icon width="18" icon="mingcute:refresh-3-fill" ></iconify-icon>
@@ -553,9 +557,18 @@
             <!-- Word count -->
             <span class="flex items-center gap-1">
               <iconify-icon width="18" icon="mingcute:book-2-fill" ></iconify-icon>
-              <span>0 words, 1 min</span>
+              <span>2.5k words, 9 min</span>
             </span>
             <!-- Categories -->
+            
+              <!-- <span class="text-gray-400">·</span> -->
+              <span class="flex flex-row items-center gap-1 group hover:underline">
+                <iconify-icon class="transition-all group-hover:scale-125 mr-0"
+                  width="18"
+                  icon="mingcute:classify-2-fill">
+                </iconify-icon>
+                <a class="article-category-link" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/">项目实践</a>
+              </span>
             
           </div>
         </section>
@@ -565,13 +578,199 @@
         
 <div class="flex flex-wrap gap-1">
   
+    
+      <a href="/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" 
+        class="
+          tag
+          text-sm
+          rounded-full
+          px-[5px]
+          border-[1px]
+          border-[var(--c-theme)]
+          text-[var(--c-theme)]
+          bg-[var(--c-0)]
+          dark:bg-[var(--c-0)]
+          dark:drop-shadow-none
+          hover:bg-[var(--c-theme)]
+          hover:text-[var(--c-0)]
+          dark:hover:text-[var(--c-10)]
+          dark:hover:bg-[var(--c-theme)]
+        ">
+        卷积神经网络
+      </a>
+    
+  
 </div>
       </div>
     </div>
   </header>
   <!-- content -->
   <article class="post-content prose m-auto dark:prose-invert">
-    
+    <h2 id="MNIST数据集简介"><a href="#MNIST数据集简介" class="headerlink" title="MNIST数据集简介"></a>MNIST数据集简介</h2><p>MNIST数据集是机器学习领域中最常用的手写数字识别数据集之一。它包含60000张训练图像和10000张测试图像，每张图像的大小为28x28像素，共有10个类别（0到9）。MNIST数据集的广泛应用使得它成为了深度学习模型的测试基准之一。</p>
+<p>让我们先看看数据集中的一些示例图像：</p>
+<p><img src="/images/mnist/dataset_samples.png" alt="MNIST数据集示例"></p>
+<p>上图展示了数据集中的10个数字示例，每个数字都是28x28的灰度图像。这些图像经过预处理，像素值已经归一化到[-1, 1]区间。</p>
+<blockquote>
+<p>本文假设读者已经对卷积神经网络(CNN)有基本了解。如果您对CNN的基本原理和组件不熟悉，建议先阅读我的<a href="/2024/03/01/CNN/">CNN综述</a>文章，其中详细介绍了CNN的发展历程、基本组件（如卷积层、池化层、激活函数等）以及经典CNN架构（如LeNet-5、AlexNet、VGG、GoogLeNet和ResNet）和现代CNN架构（如DenseNet、MobileNet和EfficientNet等）。本文将重点关注CNN在MNIST手写数字识别任务中的具体应用，包括模型设计、训练过程和性能分析，以及CNN如何通过层次化特征学习实现手写数字识别。</p>
+</blockquote>
+<h2 id="训练相关概念"><a href="#训练相关概念" class="headerlink" title="训练相关概念"></a>训练相关概念</h2><h3 id="损失函数：交叉熵"><a href="#损失函数：交叉熵" class="headerlink" title="损失函数：交叉熵"></a>损失函数：交叉熵</h3><p>在多分类问题中，我们通常使用交叉熵损失函数。交叉熵衡量了预测概率分布与真实分布之间的差异。对于单个样本，交叉熵损失的计算公式为：</p>
+<p>$$L &#x3D; -\sum_{i&#x3D;1}^{C} y_i \log(\hat{y}_i)$$</p>
+<p>其中：</p>
+<ul>
+<li>$C$ 是类别数（在MNIST中为10）</li>
+<li>$y_i$ 是真实标签的one-hot编码（目标类为1，其他类为0）</li>
+<li>$\hat{y}_i$ 是模型预测的概率分布（经过softmax函数处理）</li>
+</ul>
+<p>交叉熵损失的特点：</p>
+<ul>
+<li>当预测值接近真实值时，损失接近0</li>
+<li>当预测值偏离真实值时，损失值增大</li>
+<li>通过最小化交叉熵，模型学习到更准确的预测</li>
+</ul>
+<h3 id="优化器：Adam"><a href="#优化器：Adam" class="headerlink" title="优化器：Adam"></a>优化器：Adam</h3><p>Adam（Adaptive Moment Estimation）是一种自适应学习率的优化算法，它结合了动量（Momentum）和RMSprop的优点。Adam的更新规则如下：</p>
+<p>$$m_t &#x3D; \beta_1 m_{t-1} + (1-\beta_1)g_t$$<br>$$v_t &#x3D; \beta_2 v_{t-1} + (1-\beta_2)g_t^2$$<br>$$\hat{m}_t &#x3D; \frac{m_t}{1-\beta_1^t}$$<br>$$\hat{v}<em>t &#x3D; \frac{v_t}{1-\beta_2^t}$$<br>$$\theta_t &#x3D; \theta</em>{t-1} - \alpha\frac{\hat{m}_t}{\sqrt{\hat{v}_t}+\epsilon}$$</p>
+<p>其中：</p>
+<ul>
+<li>$g_t$ 是当前梯度</li>
+<li>$m_t$ 是一阶矩估计（梯度的移动平均）</li>
+<li>$v_t$ 是二阶矩估计（梯度平方的移动平均）</li>
+<li>$\beta_1, \beta_2$ 是衰减率（通常取0.9和0.999）</li>
+<li>$\alpha$ 是学习率</li>
+<li>$\epsilon$ 是小常数，防止除零</li>
+</ul>
+<p>Adam优化器的优点：</p>
+<ul>
+<li>自适应学习率，不同参数有不同的更新步长</li>
+<li>结合了动量，可以处理稀疏梯度</li>
+<li>对超参数的选择相对不敏感</li>
+</ul>
+<h2 id="项目实现"><a href="#项目实现" class="headerlink" title="项目实现"></a>项目实现</h2><h3 id="1-环境配置和数据加载"><a href="#1-环境配置和数据加载" class="headerlink" title="1. 环境配置和数据加载"></a>1. 环境配置和数据加载</h3><p>首先，我们需要导入必要的库并设置数据加载：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torchvision.transforms <span class="keyword">as</span> transforms</span><br><span class="line"><span class="keyword">from</span> torchvision.datasets <span class="keyword">import</span> MNIST</span><br><span class="line"><span class="keyword">from</span> torch.utils.data <span class="keyword">import</span> DataLoader</span><br><span class="line"></span><br><span class="line"><span class="comment"># 数据预处理</span></span><br><span class="line">transform = transforms.Compose([</span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    transforms.Normalize((<span class="number">0.5</span>,), (<span class="number">0.5</span>,))</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载数据集</span></span><br><span class="line">train_data = MNIST(<span class="string">&#x27;./data&#x27;</span>, train=<span class="literal">True</span>, transform=transform, download=<span class="literal">True</span>)</span><br><span class="line">test_data = MNIST(<span class="string">&#x27;./data&#x27;</span>, train=<span class="literal">False</span>, transform=transform, download=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建数据加载器</span></span><br><span class="line">train_loader = DataLoader(train_data, batch_size=<span class="number">32</span>, shuffle=<span class="literal">True</span>)</span><br><span class="line">test_loader = DataLoader(test_data, batch_size=<span class="number">32</span>, shuffle=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-CNN模型设计"><a href="#2-CNN模型设计" class="headerlink" title="2. CNN模型设计"></a>2. CNN模型设计</h3><p>我们使用了一个包含三层卷积和三层全连接层的CNN模型。每个卷积层后都跟着ReLU激活函数和最大池化层。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MnistModel</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>(MnistModel, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.conv1 = Conv2d(in_channels=<span class="number">1</span>, out_channels=<span class="number">32</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>)</span><br><span class="line">        <span class="variable language_">self</span>.maxpool1 = MaxPool2d(<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = Conv2d(in_channels=<span class="number">32</span>, out_channels=<span class="number">64</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>)</span><br><span class="line">        <span class="variable language_">self</span>.maxpool2 = MaxPool2d(<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.conv3 = Conv2d(in_channels=<span class="number">64</span>, out_channels=<span class="number">128</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>)</span><br><span class="line">        <span class="variable language_">self</span>.maxpool3 = MaxPool2d(<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.fc1 = Linear(in_features=<span class="number">128</span>*<span class="number">3</span>*<span class="number">3</span>, out_features=<span class="number">128</span>)</span><br><span class="line">        <span class="variable language_">self</span>.fc2 = Linear(in_features=<span class="number">128</span>, out_features=<span class="number">64</span>)</span><br><span class="line">        <span class="variable language_">self</span>.fc3 = Linear(in_features=<span class="number">64</span>, out_features=<span class="number">10</span>)</span><br><span class="line">        <span class="variable language_">self</span>.ReLU = ReLU()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = <span class="variable language_">self</span>.ReLU(<span class="variable language_">self</span>.maxpool1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        x = <span class="variable language_">self</span>.ReLU(<span class="variable language_">self</span>.maxpool2(<span class="variable language_">self</span>.conv2(x)))</span><br><span class="line">        x = <span class="variable language_">self</span>.ReLU(<span class="variable language_">self</span>.maxpool3(<span class="variable language_">self</span>.conv3(x)))</span><br><span class="line">        x = x.view(x.size(<span class="number">0</span>), -<span class="number">1</span>)</span><br><span class="line">        x = <span class="variable language_">self</span>.fc1(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.fc2(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.fc3(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br></pre></td></tr></table></figure>
+
+<h4 id="模型结构解析"><a href="#模型结构解析" class="headerlink" title="模型结构解析"></a>模型结构解析</h4><p>让我们详细分析每一层的输出尺寸变化：</p>
+<ol>
+<li><p>输入层：28×28×1</p>
+</li>
+<li><p>第一卷积层（Conv1）：</p>
+<ul>
+<li>输入：28×28×1</li>
+<li>卷积：3×3核，步长1，填充1</li>
+<li>输出：28×28×32</li>
+<li>最大池化：2×2，步长2</li>
+<li>最终输出：14×14×32</li>
+</ul>
+</li>
+<li><p>第二卷积层（Conv2）：</p>
+<ul>
+<li>输入：14×14×32</li>
+<li>卷积：3×3核，步长1，填充1</li>
+<li>输出：14×14×64</li>
+<li>最大池化：2×2，步长2</li>
+<li>最终输出：7×7×64</li>
+</ul>
+</li>
+<li><p>第三卷积层（Conv3）：</p>
+<ul>
+<li>输入：7×7×64</li>
+<li>卷积：3×3核，步长1，填充1</li>
+<li>输出：7×7×128</li>
+<li>最大池化：2×2，步长2</li>
+<li>最终输出：3×3×128</li>
+</ul>
+</li>
+</ol>
+<p>这就解释了为什么全连接层的输入维度是$128<em>3</em>3&#x3D;1152$。让我们用卷积和池化的输出尺寸计算公式来验证每一层的输出尺寸：</p>
+<ol>
+<li><p>第一卷积层：</p>
+<ul>
+<li>卷积：$H_{out} &#x3D; \left\lfloor \frac{28 - 3 + 2×1}{1} \right\rfloor + 1 &#x3D; 28$</li>
+<li>池化：$H_{out} &#x3D; \left\lfloor \frac{28 - 2}{2} \right\rfloor + 1 &#x3D; 14$</li>
+</ul>
+</li>
+<li><p>第二卷积层：</p>
+<ul>
+<li>卷积：$H_{out} &#x3D; \left\lfloor \frac{14 - 3 + 2×1}{1} \right\rfloor + 1 &#x3D; 14$</li>
+<li>池化：$H_{out} &#x3D; \left\lfloor \frac{14 - 2}{2} \right\rfloor + 1 &#x3D; 7$</li>
+</ul>
+</li>
+<li><p>第三卷积层：</p>
+<ul>
+<li>卷积：$H_{out} &#x3D; \left\lfloor \frac{7 - 3 + 2×1}{1} \right\rfloor + 1 &#x3D; 7$</li>
+<li>池化：$H_{out} &#x3D; \left\lfloor \frac{7 - 2}{2} \right\rfloor + 1 &#x3D; 3$</li>
+</ul>
+</li>
+</ol>
+<h3 id="3-训练过程"><a href="#3-训练过程" class="headerlink" title="3. 训练过程"></a>3. 训练过程</h3><p>训练过程中，我们使用了交叉熵损失函数和Adam优化器：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">criterion = CrossEntropyLoss()</span><br><span class="line">optimizer = optim.Adam(model.parameters(), lr=<span class="number">0.001</span>)</span><br></pre></td></tr></table></figure>
+
+<p>训练过程的损失变化如下图所示：</p>
+<p><img src="/images/mnist/training_loss.png" alt="训练损失曲线"></p>
+<p>从图中可以看出，模型的损失值随着训练步数的增加而稳定下降，表明训练过程正常。</p>
+<h3 id="4-预测结果"><a href="#4-预测结果" class="headerlink" title="4. 预测结果"></a>4. 预测结果</h3><p>下面是模型在测试集上的一些预测结果：</p>
+<p><img src="/images/mnist/predictions.png" alt="预测结果示例"></p>
+<p>绿色表示预测正确，红色表示预测错误。从图中可以看出，模型对大多数数字都能正确识别。</p>
+<h3 id="5-模型性能分析"><a href="#5-模型性能分析" class="headerlink" title="5. 模型性能分析"></a>5. 模型性能分析</h3><p>最后，让我们看看模型在各个数字上的识别准确率：</p>
+<p><img src="/images/mnist/class_accuracy.png" alt="各数字识别准确率"></p>
+<p>从柱状图可以看出：</p>
+<ul>
+<li>大多数数字的识别准确率都在99%以上</li>
+<li>某些数字（如1和7）的识别准确率特别高</li>
+<li>某些数字（如9）的识别准确率相对较低，这可能是因为它们的书写变化较大</li>
+</ul>
+<h2 id="深入理解：CNN如何实现手写数字识别？"><a href="#深入理解：CNN如何实现手写数字识别？" class="headerlink" title="深入理解：CNN如何实现手写数字识别？"></a>深入理解：CNN如何实现手写数字识别？</h2><p>通过上面的实验结果，我们看到模型达到了很高的识别准确率。那么，CNN是如何实现这个看似简单的任务的呢？让我们通过这个项目深入理解深度学习的工作原理。</p>
+<h3 id="1-从像素到特征：层次化学习过程"><a href="#1-从像素到特征：层次化学习过程" class="headerlink" title="1. 从像素到特征：层次化学习过程"></a>1. 从像素到特征：层次化学习过程</h3><p>在我们的项目中，CNN通过三层卷积网络逐步学习图像特征：</p>
+<ol>
+<li><p>第一卷积层（Conv1）提取基本特征：</p>
+<ul>
+<li>32个3×3卷积核提取边缘、角点等低级特征</li>
+<li>特征图显示了数字的基本轮廓</li>
+<li>这一层主要关注局部像素变化</li>
+</ul>
+</li>
+<li><p>第二卷积层（Conv2）组合特征：</p>
+<ul>
+<li>64个卷积核组合低级特征，形成更复杂的模式</li>
+<li>特征图开始显示数字的部分结构</li>
+<li>感受野扩大，可以检测更复杂的模式</li>
+</ul>
+</li>
+<li><p>第三卷积层（Conv3）提取高级特征：</p>
+<ul>
+<li>128个卷积核捕捉完整的数字结构</li>
+<li>特征图展示了数字的关键识别特征</li>
+<li>此时已经能够表示完整的数字形状</li>
+</ul>
+</li>
+</ol>
+<p>这种层次化的特征提取过程是深度学习区别于传统机器学习的关键所在。每一层都在前一层的基础上提取更抽象的特征，最终形成对数字的完整理解。</p>
+<h3 id="2-MNIST任务的特点与挑战"><a href="#2-MNIST任务的特点与挑战" class="headerlink" title="2. MNIST任务的特点与挑战"></a>2. MNIST任务的特点与挑战</h3><p>MNIST手写数字识别虽然是一个相对简单的计算机视觉任务，但它仍然具有一些特点和挑战：</p>
+<ol>
+<li><strong>变化多样性</strong>：同一个数字可以有多种不同的书写风格</li>
+<li><strong>噪声和变形</strong>：手写数字可能存在噪声、倾斜或变形</li>
+<li><strong>特征提取</strong>：需要从28×28的像素矩阵中提取有意义的特征</li>
+<li><strong>类别区分</strong>：某些数字（如4和9，3和8）在某些书写风格下非常相似</li>
+</ol>
+<p>我们的CNN模型通过层次化特征学习和非线性变换，成功应对了这些挑战，实现了高精度的识别。</p>
+<h2 id="结论与思考"><a href="#结论与思考" class="headerlink" title="结论与思考"></a>结论与思考</h2><p>通过这个手写数字识别项目，我们不仅实现了一个高精度的分类器，更重要的是理解了深度学习在实际应用中的工作方式：</p>
+<ol>
+<li><strong>自动特征学习</strong>：CNN能够自动从原始像素数据中学习有用的特征表示，无需人工设计特征提取器</li>
+<li><strong>层次化表示</strong>：从低级边缘特征到高级结构特征，CNN通过多层结构逐步构建复杂的表示</li>
+<li><strong>端到端优化</strong>：通过反向传播算法，模型能够端到端地优化所有参数，使整个系统协同工作</li>
+</ol>
+<p>这个项目虽然简单，但包含了深度学习的核心思想和方法。通过理解CNN如何解决MNIST这样的基础任务，我们可以更好地把握深度学习的本质，为解决更复杂的计算机视觉问题打下基础。</p>
+<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><p>完整的项目代码已经上传到GitHub：<a target="_blank" rel="noopener" href="https://github.com/onef1shy/mnist-pytorch">mnist-pytorch</a></p>
+<p>项目包含：</p>
+<ul>
+<li>完整的模型实现</li>
+<li>训练和测试代码</li>
+<li>可视化工具</li>
+<li>详细的文档说明</li>
+</ul>
+<p>如果这个项目对您有帮助，欢迎给仓库点个star⭐️。如有任何问题或建议，也欢迎在评论区留言交流。</p>
+
   </article>
 
   <!-- prev and next -->
@@ -581,8 +780,33 @@
   ">
     <div>
       
+        <a href="/2024/04/22/ResNet/"
+          class="
+            transition-all
+            flex justify-center
+            hover:-translate-x-1
+            hover:text-[var(--c-80)]
+          ">
+          <iconify-icon width="20" icon="mingcute:left-fill" data-inline="false">
+          </iconify-icon>
+          深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑
+        </a>
+      
     </div>
     <div>
+      
+        <a href="/2024/03/01/CNN/"
+          class="
+            flex 
+            justify-center
+            hover:translate-x-1 
+            transition-transform
+            hover:text-[var(--c-100)]
+          "
+        >
+          卷积神经网络(CNN)综述：从起源到现代架构的演进
+          <iconify-icon width="20" icon="mingcute:right-fill" data-inline="false"></iconify-icon>
+        </a>
       
     </div>
   </div>

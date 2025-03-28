@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <meta name="author" content="Zeyu Yan">
+
+
+  <meta name="subtitle" content="Recording Academic Journey">
+
+
+  <meta name="description" content="Undergraduate student at Xidian University, passionate about Computer Vision and Data Mining. Focusing on agricultural remote sensing image analysis and predictive modeling. Seeking to advance my knowledge in deep learning through academic research.">
+
+
+  <meta name="keywords" content="academic, blog, research, technology, computer vision, data mining">
+
+
+<title>深度高斯过程：基于遥感数据的作物产量预测技术 | Zeyu Yan</title>
+
+
+
+<link rel="icon" href="/images/about/redefine-favicon.png">
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css"
+/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/css/search.css">
+
+
+
+<script src="/lib/jquery.min.js"></script>
+
+
+<script src="/lib/iconify-icon.min.js"></script>
+
+
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+  };
+</script>
+
+<script>
+  (function () {
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const setting = localStorage.getItem("hexo-color-scheme") || "auto";
+    if (setting === "dark" || (prefersDark && setting !== "light"))
+      document.documentElement.classList.toggle("dark", true);
+    let isDark = document.documentElement.classList.contains("dark");
+  })();
+
+  $(document).ready(function () {
+    // init icon
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = document.documentElement.classList.contains("dark");
+    $("#theme-icon").attr("icon", isDark ? "ic:round-dark-mode" : "ic:round-light-mode");
+
+    function toggleGiscusTheme() {
+      const isDark = document.documentElement.classList.contains("dark");
+      const giscusFrame = document.querySelector("iframe.giscus-frame");
+      if (giscusFrame) {
+        giscusFrame.contentWindow.postMessage(
+          {
+            giscus: {
+              setConfig: {
+                theme: isDark ? "dark" : "light",
+              },
+            },
+          },
+          "https://giscus.app"
+        );
+      }
+    }
+
+
+    // toggle dark mode
+    function toggleDark() {
+      let isDark = document.documentElement.classList.contains("dark");
+      const setting = localStorage.getItem("hexo-color-scheme") || "auto";
+      isDark = !isDark;
+      document.documentElement.classList.toggle("dark", isDark);
+      $("#theme-icon").attr("icon", isDark ? "ic:round-dark-mode" : "ic:round-light-mode");
+      if (prefersDark === isDark) {
+        localStorage.setItem("hexo-color-scheme", "auto");
+      } else {
+        localStorage.setItem("hexo-color-scheme", isDark ? "dark" : "light");
+      }
+      toggleGiscusTheme();
+    }
+    $("#toggle-dark").click(toggleDark);
+
+    // listen dark mode change
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (e) => {
+        const setting = localStorage.getItem("hexo-color-scheme") || "auto";
+        if (setting === "auto") {
+          document.documentElement.classList.toggle("dark", e.matches);
+          $("#theme-icon").attr(
+            "icon",
+            e.matches ? "ic:round-dark-mode" : "ic:round-light-mode"
+          );
+          toggleGiscusTheme();
+        }
+      });
+  });
+</script>
+
+
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body 
+  class="
+    bg-[var(--c-0)]
+    text-[var(--c-80)]
+  ">
+  <!-- The navigation bar -->
+<header class="
+    flex flex-row items-center
+    w-full
+    pr-4
+    z-10
+    border-b-[1px]
+    border-b-[var(--c-border)]
+    dark:bg-[var(--c-0)]
+    dark:border-b-[var(--c-0)]
+    gap-2
+    h-[var(--h-header)]
+    text-[var(--c-80)]
+">
+  <!-- Left part -->
+  <div class="overflow-hidden h-full flex flex-row items-center">
+    <!-- Site Title on the top left -->
+    <a href="/" class="
+            whitespace-nowrap
+            text-2xl
+            text-[var(--c-theme)]
+            hover:text-[var(--c-theme)]
+            pl-4
+            font-black
+            bg-gradient-to-r from-cyan-500
+            to-blue-500 bg-clip-text text-transparent
+          ">
+      Zeyu Yan
+    </a>
+  </div>
+  <!-- Div for pushing items to both sides -->
+  <div class="flex-1"></div>
+  <!-- Right part -->
+  <div class="flex flex-row items-center z-20 h-full">
+    <!-- Page links -->
+    <div class="hidden sm:flex flex-row h-full">
+      
+        
+        
+          
+          
+        
+      <a href="/./archives" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:inbox-fill" width="22">
+        </iconify-icon>
+        
+        
+        <p>Posts</p>
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./publications" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:science-fill" width="22">
+        </iconify-icon>
+        
+        
+        <p>Publications</p>
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./about" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:user-info-fill" width="22">
+        </iconify-icon>
+        
+        
+        <p>About Me</p>
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./categories" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:classify-2-fill" width="22">
+        </iconify-icon>
+        
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./tags" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:tag-fill" width="22">
+        </iconify-icon>
+        
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./index" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:home-2-fill" width="22">
+        </iconify-icon>
+        
+        
+      </a>
+      
+    </div>
+    <!-- Icons on the right -->
+    <div class="flex flex-row items-center justify-center">
+
+      <!-- TODO: Add search icon here -->
+
+      <!-- Dark/light toggle icon -->
+      <a class="flex group p-1" title="toggle theme" id="toggle-dark">
+        <iconify-icon class="transition-transform
+                    group-hover:rotate-[45deg]
+                    group-hover:scale-125
+                    group-hover:text-[var(--c-theme)]" width="24" id="theme-icon">
+        </iconify-icon>
+      </a>
+      <!-- Icon for dropout menu on small screens -->
+      <div class="flex flex-row items-center justify-center p-1 sm:hidden">
+        <a class="w-6 h-6" aria-hidden="true" id="open-menu">
+          <iconify-icon width="24" icon="mingcute:menu-fill" class="transition-transform hover:scale-125 hover:rotate-[5deg]">
+          </iconify-icon>
+        </a>
+        <a class="w-6 h-6 hidden" aria-hidden="true" id="close-menu">
+          <iconify-icon width="24" icon="mingcute:close-circle-fill" class="transition-transform hover:scale-125 hover:rotate-[80deg]">
+          </iconify-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Dropdown menu on small screens -->
+<div id="menu-panel" class="
+        h-0
+        overflow-hidden
+        sm:hidden
+        w-full
+        z-10
+        rounded
+    ">
+  <div id="menu-content" class="
+        flex
+        flex-col
+        font-bold
+        text-xl
+        border-b-[1px]
+        relative
+        z-20
+        border-[var(--c-sep)]
+        px-2
+        py-2
+        -translate-y-full
+        transition-transform
+        duration-200
+        ">
+    
+    
+    
+    <a href="/./archives" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:inbox-fill" width="22">
+      </iconify-icon>
+      <p>
+        Posts
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./publications" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:science-fill" width="22">
+      </iconify-icon>
+      <p>
+        Publications
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./about" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:user-info-fill" width="22">
+      </iconify-icon>
+      <p>
+        About Me
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./categories" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:classify-2-fill" width="22">
+      </iconify-icon>
+      <p>
+        
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./tags" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:tag-fill" width="22">
+      </iconify-icon>
+      <p>
+        
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./index" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:home-2-fill" width="22">
+      </iconify-icon>
+      <p>
+        
+      </p>
+    </a>
+    
+    
+  </div>
+</div>
+
+  <main>
+    <!-- css -->
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.min.css">
+
+  
+<link rel="stylesheet" href="/lib/tocbot/tocbot.min.css">
+
+    <!-- toc -->
+    
+  <!-- tocbot -->
+<nav class="post-toc toc text-sm w-40 relative top-32 right-4 opacity-70 hidden lg:block" style="position: fixed !important;"></nav>
+
+
+<section class="px-6 max-w-prose mx-auto md:px-0">
+  <!-- Post header before content -->
+  <header class="py-4">
+    <div class="flex flex-col gap-2 pt-4 md:pt-6">
+      <!-- Title -->
+      <div id="article-title" class="leading-snug">
+        <p class="text-3xl font-bold text-[var(--c-100)] mb-4">深度高斯过程：基于遥感数据的作物产量预测技术</p>
+      </div>
+      <!-- Meta data -->
+      <div>
+        <section class="
+          flex flex-col gap-x-2 gap-y-1 text-sm text-[var(--c-100)]">
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <!-- Dates -->
+            <div class="flex items-center gap-1">
+              <iconify-icon width="18" icon="mingcute:add-circle-fill" ></iconify-icon>
+              Created: <time class="w-max">2024-08-20</time>
+            </div>
+            <div class="flex items-center gap-1">
+              <iconify-icon width="18" icon="mingcute:refresh-3-fill" ></iconify-icon>
+              Edited: <time class="w-max">2025-03-28</time>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-3">
+            <!-- Author -->
+            
+
+            <!-- Word count -->
+            <span class="flex items-center gap-1">
+              <iconify-icon width="18" icon="mingcute:book-2-fill" ></iconify-icon>
+              <span>4.6k words, 17 min</span>
+            </span>
+            <!-- Categories -->
+            
+              <!-- <span class="text-gray-400">·</span> -->
+              <span class="flex flex-row items-center gap-1 group hover:underline">
+                <iconify-icon class="transition-all group-hover:scale-125 mr-0"
+                  width="18"
+                  icon="mingcute:classify-2-fill">
+                </iconify-icon>
+                <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">论文笔记</a>
+              </span>
+            
+          </div>
+        </section>
+      </div>
+      <!-- tags -->
+      <div>
+        
+<div class="flex flex-wrap gap-1">
+  
+    
+      <a href="/tags/%E4%BA%A7%E9%87%8F%E9%A2%84%E4%BC%B0/" 
+        class="
+          tag
+          text-sm
+          rounded-full
+          px-[5px]
+          border-[1px]
+          border-[var(--c-theme)]
+          text-[var(--c-theme)]
+          bg-[var(--c-0)]
+          dark:bg-[var(--c-0)]
+          dark:drop-shadow-none
+          hover:bg-[var(--c-theme)]
+          hover:text-[var(--c-0)]
+          dark:hover:text-[var(--c-10)]
+          dark:hover:bg-[var(--c-theme)]
+        ">
+        产量预估
+      </a>
+    
+  
+</div>
+      </div>
+    </div>
+  </header>
+  <!-- content -->
+  <article class="post-content prose m-auto dark:prose-invert">
+    <h2 id="1-论文背景与动机"><a href="#1-论文背景与动机" class="headerlink" title="1. 论文背景与动机"></a>1. 论文背景与动机</h2><p>《Deep Gaussian Process for Crop Yield Prediction Based on Remote Sensing Data》是由斯坦福大学的Jiaxuan You和同事们于2017年在AAAI会议上发表的一篇开创性论文，该论文荣获AAAI计算可持续性赛道的最佳学生论文奖，以及世界银行大数据创新挑战赛的”最佳大数据解决方案”奖。</p>
+<h3 id="1-1-研究背景"><a href="#1-1-研究背景" class="headerlink" title="1.1 研究背景"></a>1.1 研究背景</h3><p>准确预测作物产量对于全球粮食安全、农业管理和政策制定至关重要。传统的作物产量预测方法主要依赖于地面调查和专家经验，这些方法成本高昂且效率低下。随着遥感技术的发展，利用卫星影像数据预测作物产量成为可能，这提供了一种更加高效、大规模的解决方案。</p>
+<p>然而，遥感数据的高维度、非结构化特性以及作物生长过程的复杂性使得传统的机器学习方法在处理此类问题时面临着巨大挑战。此外，地理空间数据中固有的空间相关性也需要特殊处理。</p>
+<h3 id="1-2-研究动机"><a href="#1-2-研究动机" class="headerlink" title="1.2 研究动机"></a>1.2 研究动机</h3><p>论文的主要动机是解决遥感数据用于作物产量预测中面临的三大挑战：</p>
+<ol>
+<li><p><strong>数据复杂性</strong>：卫星图像数据具有高维度、非结构化的特性，且包含时间序列信息，传统方法难以有效处理。</p>
+</li>
+<li><p><strong>空间相关性</strong>：地理上邻近的区域往往具有相似的土壤、气候和农业管理条件，这种空间相关性是重要的预测信号，但常被传统模型忽略。</p>
+</li>
+<li><p><strong>数据稀疏性</strong>：详细的作物产量标注数据通常较为稀少，尤其是在发展中国家地区。</p>
+</li>
+</ol>
+<p>为了解决这些挑战，论文提出了一种新颖的深度高斯过程模型，将深度神经网络的表达能力与高斯过程的空间建模优势相结合，实现了更准确的作物产量预测。</p>
+<h2 id="2-方法论与模型架构"><a href="#2-方法论与模型架构" class="headerlink" title="2. 方法论与模型架构"></a>2. 方法论与模型架构</h2><h3 id="2-1-数据来源与处理"><a href="#2-1-数据来源与处理" class="headerlink" title="2.1 数据来源与处理"></a>2.1 数据来源与处理</h3><p>该研究使用了两类主要数据：</p>
+<ol>
+<li><p><strong>遥感数据</strong>：主要来自MODIS (Moderate Resolution Imaging Spectroradiometer) 卫星，提供了包括植被指数、地表温度等多个波段的信息。MODIS提供了250米到1000米分辨率的数据，具体包括：</p>
+<ul>
+<li>近红外反射率(841-876nm)和红光反射率(620-670nm)波段，用于计算NDVI</li>
+<li>地表温度数据(LST)</li>
+<li>地表反射率的七个波段</li>
+<li>土地覆盖类型信息</li>
+</ul>
+</li>
+<li><p><strong>产量数据</strong>：来自美国农业部(USDA)的县级大豆产量历史数据，作为模型的标签。这些数据以蒲式耳&#x2F;英亩为单位，通过USDA国家农业统计服务(NASS)收集。</p>
+</li>
+</ol>
+<h4 id="2-1-1-详细数据处理流程"><a href="#2-1-1-详细数据处理流程" class="headerlink" title="2.1.1 详细数据处理流程"></a>2.1.1 详细数据处理流程</h4><ol>
+<li><strong>数据获取</strong>：通过Google Earth Engine API批量下载MODIS卫星数据</li>
+<li><strong>时间窗口选择</strong>：选择每年5月至10月的生长季数据，每8天一个时间点</li>
+<li><strong>空间处理</strong>：<ul>
+<li>使用县级行政边界数据提取每个县的卫星图像</li>
+<li>应用农田掩膜(Cropland Data Layer)，排除非农业用地区域</li>
+<li>将每个县的卫星图像剪裁到统一大小</li>
+</ul>
+</li>
+<li><strong>特征提取</strong>：<ul>
+<li>计算归一化植被指数(NDVI): $NDVI &#x3D; \frac{NIR - RED}{NIR + RED}$</li>
+<li>提取地表温度(LST)数据</li>
+</ul>
+</li>
+<li><strong>数据清洗</strong>：<ul>
+<li>处理云遮挡和其他数据缺失问题</li>
+<li>进行数据插值和异常值检测</li>
+<li>标准化特征以提高模型训练稳定性</li>
+</ul>
+</li>
+</ol>
+<h3 id="2-2-深度高斯过程框架"><a href="#2-2-深度高斯过程框架" class="headerlink" title="2.2 深度高斯过程框架"></a>2.2 深度高斯过程框架</h3><p>论文提出的深度高斯过程框架主要包含两个核心组件：一个深度神经网络和一个高斯过程回归器。这种结构设计的核心思想是将深度学习的强大特征提取能力与高斯过程的概率建模和空间相关性建模相结合。</p>
+<h4 id="2-2-1-深度神经网络组件"><a href="#2-2-1-深度神经网络组件" class="headerlink" title="2.2.1 深度神经网络组件"></a>2.2.1 深度神经网络组件</h4><p>论文探索了两种主要的神经网络架构：</p>
+<ol>
+<li><p><strong>CNN架构具体实现</strong>：</p>
+<ul>
+<li><strong>输入层</strong>：接收形状为$(w, h, c, t)$的张量，其中$w$和$h$是空间维度，$c$是通道数，$t$是时间步数</li>
+<li><strong>卷积层结构</strong>：<ul>
+<li>第一层：32个$3\times3$卷积核，步长为1，ReLU激活</li>
+<li>第二层：64个$3\times3$卷积核，步长为2，ReLU激活</li>
+<li>第三层：128个$3\times3$卷积核，步长为2，ReLU激活</li>
+</ul>
+</li>
+<li><strong>池化层</strong>：每个卷积层后使用$2\times2$最大池化</li>
+<li><strong>全连接层</strong>：两个全连接层，分别为1024和512个神经元，使用Dropout(0.5)防止过拟合</li>
+<li><strong>输出层</strong>：最终输出一个低维特征向量(通常为256维)</li>
+</ul>
+</li>
+<li><p><strong>LSTM架构具体实现</strong>：</p>
+<ul>
+<li><strong>输入处理</strong>：对每个时间步的卫星图像特征进行空间汇总，得到时间序列表示</li>
+<li><strong>LSTM层</strong>：<ul>
+<li>第一层：128个LSTM单元，返回序列</li>
+<li>第二层：64个LSTM单元，只返回最后时间步的输出</li>
+</ul>
+</li>
+<li><strong>全连接层</strong>：一个256神经元的全连接层，ReLU激活</li>
+<li><strong>输出层</strong>：生成最终特征向量</li>
+</ul>
+</li>
+</ol>
+<p>这两种架构解决了不同的问题方面：CNN更擅长处理空间模式，而LSTM更擅长捕捉时间依赖关系。特别是在作物生长这样的时序问题上，LSTM的优势尤为明显。</p>
+<h4 id="2-2-2-高斯过程回归组件详解"><a href="#2-2-2-高斯过程回归组件详解" class="headerlink" title="2.2.2 高斯过程回归组件详解"></a>2.2.2 高斯过程回归组件详解</h4><p>高斯过程是一种非参数贝叶斯方法，能够建模函数的分布，提供预测的不确定性估计。在本研究中，高斯过程的应用有几个关键要点：</p>
+<ol>
+<li><p><strong>核函数选择</strong>：虽然论文主要使用RBF核函数，但也探索了其他核函数的性能：</p>
+<ul>
+<li><strong>径向基函数(RBF)</strong>：$k(\mathbf{z}_i, \mathbf{z}_j) &#x3D; \sigma_f^2 \exp\left(-\frac{1}{2l^2}||\mathbf{z}_i - \mathbf{z}_j||^2\right)$</li>
+<li><strong>Matérn核</strong>：提供更少的平滑假设，对于不太规则的函数更适用</li>
+<li><strong>周期核</strong>：可以捕捉季节性模式</li>
+</ul>
+</li>
+<li><p><strong>超参数学习</strong>：通过边缘似然最大化，自动学习核函数的超参数：</p>
+<ul>
+<li>信号方差$\sigma_f^2$控制输出的幅度</li>
+<li>长度尺度$l$控制函数的平滑度</li>
+<li>观测噪声方差$\sigma_n^2$表示数据中的噪声水平</li>
+</ul>
+</li>
+<li><p><strong>预测过程</strong>：给定训练数据$\mathbf{X}<em>{train}$、训练标签$\mathbf{y}</em>{train}$和测试输入$\mathbf{X}<em>{test}$，GP预测分布为：<br>$$\mathbf{y}</em>{test} | \mathbf{X}<em>{train}, \mathbf{y}</em>{train}, \mathbf{X}<em>{test} \sim \mathcal{N}(\boldsymbol{\mu}</em>{test}, \boldsymbol{\Sigma}_{test})$$</p>
+<p>其中：<br>$$\boldsymbol{\mu}<em>{test} &#x3D; \mathbf{K}</em>{test, train}[\mathbf{K}<em>{train, train} + \sigma_n^2\mathbf{I}]^{-1}\mathbf{y}</em>{train}$$<br>$$\boldsymbol{\Sigma}<em>{test} &#x3D; \mathbf{K}</em>{test, test} - \mathbf{K}<em>{test, train}[\mathbf{K}</em>{train, train} + \sigma_n^2\mathbf{I}]^{-1}\mathbf{K}_{train, test}$$</p>
+</li>
+<li><p><strong>优势</strong>：GP不仅提供点预测，还提供预测的不确定性估计，这在农业决策中尤为重要。</p>
+</li>
+</ol>
+<h4 id="2-2-3-端到端学习算法"><a href="#2-2-3-端到端学习算法" class="headerlink" title="2.2.3 端到端学习算法"></a>2.2.3 端到端学习算法</h4><p>深度高斯过程模型采用端到端的学习算法，将神经网络特征提取和高斯过程建模联合优化：</p>
+<ol>
+<li><p><strong>目标函数</strong>：最大化带噪声观测的对数边缘似然：<br>$$\mathcal{L}(\theta, \mathbf{\Phi}) &#x3D; \log p(\mathbf{y}|\mathbf{X}, \theta, \mathbf{\Phi})$$</p>
+<p>其中$\theta$是神经网络参数，$\mathbf{\Phi}$是GP超参数。</p>
+</li>
+<li><p><strong>优化算法</strong>：使用随机梯度下降的变种(如Adam)交替优化神经网络参数和GP超参数：</p>
+<ul>
+<li>对神经网络参数，计算$\frac{\partial \mathcal{L}}{\partial \theta}$并更新$\theta$</li>
+<li>对GP超参数，计算$\frac{\partial \mathcal{L}}{\partial \mathbf{\Phi}}$并更新$\mathbf{\Phi}$</li>
+</ul>
+</li>
+<li><p><strong>计算复杂度</strong>：</p>
+<ul>
+<li>时间复杂度主要由GP部分决定，为$O(n^3)$，其中$n$是训练样本数</li>
+<li>通过小批量训练和稀疏近似方法缓解计算负担</li>
+</ul>
+</li>
+<li><p><strong>梯度传播</strong>：GP层的梯度可以通过核矩阵的微分传回神经网络，实现端到端训练</p>
+</li>
+</ol>
+<h3 id="2-3-特征工程创新"><a href="#2-3-特征工程创新" class="headerlink" title="2.3 特征工程创新"></a>2.3 特征工程创新</h3><p>论文中的一个关键创新是使用直方图来表示卫星图像数据，这种方法有几个显著优势：</p>
+<ol>
+<li><p><strong>直方图表示的动机</strong>：</p>
+<ul>
+<li>减少图像噪声的影响</li>
+<li>降低数据维度，提高计算效率</li>
+<li>捕捉区域内像素值的统计分布，而非单一统计量（如均值）</li>
+</ul>
+</li>
+<li><p><strong>直方图类型详解</strong>：</p>
+<ul>
+<li><strong>单变量直方图</strong>：将NDVI值分为多个区间(bins)，计算每个区间像素的频率</li>
+<li><strong>二维联合直方图</strong>：同时考虑NDVI和LST两个变量，创建二维网格，计算落在每个网格的像素数量</li>
+<li><strong>三维联合直方图</strong>：同时考虑三个变量的联合分布，如NDVI、LST和一个反射率波段</li>
+</ul>
+</li>
+<li><p><strong>直方图参数选择</strong>：</p>
+<ul>
+<li>单变量直方图通常使用20-30个区间</li>
+<li>二维联合直方图使用$10 \times 10$的网格</li>
+<li>三维联合直方图使用$5 \times 5 \times 5$的网格</li>
+</ul>
+</li>
+<li><p><strong>直方图序列</strong>：对每个时间点计算直方图，形成直方图序列，捕捉作物生长的时间动态：<br>$$H_i &#x3D; [h_{i1}, h_{i2}, …, h_{iT}]$$<br>其中$h_{it}$是第$i$个县在第$t$个时间点的直方图。</p>
+</li>
+<li><p><strong>直方图标准化</strong>：为消除县大小差异的影响，对直方图进行归一化处理，使所有直方图的总和为1。</p>
+</li>
+</ol>
+<h2 id="3-实验设置与评估"><a href="#3-实验设置与评估" class="headerlink" title="3. 实验设置与评估"></a>3. 实验设置与评估</h2><h3 id="3-1-实验数据集详情"><a href="#3-1-实验数据集详情" class="headerlink" title="3.1 实验数据集详情"></a>3.1 实验数据集详情</h3><p>实验采用了美国11个主要大豆生产州的县级数据：</p>
+<ol>
+<li><p><strong>空间覆盖</strong>：</p>
+<ul>
+<li>州：Illinois, Indiana, Iowa, Kansas, Michigan, Minnesota, Missouri, Nebraska, North Dakota, Ohio, South Dakota</li>
+<li>县数量：1,123个县</li>
+<li>这些州占美国大豆总产量的82%</li>
+</ul>
+</li>
+<li><p><strong>时间覆盖</strong>：</p>
+<ul>
+<li>年份：2003-2015年（13年）</li>
+<li>生长季：每年5月至10月</li>
+<li>数据频率：每8天一个时间点，每年约24个时间点</li>
+</ul>
+</li>
+<li><p><strong>样本构成</strong>：</p>
+<ul>
+<li>每个样本点代表一个县-年组合</li>
+<li>总样本量：约13,000个县-年样本点(1,123县×13年×89%有效数据率)</li>
+<li>训练&#x2F;测试划分：采用留一年出交叉验证，例如使用2003-2014年数据训练，在2015年测试</li>
+</ul>
+</li>
+<li><p><strong>数据预处理</strong>：</p>
+<ul>
+<li>去除非作物区域</li>
+<li>处理缺失值（如云遮挡）</li>
+<li>数据标准化</li>
+<li>过滤小于阈值的县级样本（主要是大豆种植面积过小的县）</li>
+</ul>
+</li>
+</ol>
+<h3 id="3-2-模型实现细节"><a href="#3-2-模型实现细节" class="headerlink" title="3.2 模型实现细节"></a>3.2 模型实现细节</h3><ol>
+<li><p><strong>CNN实现细节</strong>：</p>
+<ul>
+<li>输入：$64 \times 64 \times C \times T$张量，其中$C$是通道数，$T$是时间步</li>
+<li>批量大小：64</li>
+<li>优化器：Adam，学习率0.001，β₁&#x3D;0.9，β₂&#x3D;0.999</li>
+<li>正则化：权重衰减(L2)和Dropout(0.5)</li>
+<li>训练轮数：100轮，提前停止策略</li>
+</ul>
+</li>
+<li><p><strong>LSTM实现细节</strong>：</p>
+<ul>
+<li>输入：$T \times F$张量，其中$T$是时间步，$F$是每个时间步的特征维度</li>
+<li>训练参数与CNN相似，但批量大小为128</li>
+<li>LSTM单元使用tanh激活函数和sigmoid门控函数</li>
+</ul>
+</li>
+<li><p><strong>GP实现</strong>：</p>
+<ul>
+<li>使用GPflow库实现</li>
+<li>核函数：径向基函数(RBF)</li>
+<li>超参数初始化：<ul>
+<li>信号方差$\sigma_f^2 &#x3D; 1.0$</li>
+<li>长度尺度$l &#x3D; 1.0$</li>
+<li>观测噪声方差$\sigma_n^2 &#x3D; 0.1$</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>计算资源</strong>：</p>
+<ul>
+<li>硬件：英伟达Tesla K80 GPU</li>
+<li>软件框架：TensorFlow 1.0和GPflow</li>
+</ul>
+</li>
+</ol>
+<h3 id="3-3-评估方法详解"><a href="#3-3-评估方法详解" class="headerlink" title="3.3 评估方法详解"></a>3.3 评估方法详解</h3><ol>
+<li><p><strong>留一年出交叉验证(LOOCV)</strong>：这种方法更符合实际预测场景，因为在实际应用中，我们总是用历史数据预测未来产量。具体流程：</p>
+<ul>
+<li>从13年数据中选择一年作为测试集</li>
+<li>使用其余12年作为训练集</li>
+<li>重复此过程13次，每次选择不同年份作为测试集</li>
+<li>平均所有测试结果</li>
+</ul>
+</li>
+<li><p><strong>评估指标详细说明</strong>：</p>
+<ul>
+<li><strong>RMSE (均方根误差)</strong>：$\sqrt{\frac{1}{n}\sum_{i&#x3D;1}^{n}(y_i - \hat{y}_i)^2}$<br>计量单位为蒲式耳&#x2F;英亩，值越小越好</li>
+<li><strong>MAE (平均绝对误差)</strong>：$\frac{1}{n}\sum_{i&#x3D;1}^{n}|y_i - \hat{y}_i|$<br>同样以蒲式耳&#x2F;英亩为单位</li>
+<li><strong>R² (决定系数)</strong>：$1 - \frac{\sum_{i&#x3D;1}^{n}(y_i - \hat{y}<em>i)^2}{\sum</em>{i&#x3D;1}^{n}(y_i - \bar{y})^2}$<br>范围在[0,1]之间，越接近1表示模型解释的方差比例越高</li>
+</ul>
+</li>
+<li><p><strong>基准模型配置</strong>：</p>
+<ul>
+<li><strong>线性回归</strong>：使用sklearn实现，带L2正则化(Ridge回归)</li>
+<li><strong>决策树</strong>：最大深度10，最小叶子样本数20</li>
+<li><strong>随机森林</strong>：100棵树，最大深度15</li>
+<li><strong>纯GP模型</strong>：直接在原始特征上应用GP回归</li>
+<li><strong>纯深度学习模型</strong>：CNN或LSTM，输出层直接预测产量，不使用GP</li>
+</ul>
+</li>
+</ol>
+<h2 id="4-实验结果与分析"><a href="#4-实验结果与分析" class="headerlink" title="4. 实验结果与分析"></a>4. 实验结果与分析</h2><h3 id="4-1-模型性能全面对比"><a href="#4-1-模型性能全面对比" class="headerlink" title="4.1 模型性能全面对比"></a>4.1 模型性能全面对比</h3><h4 id="4-1-1-整体性能比较"><a href="#4-1-1-整体性能比较" class="headerlink" title="4.1.1 整体性能比较"></a>4.1.1 整体性能比较</h4><p>下表展示了在留一年出交叉验证设置下，不同模型的平均性能：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>RMSE (bu&#x2F;acre)</th>
+<th>MAE (bu&#x2F;acre)</th>
+<th>R²</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>线性回归</td>
+<td>7.47</td>
+<td>5.76</td>
+<td>0.32</td>
+</tr>
+<tr>
+<td>决策树</td>
+<td>7.86</td>
+<td>6.02</td>
+<td>0.29</td>
+</tr>
+<tr>
+<td>随机森林</td>
+<td>6.69</td>
+<td>5.16</td>
+<td>0.47</td>
+</tr>
+<tr>
+<td>纯CNN</td>
+<td>6.11</td>
+<td>4.78</td>
+<td>0.55</td>
+</tr>
+<tr>
+<td>纯LSTM</td>
+<td>6.33</td>
+<td>4.98</td>
+<td>0.53</td>
+</tr>
+<tr>
+<td>纯GP</td>
+<td>6.85</td>
+<td>5.31</td>
+<td>0.44</td>
+</tr>
+<tr>
+<td>CNN+GP</td>
+<td>5.56</td>
+<td>4.35</td>
+<td>0.61</td>
+</tr>
+<tr>
+<td>LSTM+GP</td>
+<td>5.38</td>
+<td>4.13</td>
+<td>0.64</td>
+</tr>
+</tbody></table>
+<p>可以看出，融合了深度学习和高斯过程的模型明显优于单一类型的模型。</p>
+<h4 id="4-1-2-年度性能分析"><a href="#4-1-2-年度性能分析" class="headerlink" title="4.1.2 年度性能分析"></a>4.1.2 年度性能分析</h4><p>下表展示了各年份测试集上CNN+GP和LSTM+GP模型的RMSE(蒲式耳&#x2F;英亩)：</p>
+<table>
+<thead>
+<tr>
+<th>年份</th>
+<th>CNN</th>
+<th>CNN+GP</th>
+<th>LSTM</th>
+<th>LSTM+GP</th>
+<th>年产量变化情况</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2009</td>
+<td>6.07</td>
+<td>5.56</td>
+<td>5.18</td>
+<td>6.37</td>
+<td>正常年</td>
+</tr>
+<tr>
+<td>2010</td>
+<td>6.75</td>
+<td>7.03</td>
+<td>7.27</td>
+<td>7.30</td>
+<td>丰收年</td>
+</tr>
+<tr>
+<td>2011</td>
+<td>6.77</td>
+<td>6.40</td>
+<td>6.82</td>
+<td>6.72</td>
+<td>干旱年</td>
+</tr>
+<tr>
+<td>2012</td>
+<td>5.91</td>
+<td>5.72</td>
+<td>7.01</td>
+<td>6.46</td>
+<td>严重干旱年</td>
+</tr>
+<tr>
+<td>2013</td>
+<td>6.41</td>
+<td>6.00</td>
+<td>5.91</td>
+<td>5.83</td>
+<td>正常年</td>
+</tr>
+<tr>
+<td>2014</td>
+<td>5.28</td>
+<td>4.87</td>
+<td>5.99</td>
+<td>4.65</td>
+<td>丰收年</td>
+</tr>
+<tr>
+<td>2015</td>
+<td>6.18</td>
+<td>5.36</td>
+<td>6.14</td>
+<td>5.13</td>
+<td>正常年</td>
+</tr>
+</tbody></table>
+<p>这些结果显示：</p>
+<ul>
+<li>不同年份的预测难度不同，与当年的气候和生长条件密切相关</li>
+<li>在极端条件年份(如2012年严重干旱)，CNN+GP表现更好</li>
+<li>在正常和丰收年份，LSTM+GP通常表现更佳</li>
+<li>与纯深度学习模型相比，加入GP组件后，在大多数年份都能显著改善预测性能</li>
+</ul>
+<h3 id="4-2-空间相关性深入分析"><a href="#4-2-空间相关性深入分析" class="headerlink" title="4.2 空间相关性深入分析"></a>4.2 空间相关性深入分析</h3><p>研究通过多种方式验证了高斯过程捕捉空间相关性的能力：</p>
+<ol>
+<li><p><strong>核矩阵可视化</strong>：论文绘制了不同县之间的核矩阵热图，显示：</p>
+<ul>
+<li>地理上相邻的县通常具有更高的核相似度</li>
+<li>这种相似度模式与实际的农业生产区域分布高度一致</li>
+<li>核矩阵能够自动识别出具有相似农业实践和环境条件的县群</li>
+</ul>
+</li>
+<li><p><strong>预测误差空间分布</strong>：</p>
+<ul>
+<li>相邻县域往往有相似的预测误差</li>
+<li>高斯过程能够识别并修正这种空间相关的误差模式</li>
+</ul>
+</li>
+<li><p><strong>长度尺度分析</strong>：</p>
+<ul>
+<li>学习到的GP长度尺度($l$)反映了空间相关性的范围</li>
+<li>不同特征和年份的长度尺度不同，说明空间相关性是动态变化的</li>
+<li>通过分析实验发现，最优长度尺度通常对应约50-100英里的物理距离，这与农业区域的典型尺度相符</li>
+</ul>
+</li>
+</ol>
+<h3 id="4-3-时间模式分析"><a href="#4-3-时间模式分析" class="headerlink" title="4.3 时间模式分析"></a>4.3 时间模式分析</h3><p>研究对作物生长的时间模式进行了详细分析：</p>
+<ol>
+<li><p><strong>关键生长期识别</strong>：</p>
+<ul>
+<li>通过分析LSTM的注意力权重，确定了对产量预测最重要的时间阶段</li>
+<li>发现7月中旬至8月初(大豆开花和结荚期)是最关键的预测时期</li>
+<li>这与农学知识一致，因为这一阶段的生长条件对最终产量影响最大</li>
+</ul>
+</li>
+<li><p><strong>时间特征重要性</strong>：</p>
+<ul>
+<li>研究计算了每个时间点特征的重要性得分</li>
+<li>重要性随生长季节呈现先升后降的趋势</li>
+</ul>
+</li>
+<li><p><strong>早期预测能力</strong>：</p>
+<ul>
+<li>研究测试了使用不完整生长季数据的预测性能</li>
+<li>发现使用至8月初的数据，模型可以达到接近全季数据的预测准确性</li>
+<li>这说明模型具有早期预测能力，可以在收获前数月提供可靠预测</li>
+</ul>
+</li>
+</ol>
+<h3 id="4-4-特征重要性综合分析"><a href="#4-4-特征重要性综合分析" class="headerlink" title="4.4 特征重要性综合分析"></a>4.4 特征重要性综合分析</h3><p>论文通过多种方法分析了不同遥感特征对预测的贡献：</p>
+<ol>
+<li><p><strong>单一特征表现</strong>：</p>
+<ul>
+<li>NDVI(归一化植被指数)是单独预测性能最好的特征，RMSE为6.41蒲式耳&#x2F;英亩</li>
+<li>LST(地表温度)次之，RMSE为7.19蒲式耳&#x2F;英亩</li>
+<li>各个反射率波段的单独预测性能较差</li>
+</ul>
+</li>
+<li><p><strong>特征组合效果</strong>：</p>
+<ul>
+<li>NDVI+LST的组合显著优于单一特征</li>
+<li>添加更多特征带来的性能提升逐渐减小</li>
+<li>最佳组合是NDVI+LST+近红外反射率，RMSE为5.38蒲式耳&#x2F;英亩</li>
+</ul>
+</li>
+<li><p><strong>不同尺度特征的贡献</strong>：</p>
+<ul>
+<li>县级平均特征提供基线信息</li>
+<li>直方图表示捕捉了县内特征分布，提供更丰富信息</li>
+<li>联合直方图捕捉了特征间的相互关系，进一步提高性能</li>
+</ul>
+</li>
+<li><p><strong>特征与气候条件的交互</strong>：</p>
+<ul>
+<li>在干旱年份，LST的重要性显著增加</li>
+<li>在正常年份，NDVI和其他植被指数更为重要</li>
+<li>这表明模型能够自动适应不同气候条件下的预测策略</li>
+</ul>
+</li>
+</ol>
+<h2 id="5-应用场景与局限性"><a href="#5-应用场景与局限性" class="headerlink" title="5. 应用场景与局限性"></a>5. 应用场景与局限性</h2><h3 id="5-1-潜在应用场景"><a href="#5-1-潜在应用场景" class="headerlink" title="5.1 潜在应用场景"></a>5.1 潜在应用场景</h3><ol>
+<li><strong>早期预警系统</strong>：提前数月预测作物产量，帮助政府和组织准备</li>
+<li><strong>精准农业</strong>：帮助农民优化资源分配</li>
+<li><strong>发展中国家应用</strong>：弥补地面观测不足，提供可靠预测</li>
+</ol>
+<h3 id="5-2-局限性与未来方向"><a href="#5-2-局限性与未来方向" class="headerlink" title="5.2 局限性与未来方向"></a>5.2 局限性与未来方向</h3><ol>
+<li><strong>数据分辨率限制</strong>：MODIS数据分辨率较低</li>
+<li><strong>计算复杂度</strong>：高斯过程计算复杂度高</li>
+<li><strong>未来方向</strong>：多分辨率融合、多作物模型、迁移学习等</li>
+</ol>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><p>本研究通过创新性地结合深度学习和高斯过程，有效解决了遥感数据作物产量预测的关键挑战。实验结果表明，这种融合方法能够显著提高预测准确性，并具有良好的解释性和泛化能力。</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p>[1] You, J., et al. (2017). Deep Gaussian Process for Crop Yield Prediction Based on Remote Sensing Data. AAAI-17, pp. 4559-4566.</p>
+<p>[2] Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian Processes for Machine Learning. MIT Press.</p>
+<p>[3] Justice, C. O., et al. (1998). The Moderate Resolution Imaging Spectroradiometer (MODIS): land remote sensing for global change research. IEEE Transactions on Geoscience and Remote Sensing, 36(4), 1228-1249. </p>
+
+  </article>
+
+  <!-- prev and next -->
+  <div class="flex justify-between mt-4 pt-4
+    border-t border-[var(--c-sep)] text-sm
+    gap-2 text-[var(--c-50)]
+  ">
+    <div>
+      
+    </div>
+    <div>
+      
+        <a href="/2024/07/20/Google_Scholar_Crawler/"
+          class="
+            flex 
+            justify-center
+            hover:translate-x-1 
+            transition-transform
+            hover:text-[var(--c-100)]
+          "
+        >
+          从0到1：构建智能化Google Scholar文献爬虫
+          <iconify-icon width="20" icon="mingcute:right-fill" data-inline="false"></iconify-icon>
+        </a>
+      
+    </div>
+  </div>
+
+  <!-- comment -->
+  <div class="article-comments mt-12">
+    
+
+  </div>
+</section>
+<!-- js inspect -->
+
+<script src="/lib/clipboard.min.js"></script>
+
+
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+  });
+</script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  $(document).ready(() => {
+    const maraidConfig = {
+      theme: "default",
+      logLevel: 3,
+      flowchart: { curve: "linear" },
+      gantt: { axisFormat: "%m/%d/%Y" },
+      sequence: { actorMargin: 50 },
+    };
+    mermaid.initialize(maraidConfig);
+  });
+</script>
+
+
+
+<script src="/lib/fancybox/fancybox.umd.min.js"></script>
+
+<script>
+  $(document).ready(() => {
+    $('.post-content').each(function(i){
+      $(this).find('img').each(function(){
+        if ($(this).parent().hasClass('fancybox') || $(this).parent().is('a')) return;
+        var alt = this.alt;
+        var title = this.title;
+        if (alt) $(this).after('<span class="fancybox-alt">' + alt + '</span>');
+        else if (title) $(this).after('<span class="fancybox-title">' + title + '</span>');
+        $(this).wrap('<a class="fancybox-img" href="' + this.src + '" data-fancybox=\"gallery\" data-caption="' + title + '"></a>')
+      });
+      $(this).find('.fancybox').each(function(){
+        $(this).attr('rel', 'article' + i);
+      });
+    });
+
+    Fancybox.bind('[data-fancybox="gallery"]', {
+        // options
+    })
+  })
+</script>
+
+<!-- tocbot begin -->
+
+<script src="/lib/tocbot/tocbot.min.js"></script>
+
+<script>
+  $(document).ready(() => {
+      tocbot.init({
+        // Where to render the table of contents.
+        tocSelector: '.post-toc',
+        // Where to grab the headings to build the table of contents.
+        contentSelector: '.post-content',
+        // Which headings to grab inside of the contentSelector element.
+        headingSelector: 'h1, h2, h3',
+        // For headings inside relative or absolute positioned containers within content.
+        hasInnerContainers: true,
+    });
+  })
+</script>
+<!-- tocbot end -->
+
+  </main>
+  <footer class="flex flex-col mt-18 mb-12 items-center
+  text-[var(--c-50)] text-sm">
+  <div class="flex flex-row items-center my-12">
+    
+    
+        
+        
+            
+            
+            
+        
+        <div class="relative group">
+            <a class="
+                hover:text-[var(--c-theme)]
+                hover:bg-[var(--c-20)]
+                rounded-lg
+                p-2
+                my-1
+                flex flex-row items-center
+                group" title="Github" target="_blank" rel="noopener" href="https://github.com/onef1shy">
+                <iconify-icon width="28" icon="mingcute:github-fill"></iconify-icon>
+            </a>
+            
+        </div>
+    
+        
+        
+            
+            
+            
+        
+        <div class="relative group">
+            <a class="
+                hover:text-[var(--c-theme)]
+                hover:bg-[var(--c-20)]
+                rounded-lg
+                p-2
+                my-1
+                flex flex-row items-center
+                group" title="QQ" href="javascript:void(0)">
+                <iconify-icon width="28" icon="mingcute:qq-fill"></iconify-icon>
+            </a>
+            
+            <div class="absolute left-0 bottom-full mb-2 hidden group-hover:block z-10">
+                <img src="/images/about/qq-qr.png" class="max-w-[150px] rounded-md shadow-lg" alt="QQ QR Code">
+            </div>
+            
+        </div>
+    
+        
+        
+            
+            
+            
+        
+        <div class="relative group">
+            <a class="
+                hover:text-[var(--c-theme)]
+                hover:bg-[var(--c-20)]
+                rounded-lg
+                p-2
+                my-1
+                flex flex-row items-center
+                group" title="WeChat" href="javascript:void(0)">
+                <iconify-icon width="28" icon="mingcute:wechat-fill"></iconify-icon>
+            </a>
+            
+            <div class="absolute left-0 bottom-full mb-2 hidden group-hover:block z-10">
+                <img src="/images/about/wechat-qr.png" class="max-w-[150px] rounded-md shadow-lg" alt="WeChat QR Code">
+            </div>
+            
+        </div>
+    
+
+  </div>
+  <!-- busuanzi -->
+  <div class="mb-6">
+    
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- Busuanzi Analytics -->
+<div class="flex flex-col items-center mb-2">
+  <div class="flex flex-row items-center">
+    <iconify-icon width="16" icon="ic:round-person" width="18"></iconify-icon>
+    <span class="mr-1">访客 Visitors: </span>
+    <span id="busuanzi_value_site_uv"></span>
+  </div>
+  <div class="flex flex-row items-center">
+    <iconify-icon width="16" icon="carbon:view-filled" width="18"></iconify-icon>
+    <span class="mx-1">浏览量 Page Views:</span>
+    <span id="busuanzi_value_site_pv"></span>
+  </div>
+</div>
+<!-- End Busuanzi Analytics -->
+
+
+  </div>
+  <!-- copyright -->
+  <div class="flex flex-row items-center gap-2">
+    <a class="hover:underline"
+      target="_blank"
+      href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    >
+      CC BY-NC-SA 4.0
+    </a>
+    <span>© 2024-2025</span>
+    <a class="hover:underline"
+    href="https://github.com/onef1shy" 
+    target="_blank" 
+    rel="noopener noreferrer">闫泽宇</a>
+  </div>
+  <!-- powered by -->
+  <div class="flex items-center gap-1">
+    <span>Powered by</span>
+    <a class="hover:underline" 
+    href="https://hexo.io/" target="_blank" rel="noopener noreferrer">Hexo</a>
+    <span>&</span>
+    <a href="https://github.com/chen-yingfa/hexo-theme-fengye" 
+    class="hover:underline"
+    target="_blank"
+      rel="noopener noreferrer"
+      >
+      枫叶 Fengye
+    </a>
+  </div>
+
+</footer>
+
+  <div class="
+    back-to-top
+    fixed right-6
+    z-1024
+    -bottom-20
+    rounded-lg
+    font-bold
+    py-1 px-2
+    text-[var(--c-80)]
+    bg-[var(--c-20)]
+    cursor-pointer
+    text-center
+    drop-shadow-md
+  ">
+    <span class="flex justify-center items-center text-sm">
+      <span id="scrollpercent"><span>0</span> %</span>
+      <iconify-icon width="18" icon="mingcute:arrow-to-up-fill" id="go-top"></iconify-icon>
+    </span>
+  </div>
+  
+<script src="/js/main.js"></script>
+
+
+  <div class="fixed top-0 bottom-0 left-0 right-0 pointer-events-none print:hidden" id="maple"></div>
+</body>
+
+</html>

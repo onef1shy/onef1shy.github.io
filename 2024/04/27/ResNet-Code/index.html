@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <meta name="author" content="Zeyu Yan">
+
+
+  <meta name="subtitle" content="Recording Academic Journey">
+
+
+  <meta name="description" content="Undergraduate student at Xidian University, passionate about Computer Vision and Data Mining. Focusing on agricultural remote sensing image analysis and predictive modeling. Seeking to advance my knowledge in deep learning through academic research.">
+
+
+  <meta name="keywords" content="academic, blog, research, technology, computer vision, data mining">
+
+
+<title>深度残差网络(ResNet)代码详解：PyTorch复现CIFAR-10图像分类 | Zeyu Yan</title>
+
+
+
+<link rel="icon" href="/images/about/redefine-favicon.png">
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css"
+/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/css/search.css">
+
+
+
+<script src="/lib/jquery.min.js"></script>
+
+
+<script src="/lib/iconify-icon.min.js"></script>
+
+
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+  };
+</script>
+
+<script>
+  (function () {
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const setting = localStorage.getItem("hexo-color-scheme") || "auto";
+    if (setting === "dark" || (prefersDark && setting !== "light"))
+      document.documentElement.classList.toggle("dark", true);
+    let isDark = document.documentElement.classList.contains("dark");
+  })();
+
+  $(document).ready(function () {
+    // init icon
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = document.documentElement.classList.contains("dark");
+    $("#theme-icon").attr("icon", isDark ? "ic:round-dark-mode" : "ic:round-light-mode");
+
+    function toggleGiscusTheme() {
+      const isDark = document.documentElement.classList.contains("dark");
+      const giscusFrame = document.querySelector("iframe.giscus-frame");
+      if (giscusFrame) {
+        giscusFrame.contentWindow.postMessage(
+          {
+            giscus: {
+              setConfig: {
+                theme: isDark ? "dark" : "light",
+              },
+            },
+          },
+          "https://giscus.app"
+        );
+      }
+    }
+
+
+    // toggle dark mode
+    function toggleDark() {
+      let isDark = document.documentElement.classList.contains("dark");
+      const setting = localStorage.getItem("hexo-color-scheme") || "auto";
+      isDark = !isDark;
+      document.documentElement.classList.toggle("dark", isDark);
+      $("#theme-icon").attr("icon", isDark ? "ic:round-dark-mode" : "ic:round-light-mode");
+      if (prefersDark === isDark) {
+        localStorage.setItem("hexo-color-scheme", "auto");
+      } else {
+        localStorage.setItem("hexo-color-scheme", isDark ? "dark" : "light");
+      }
+      toggleGiscusTheme();
+    }
+    $("#toggle-dark").click(toggleDark);
+
+    // listen dark mode change
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (e) => {
+        const setting = localStorage.getItem("hexo-color-scheme") || "auto";
+        if (setting === "auto") {
+          document.documentElement.classList.toggle("dark", e.matches);
+          $("#theme-icon").attr(
+            "icon",
+            e.matches ? "ic:round-dark-mode" : "ic:round-light-mode"
+          );
+          toggleGiscusTheme();
+        }
+      });
+  });
+</script>
+
+
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body 
+  class="
+    bg-[var(--c-0)]
+    text-[var(--c-80)]
+  ">
+  <!-- The navigation bar -->
+<header class="
+    flex flex-row items-center
+    w-full
+    pr-4
+    z-10
+    border-b-[1px]
+    border-b-[var(--c-border)]
+    dark:bg-[var(--c-0)]
+    dark:border-b-[var(--c-0)]
+    gap-2
+    h-[var(--h-header)]
+    text-[var(--c-80)]
+">
+  <!-- Left part -->
+  <div class="overflow-hidden h-full flex flex-row items-center">
+    <!-- Site Title on the top left -->
+    <a href="/" class="
+            whitespace-nowrap
+            text-2xl
+            text-[var(--c-theme)]
+            hover:text-[var(--c-theme)]
+            pl-4
+            font-black
+            bg-gradient-to-r from-cyan-500
+            to-blue-500 bg-clip-text text-transparent
+          ">
+      Zeyu Yan
+    </a>
+  </div>
+  <!-- Div for pushing items to both sides -->
+  <div class="flex-1"></div>
+  <!-- Right part -->
+  <div class="flex flex-row items-center z-20 h-full">
+    <!-- Page links -->
+    <div class="hidden sm:flex flex-row h-full">
+      
+        
+        
+          
+          
+        
+      <a href="/./archives" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:inbox-fill" width="22">
+        </iconify-icon>
+        
+        
+        <p>Posts</p>
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./publications" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:science-fill" width="22">
+        </iconify-icon>
+        
+        
+        <p>Publications</p>
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./about" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:user-info-fill" width="22">
+        </iconify-icon>
+        
+        
+        <p>About Me</p>
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./categories" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:classify-2-fill" width="22">
+        </iconify-icon>
+        
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./tags" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:tag-fill" width="22">
+        </iconify-icon>
+        
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./index" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:home-2-fill" width="22">
+        </iconify-icon>
+        
+        
+      </a>
+      
+    </div>
+    <!-- Icons on the right -->
+    <div class="flex flex-row items-center justify-center">
+
+      <!-- TODO: Add search icon here -->
+
+      <!-- Dark/light toggle icon -->
+      <a class="flex group p-1" title="toggle theme" id="toggle-dark">
+        <iconify-icon class="transition-transform
+                    group-hover:rotate-[45deg]
+                    group-hover:scale-125
+                    group-hover:text-[var(--c-theme)]" width="24" id="theme-icon">
+        </iconify-icon>
+      </a>
+      <!-- Icon for dropout menu on small screens -->
+      <div class="flex flex-row items-center justify-center p-1 sm:hidden">
+        <a class="w-6 h-6" aria-hidden="true" id="open-menu">
+          <iconify-icon width="24" icon="mingcute:menu-fill" class="transition-transform hover:scale-125 hover:rotate-[5deg]">
+          </iconify-icon>
+        </a>
+        <a class="w-6 h-6 hidden" aria-hidden="true" id="close-menu">
+          <iconify-icon width="24" icon="mingcute:close-circle-fill" class="transition-transform hover:scale-125 hover:rotate-[80deg]">
+          </iconify-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Dropdown menu on small screens -->
+<div id="menu-panel" class="
+        h-0
+        overflow-hidden
+        sm:hidden
+        w-full
+        z-10
+        rounded
+    ">
+  <div id="menu-content" class="
+        flex
+        flex-col
+        font-bold
+        text-xl
+        border-b-[1px]
+        relative
+        z-20
+        border-[var(--c-sep)]
+        px-2
+        py-2
+        -translate-y-full
+        transition-transform
+        duration-200
+        ">
+    
+    
+    
+    <a href="/./archives" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:inbox-fill" width="22">
+      </iconify-icon>
+      <p>
+        Posts
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./publications" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:science-fill" width="22">
+      </iconify-icon>
+      <p>
+        Publications
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./about" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:user-info-fill" width="22">
+      </iconify-icon>
+      <p>
+        About Me
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./categories" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:classify-2-fill" width="22">
+      </iconify-icon>
+      <p>
+        
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./tags" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:tag-fill" width="22">
+      </iconify-icon>
+      <p>
+        
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./index" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:home-2-fill" width="22">
+      </iconify-icon>
+      <p>
+        
+      </p>
+    </a>
+    
+    
+  </div>
+</div>
+
+  <main>
+    <!-- css -->
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.min.css">
+
+  
+<link rel="stylesheet" href="/lib/tocbot/tocbot.min.css">
+
+    <!-- toc -->
+    
+  <!-- tocbot -->
+<nav class="post-toc toc text-sm w-40 relative top-32 right-4 opacity-70 hidden lg:block" style="position: fixed !important;"></nav>
+
+
+<section class="px-6 max-w-prose mx-auto md:px-0">
+  <!-- Post header before content -->
+  <header class="py-4">
+    <div class="flex flex-col gap-2 pt-4 md:pt-6">
+      <!-- Title -->
+      <div id="article-title" class="leading-snug">
+        <p class="text-3xl font-bold text-[var(--c-100)] mb-4">深度残差网络(ResNet)代码详解：PyTorch复现CIFAR-10图像分类</p>
+      </div>
+      <!-- Meta data -->
+      <div>
+        <section class="
+          flex flex-col gap-x-2 gap-y-1 text-sm text-[var(--c-100)]">
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <!-- Dates -->
+            <div class="flex items-center gap-1">
+              <iconify-icon width="18" icon="mingcute:add-circle-fill" ></iconify-icon>
+              Created: <time class="w-max">2024-04-27</time>
+            </div>
+            <div class="flex items-center gap-1">
+              <iconify-icon width="18" icon="mingcute:refresh-3-fill" ></iconify-icon>
+              Edited: <time class="w-max">2025-03-28</time>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-3">
+            <!-- Author -->
+            
+
+            <!-- Word count -->
+            <span class="flex items-center gap-1">
+              <iconify-icon width="18" icon="mingcute:book-2-fill" ></iconify-icon>
+              <span>3.8k words, 16 min</span>
+            </span>
+            <!-- Categories -->
+            
+              <!-- <span class="text-gray-400">·</span> -->
+              <span class="flex flex-row items-center gap-1 group hover:underline">
+                <iconify-icon class="transition-all group-hover:scale-125 mr-0"
+                  width="18"
+                  icon="mingcute:classify-2-fill">
+                </iconify-icon>
+                <a class="article-category-link" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/">项目实践</a>
+              </span>
+            
+          </div>
+        </section>
+      </div>
+      <!-- tags -->
+      <div>
+        
+<div class="flex flex-wrap gap-1">
+  
+    
+      <a href="/tags/%E6%AE%8B%E5%B7%AE%E7%BD%91%E7%BB%9C/" 
+        class="
+          tag
+          text-sm
+          rounded-full
+          px-[5px]
+          border-[1px]
+          border-[var(--c-theme)]
+          text-[var(--c-theme)]
+          bg-[var(--c-0)]
+          dark:bg-[var(--c-0)]
+          dark:drop-shadow-none
+          hover:bg-[var(--c-theme)]
+          hover:text-[var(--c-0)]
+          dark:hover:text-[var(--c-10)]
+          dark:hover:bg-[var(--c-theme)]
+        ">
+        残差网络
+      </a>
+    
+  
+</div>
+      </div>
+    </div>
+  </header>
+  <!-- content -->
+  <article class="post-content prose m-auto dark:prose-invert">
+    <blockquote>
+<p>本文是<a href="/2024/04/22/ResNet/">《深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑》</a>的姊妹篇，专注于ResNet的代码实现。建议先阅读论文解读文章，了解ResNet的理论基础和核心思想，再学习本文的代码实现部分。</p>
+</blockquote>
+<p>在上一篇文章中，我们详细解读了何恺明等人提出的深度残差网络(ResNet)论文。本文将聚焦于ResNet的代码实现，通过PyTorch框架在CIFAR-10数据集上复现论文中的模型结构和实验结果。</p>
+<h2 id="1-项目概述"><a href="#1-项目概述" class="headerlink" title="1. 项目概述"></a>1. 项目概述</h2><p>本项目旨在精确复现2016年发表的原始ResNet论文中的方法和结果，实现了多种深度的ResNet变体，包括标准ResNet (ResNet18&#x2F;34&#x2F;50&#x2F;101&#x2F;152) 和专为CIFAR-10设计的变体 (ResNet20&#x2F;32&#x2F;44&#x2F;56&#x2F;110&#x2F;1202)。</p>
+<p>项目的主要文件包括：</p>
+<ul>
+<li><code>resnet.py</code>: 定义ResNet模型架构</li>
+<li><code>train.py</code>: 训练和评估脚本</li>
+<li><code>run.sh</code>: 训练脚本示例</li>
+</ul>
+<h2 id="2-残差块实现"><a href="#2-残差块实现" class="headerlink" title="2. 残差块实现"></a>2. 残差块实现</h2><p>ResNet的核心是残差块(Residual Block)，它通过跳跃连接(shortcut connection)解决了深度网络的退化问题。我们实现了两种类型的残差块：基本残差块和瓶颈残差块。</p>
+<h3 id="2-1-基本残差块-BasicBlock"><a href="#2-1-基本残差块-BasicBlock" class="headerlink" title="2.1 基本残差块(BasicBlock)"></a>2.1 基本残差块(BasicBlock)</h3><p>基本残差块用于ResNet18&#x2F;34等较浅的网络，结构为：两个3×3卷积层加上跳跃连接。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BasicBlock</span>(nn.Module):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;基本残差块，用于ResNet18/34等较浅的网络&quot;&quot;&quot;</span></span><br><span class="line">    expansion = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, out_channels, stride=<span class="number">1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(BasicBlock, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="comment"># 原始论文中的基本残差块结构：</span></span><br><span class="line">        <span class="comment"># conv -&gt; BN -&gt; ReLU -&gt; conv -&gt; BN -&gt; 加上shortcut -&gt; ReLU</span></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=stride, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(out_channels)</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=<span class="number">1</span>, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn2 = nn.BatchNorm2d(out_channels)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.shortcut = nn.Sequential()</span><br><span class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> in_channels != out_channels * <span class="variable language_">self</span>.expansion:</span><br><span class="line">            <span class="variable language_">self</span>.shortcut = nn.Sequential(</span><br><span class="line">                nn.Conv2d(in_channels, out_channels * <span class="variable language_">self</span>.expansion, kernel_size=<span class="number">1</span>,</span><br><span class="line">                          stride=stride, bias=<span class="literal">False</span>),</span><br><span class="line">                nn.BatchNorm2d(out_channels * <span class="variable language_">self</span>.expansion)</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = <span class="variable language_">self</span>.bn2(<span class="variable language_">self</span>.conv2(out))</span><br><span class="line">        out += <span class="variable language_">self</span>.shortcut(x)  <span class="comment"># 关键的残差连接</span></span><br><span class="line">        out = F.relu(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<p>代码解析：</p>
+<ol>
+<li><code>expansion = 1</code>: 表示输出通道数与指定的<code>out_channels</code>相同，没有扩展</li>
+<li>两个3×3卷积层，每层后跟批量归一化(Batch Normalization)</li>
+<li><code>shortcut</code>连接：当输入和输出维度不匹配时(stride≠1或通道数不同)，使用1×1卷积进行维度调整</li>
+<li>前向传播中的<code>out += self.shortcut(x)</code>实现了残差连接，将输入直接加到卷积层的输出上</li>
+</ol>
+<h3 id="2-2-瓶颈残差块-Bottleneck"><a href="#2-2-瓶颈残差块-Bottleneck" class="headerlink" title="2.2 瓶颈残差块(Bottleneck)"></a>2.2 瓶颈残差块(Bottleneck)</h3><p>瓶颈残差块用于ResNet50&#x2F;101&#x2F;152等较深的网络，结构为：1×1卷积降维 → 3×3卷积 → 1×1卷积升维。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Bottleneck</span>(nn.Module):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;瓶颈残差块，用于ResNet50/101/152等较深的网络&quot;&quot;&quot;</span></span><br><span class="line">    expansion = <span class="number">4</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels, out_channels, stride=<span class="number">1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(Bottleneck, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(in_channels, out_channels,</span><br><span class="line">                               kernel_size=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(out_channels)</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=stride, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn2 = nn.BatchNorm2d(out_channels)</span><br><span class="line">        <span class="variable language_">self</span>.conv3 = nn.Conv2d(out_channels, out_channels * <span class="variable language_">self</span>.expansion,</span><br><span class="line">                               kernel_size=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn3 = nn.BatchNorm2d(out_channels * <span class="variable language_">self</span>.expansion)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.shortcut = nn.Sequential()</span><br><span class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> in_channels != out_channels * <span class="variable language_">self</span>.expansion:</span><br><span class="line">            <span class="variable language_">self</span>.shortcut = nn.Sequential(</span><br><span class="line">                nn.Conv2d(in_channels, out_channels * <span class="variable language_">self</span>.expansion,</span><br><span class="line">                          kernel_size=<span class="number">1</span>, stride=stride, bias=<span class="literal">False</span>),</span><br><span class="line">                nn.BatchNorm2d(out_channels * <span class="variable language_">self</span>.expansion)</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn2(<span class="variable language_">self</span>.conv2(out)))</span><br><span class="line">        out = <span class="variable language_">self</span>.bn3(<span class="variable language_">self</span>.conv3(out))</span><br><span class="line">        out += <span class="variable language_">self</span>.shortcut(x)  <span class="comment"># 残差连接</span></span><br><span class="line">        out = F.relu(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<p>代码解析：</p>
+<ol>
+<li><code>expansion = 4</code>: 表示输出通道数是指定<code>out_channels</code>的4倍</li>
+<li>三个卷积层：<ul>
+<li>1×1卷积降维：减少通道数，降低计算复杂度</li>
+<li>3×3卷积：主要的特征提取</li>
+<li>1×1卷积升维：恢复&#x2F;扩展通道数</li>
+</ul>
+</li>
+<li>瓶颈设计大大减少了参数量和计算复杂度，同时保持了性能</li>
+</ol>
+<h2 id="3-ResNet网络架构"><a href="#3-ResNet网络架构" class="headerlink" title="3. ResNet网络架构"></a>3. ResNet网络架构</h2><p>我们实现了两种ResNet变体：标准ResNet和CIFAR-10专用ResNet。</p>
+<h3 id="3-1-标准ResNet"><a href="#3-1-标准ResNet" class="headerlink" title="3.1 标准ResNet"></a>3.1 标准ResNet</h3><p>标准ResNet架构适用于ImageNet等大型数据集，但我们也可以将其应用于CIFAR-10。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ResNet</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, block, num_blocks, num_classes=<span class="number">10</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(ResNet, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.in_channels = <span class="number">64</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># CIFAR-10使用3x3卷积，步长为1</span></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(<span class="number">3</span>, <span class="number">64</span>, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=<span class="number">1</span>, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(<span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 构建残差层</span></span><br><span class="line">        <span class="variable language_">self</span>.layer1 = <span class="variable language_">self</span>._make_layer(block, <span class="number">64</span>, num_blocks[<span class="number">0</span>], stride=<span class="number">1</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer2 = <span class="variable language_">self</span>._make_layer(block, <span class="number">128</span>, num_blocks[<span class="number">1</span>], stride=<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer3 = <span class="variable language_">self</span>._make_layer(block, <span class="number">256</span>, num_blocks[<span class="number">2</span>], stride=<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer4 = <span class="variable language_">self</span>._make_layer(block, <span class="number">512</span>, num_blocks[<span class="number">3</span>], stride=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 全连接层</span></span><br><span class="line">        <span class="variable language_">self</span>.fc = nn.Linear(<span class="number">512</span> * block.expansion, num_classes)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_make_layer</span>(<span class="params">self, block, out_channels, num_blocks, stride</span>):</span><br><span class="line">        strides = [stride] + [<span class="number">1</span>] * (num_blocks - <span class="number">1</span>)</span><br><span class="line">        layers = []</span><br><span class="line">        <span class="keyword">for</span> stride <span class="keyword">in</span> strides:</span><br><span class="line">            layers.append(block(<span class="variable language_">self</span>.in_channels, out_channels, stride))</span><br><span class="line">            <span class="variable language_">self</span>.in_channels = out_channels * block.expansion</span><br><span class="line">        <span class="keyword">return</span> nn.Sequential(*layers)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = <span class="variable language_">self</span>.layer1(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer2(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer3(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer4(out)</span><br><span class="line">        out = F.avg_pool2d(out, <span class="number">4</span>)</span><br><span class="line">        out = out.view(out.size(<span class="number">0</span>), -<span class="number">1</span>)</span><br><span class="line">        out = <span class="variable language_">self</span>.fc(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<p>代码解析：</p>
+<ol>
+<li>初始层：3×3卷积，64个滤波器，步长为1（与ImageNet版本不同，ImageNet使用7×7卷积，步长为2）</li>
+<li>四个阶段的残差层，通道数分别为64、128、256、512</li>
+<li><code>_make_layer</code>方法：构建每个阶段的残差块序列，第一个块可能改变步长和通道数，后续块保持相同的通道数和步长1</li>
+<li>全局平均池化和全连接层用于最终分类</li>
+</ol>
+<h3 id="3-2-CIFAR-10专用ResNet"><a href="#3-2-CIFAR-10专用ResNet" class="headerlink" title="3.2 CIFAR-10专用ResNet"></a>3.2 CIFAR-10专用ResNet</h3><p>CIFAR-10专用ResNet变体严格按照原始论文中的设计，更适合CIFAR-10这样的小型数据集。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CifarResNet</span>(nn.Module):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;专为CIFAR-10设计的ResNet变体，结构与原始论文一致&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, block, num_blocks, num_classes=<span class="number">10</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(CifarResNet, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="comment"># 原始论文中CIFAR-10的ResNet结构：</span></span><br><span class="line">        <span class="comment"># 第一层：3x3卷积，16个滤波器</span></span><br><span class="line">        <span class="comment"># 然后是3个阶段，每个阶段有n个残差块</span></span><br><span class="line">        <span class="comment"># 第一阶段：16个滤波器</span></span><br><span class="line">        <span class="comment"># 第二阶段：32个滤波器，第一个残差块步长为2</span></span><br><span class="line">        <span class="comment"># 第三阶段：64个滤波器，第一个残差块步长为2</span></span><br><span class="line">        <span class="comment"># 最后是全局平均池化和全连接层</span></span><br><span class="line">        <span class="variable language_">self</span>.in_channels = <span class="number">16</span></span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(<span class="number">3</span>, <span class="number">16</span>, kernel_size=<span class="number">3</span>,</span><br><span class="line">                               stride=<span class="number">1</span>, padding=<span class="number">1</span>, bias=<span class="literal">False</span>)</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(<span class="number">16</span>)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.layer1 = <span class="variable language_">self</span>._make_layer(block, <span class="number">16</span>, num_blocks[<span class="number">0</span>], stride=<span class="number">1</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer2 = <span class="variable language_">self</span>._make_layer(block, <span class="number">32</span>, num_blocks[<span class="number">1</span>], stride=<span class="number">2</span>)</span><br><span class="line">        <span class="variable language_">self</span>.layer3 = <span class="variable language_">self</span>._make_layer(block, <span class="number">64</span>, num_blocks[<span class="number">2</span>], stride=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.fc = nn.Linear(<span class="number">64</span> * block.expansion, num_classes)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_make_layer</span>(<span class="params">self, block, out_channels, num_blocks, stride</span>):</span><br><span class="line">        strides = [stride] + [<span class="number">1</span>] * (num_blocks - <span class="number">1</span>)</span><br><span class="line">        layers = []</span><br><span class="line">        <span class="keyword">for</span> stride <span class="keyword">in</span> strides:</span><br><span class="line">            layers.append(block(<span class="variable language_">self</span>.in_channels, out_channels, stride))</span><br><span class="line">            <span class="variable language_">self</span>.in_channels = out_channels * block.expansion</span><br><span class="line">        <span class="keyword">return</span> nn.Sequential(*layers)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        out = F.relu(<span class="variable language_">self</span>.bn1(<span class="variable language_">self</span>.conv1(x)))</span><br><span class="line">        out = <span class="variable language_">self</span>.layer1(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer2(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.layer3(out)</span><br><span class="line">        <span class="comment"># 原始论文中，CIFAR-10图像大小为32x32</span></span><br><span class="line">        <span class="comment"># 经过3个阶段，每个阶段的第一个block有stride=2（除了第一阶段），所以尺寸变为32-&gt;32-&gt;16-&gt;8</span></span><br><span class="line">        <span class="comment"># 因此最终特征图大小为8x8，需要使用8x8的平均池化</span></span><br><span class="line">        out = F.avg_pool2d(out, <span class="number">8</span>)</span><br><span class="line">        out = out.view(out.size(<span class="number">0</span>), -<span class="number">1</span>)</span><br><span class="line">        out = <span class="variable language_">self</span>.fc(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<p>代码解析：</p>
+<ol>
+<li>初始层：3×3卷积，16个滤波器（比标准ResNet少）</li>
+<li>三个阶段的残差层，通道数分别为16、32、64（比标准ResNet少）</li>
+<li>每个阶段的残差块数量由<code>num_blocks</code>参数决定，决定了网络的深度</li>
+<li>最终使用8×8的全局平均池化，因为CIFAR-10图像经过网络后的特征图大小为8×8</li>
+</ol>
+<h2 id="4-不同深度的ResNet变体"><a href="#4-不同深度的ResNet变体" class="headerlink" title="4. 不同深度的ResNet变体"></a>4. 不同深度的ResNet变体</h2><p>我们实现了多种不同深度的ResNet变体，包括标准ResNet和CIFAR-10专用ResNet。</p>
+<h3 id="4-1-标准ResNet变体"><a href="#4-1-标准ResNet变体" class="headerlink" title="4.1 标准ResNet变体"></a>4.1 标准ResNet变体</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet18</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(BasicBlock, [<span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet34</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(BasicBlock, [<span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet50</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(Bottleneck, [<span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet101</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(Bottleneck, [<span class="number">3</span>, <span class="number">4</span>, <span class="number">23</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet152</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="keyword">return</span> ResNet(Bottleneck, [<span class="number">3</span>, <span class="number">8</span>, <span class="number">36</span>, <span class="number">3</span>], num_classes)</span><br></pre></td></tr></table></figure>
+
+<p>这些函数创建不同深度的标准ResNet模型：</p>
+<ul>
+<li>ResNet18&#x2F;34使用基本残差块(BasicBlock)</li>
+<li>ResNet50&#x2F;101&#x2F;152使用瓶颈残差块(Bottleneck)</li>
+<li>列表[a,b,c,d]指定了四个阶段中每个阶段的残差块数量</li>
+</ul>
+<h3 id="4-2-CIFAR-10专用ResNet变体"><a href="#4-2-CIFAR-10专用ResNet变体" class="headerlink" title="4.2 CIFAR-10专用ResNet变体"></a>4.2 CIFAR-10专用ResNet变体</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet20</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;CIFAR-10专用的ResNet20&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet32</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;CIFAR-10专用的ResNet32&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">5</span>, <span class="number">5</span>, <span class="number">5</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet44</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;CIFAR-10专用的ResNet44&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">7</span>, <span class="number">7</span>, <span class="number">7</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet56</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;CIFAR-10专用的ResNet56&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">9</span>, <span class="number">9</span>, <span class="number">9</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet110</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;CIFAR-10专用的ResNet110&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">18</span>, <span class="number">18</span>, <span class="number">18</span>], num_classes)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">ResNet1202</span>(<span class="params">num_classes=<span class="number">10</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;CIFAR-10专用的ResNet1202&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> CifarResNet(BasicBlock, [<span class="number">200</span>, <span class="number">200</span>, <span class="number">200</span>], num_classes)</span><br></pre></td></tr></table></figure>
+
+<p>这些函数创建不同深度的CIFAR-10专用ResNet模型：</p>
+<ul>
+<li>所有CIFAR-10专用模型都使用基本残差块(BasicBlock)</li>
+<li>列表[a,b,c]指定了三个阶段中每个阶段的残差块数量</li>
+<li>总层数计算：2(初始卷积+最终FC) + 6n(每个残差块2层，共3n个残差块)，例如ResNet20中n&#x3D;3，所以总层数为2+6×3&#x3D;20</li>
+</ul>
+<h2 id="5-训练与数据处理"><a href="#5-训练与数据处理" class="headerlink" title="5. 训练与数据处理"></a>5. 训练与数据处理</h2><p>训练脚本(<code>train.py</code>)实现了模型的训练、评估和可视化。以下是关键部分的代码解析：</p>
+<h3 id="5-1-数据预处理"><a href="#5-1-数据预处理" class="headerlink" title="5.1 数据预处理"></a>5.1 数据预处理</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Data preprocessing</span></span><br><span class="line">transform_train = transforms.Compose([</span><br><span class="line">    <span class="comment"># 原始论文中的数据增强：4像素padding后随机裁剪到32x32</span></span><br><span class="line">    transforms.RandomCrop(<span class="number">32</span>, padding=<span class="number">4</span>),</span><br><span class="line">    <span class="comment"># 随机水平翻转</span></span><br><span class="line">    transforms.RandomHorizontalFlip(),</span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    <span class="comment"># 使用CIFAR-10的均值和标准差进行归一化</span></span><br><span class="line">    transforms.Normalize((<span class="number">0.4914</span>, <span class="number">0.4822</span>, <span class="number">0.4465</span>),</span><br><span class="line">                         (<span class="number">0.2023</span>, <span class="number">0.1994</span>, <span class="number">0.2010</span>)),</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">transform_test = transforms.Compose([</span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    <span class="comment"># 测试集只需要归一化，不需要数据增强</span></span><br><span class="line">    transforms.Normalize((<span class="number">0.4914</span>, <span class="number">0.4822</span>, <span class="number">0.4465</span>),</span><br><span class="line">                         (<span class="number">0.2023</span>, <span class="number">0.1994</span>, <span class="number">0.2010</span>)),</span><br><span class="line">])</span><br></pre></td></tr></table></figure>
+
+<p>数据预处理遵循原始论文中的设置：</p>
+<ol>
+<li>训练集：4像素填充后随机裁剪到32×32、随机水平翻转、归一化</li>
+<li>测试集：只进行归一化，不使用数据增强</li>
+<li>归一化使用CIFAR-10数据集的均值和标准差</li>
+</ol>
+<h3 id="5-2-学习率调度"><a href="#5-2-学习率调度" class="headerlink" title="5.2 学习率调度"></a>5.2 学习率调度</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 学习率调度：原始论文中在32k和48k迭代时将学习率除以10</span></span><br><span class="line"><span class="comment"># 对于批量大小128，这相当于约82和123个epoch</span></span><br><span class="line">scheduler = optim.lr_scheduler.MultiStepLR(</span><br><span class="line">    optimizer, milestones=[<span class="number">82</span>, <span class="number">123</span>], gamma=<span class="number">0.1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>学习率调度遵循原始论文中的设置：</p>
+<ol>
+<li>初始学习率为0.1</li>
+<li>在训练过程中的特定时间点（原论文中为32k和48k迭代）将学习率除以10</li>
+<li>对于CIFAR-10数据集（50k训练样本）和批量大小128，这相当于约82和123个epoch</li>
+</ol>
+<p><img src="/images/ResNet_Code/resnet_lr_curve.png" alt="学习率调整曲线"></p>
+<h2 id="6-实验结果与分析"><a href="#6-实验结果与分析" class="headerlink" title="6. 实验结果与分析"></a>6. 实验结果与分析</h2><p>通过运行训练脚本，我们复现了原始论文中的实验结果并进行了扩展实验。以下是按照不同维度的分析：</p>
+<h3 id="6-1-训练过程特征"><a href="#6-1-训练过程特征" class="headerlink" title="6.1 训练过程特征"></a>6.1 训练过程特征</h3><p>以ResNet20和ResNet110为例，观察其训练曲线的特征：</p>
+<p><img src="/images/ResNet_Code/resnet20_loss_acc.png" alt="ResNet20训练曲线"><br><img src="/images/ResNet_Code/resnet110_loss_acc.png" alt="ResNet110训练曲线"></p>
+<p>关键观察：</p>
+<ol>
+<li><strong>学习率影响</strong>：在学习率下降点（约第82和123个epoch）处，所有模型的训练和测试曲线都有明显的下降，验证了学习率调度的有效性</li>
+<li><strong>深浅网络差异</strong>：深层网络（ResNet110）比浅层网络（ResNet20）达到更低的训练损失，但测试准确率提升有限</li>
+<li><strong>收敛特性</strong>：ResNet110收敛需要更多轮次，但最终能达到更低的训练损失</li>
+</ol>
+<h3 id="6-2-网络深度与性能关系"><a href="#6-2-网络深度与性能关系" class="headerlink" title="6.2 网络深度与性能关系"></a>6.2 网络深度与性能关系</h3><p>下图比较了CIFAR专用ResNet不同深度模型在CIFAR-10测试集上的准确率：</p>
+<p><img src="/images/ResNet_Code/depth_comparison.png" alt="不同深度ResNet性能比较"></p>
+<p>独特发现：</p>
+<ol>
+<li><strong>增深收益递减</strong>：网络深度从20增加到56时，测试准确率有明显提升（91.61% → 93.05%）</li>
+<li><strong>过深反效果</strong>：网络深度从56增加到110时，准确率略有下降（93.05% → 92.71%）</li>
+<li><strong>极深网络表现</strong>：ResNet1202（1202层）的准确率为93.61%，虽然比ResNet56高，但提升幅度不成比例</li>
+</ol>
+<p>这一发现与原论文结论一致：对于CIFAR-10这样的小型数据集，单纯增加深度并不一定带来持续的性能提升。</p>
+<h3 id="6-3-架构效率对比"><a href="#6-3-架构效率对比" class="headerlink" title="6.3 架构效率对比"></a>6.3 架构效率对比</h3><p>我们对比了标准ResNet和CIFAR专用ResNet两种架构设计在不同维度上的效率：</p>
+<h4 id="6-3-1-参数效率与模型性能"><a href="#6-3-1-参数效率与模型性能" class="headerlink" title="6.3.1 参数效率与模型性能"></a>6.3.1 参数效率与模型性能</h4><p><img src="/images/ResNet_Code/standard_vs_cifar_comparison.png" alt="模型大小与准确率比较"></p>
+<p>从参数量与性能的角度发现：</p>
+<ol>
+<li><strong>CIFAR专用设计特点</strong>：CIFAR专用ResNet（蓝色圆点）参数量远小于标准ResNet（红色方块），体现了针对小型数据集的轻量化设计思想</li>
+<li><strong>宽度vs深度策略</strong>：标准ResNet通过增加通道宽度获得更强表征能力，而CIFAR专用ResNet则侧重于增加深度</li>
+<li><strong>最佳参数平衡点</strong>：ResNet34达到最佳性能（94.84%），之后继续增加参数（如ResNet50）反而导致准确率下降</li>
+</ol>
+<h4 id="6-3-2-计算效率与训练成本"><a href="#6-3-2-计算效率与训练成本" class="headerlink" title="6.3.2 计算效率与训练成本"></a>6.3.2 计算效率与训练成本</h4><p><img src="/images/ResNet_Code/training_time_comparison.png" alt="训练时间与准确率比较"></p>
+<p>从训练时间与性能角度发现：</p>
+<ol>
+<li><strong>计算成本差异</strong>：训练时间从ResNet20的26分钟到ResNet1202的15小时不等，但性能提升并不成比例</li>
+<li><strong>架构设计影响</strong>：相似参数量的网络，标准ResNet架构比CIFAR专用架构有更好的性能&#x2F;时间比</li>
+<li><strong>极限性价比</strong>：ResNet34的40分钟训练时间达到最高准确率，是性价比最高的选择</li>
+</ol>
+<h3 id="6-4-类别识别能力分析"><a href="#6-4-类别识别能力分析" class="headerlink" title="6.4 类别识别能力分析"></a>6.4 类别识别能力分析</h3><p>通过混淆矩阵比较ResNet20和ResNet34的类别识别能力：</p>
+<p><img src="/images/ResNet_Code/resnet20_confusion_matrix.png" alt="ResNet20混淆矩阵"><br><img src="/images/ResNet_Code/resnet34_confusion_matrix.png" alt="ResNet34混淆矩阵"></p>
+<p>独特发现：</p>
+<ol>
+<li><strong>困难类别共性</strong>：两种架构都在相同类别对（如”猫”和”狗”）上遇到困难，说明这些类别本身存在语义重叠</li>
+<li><strong>架构差异体现</strong>：标准ResNet在困难类别上的优势更明显，这可能源于其更强的特征提取能力</li>
+<li><strong>数据集特性</strong>：”青蛙”和”船”类别两种架构都表现较好，而”猫”类别普遍较差，反映了数据集中类别的固有难度差异</li>
+</ol>
+<h3 id="6-5-具体样本分析"><a href="#6-5-具体样本分析" class="headerlink" title="6.5 具体样本分析"></a>6.5 具体样本分析</h3><p>比较ResNet20和ResNet34对相同测试样本的预测能力：</p>
+<p><img src="/images/ResNet_Code/resnet20_predictions.png" alt="ResNet20预测示例"><br><img src="/images/ResNet_Code/resnet34_predictions.png" alt="ResNet34预测示例"></p>
+<p>关键发现：</p>
+<ol>
+<li><strong>细节识别差异</strong>：ResNet34在细节丰富或背景复杂的图像上表现更好</li>
+<li><strong>错误模式差异</strong>：两种架构的错误模式有所不同，ResNet34更善于处理需要更细微特征区分的图像</li>
+<li><strong>特征表达能力</strong>：标准ResNet架构在小目标识别和复杂场景理解上展现出明显优势</li>
+</ol>
+<h2 id="7-总结与发现"><a href="#7-总结与发现" class="headerlink" title="7. 总结与发现"></a>7. 总结与发现</h2><p>本项目复现了ResNet在CIFAR-10上的表现，对比了标准和专用架构，得出以下关键结论：</p>
+<ol>
+<li><p><strong>残差连接突破</strong>：成功训练1202层深网络，验证了残差连接解决深度网络退化问题的有效性</p>
+</li>
+<li><p><strong>架构设计重于深度</strong>：标准ResNet (ResNet34)以94.84%的准确率超过所有CIFAR专用变体，说明合理的架构设计比单纯增加深度更重要</p>
+</li>
+<li><p><strong>参数与性能权衡</strong>：</p>
+<ul>
+<li>CIFAR专用ResNet：轻量级（&lt;1M参数），适合资源受限场景</li>
+<li>标准ResNet：参数更多但性能更高，ResNet34最佳（21.3M参数）</li>
+<li>过度参数化风险：ResNet50（23.5M）性能不如ResNet34，表明小数据集上存在过参数化问题</li>
+</ul>
+</li>
+<li><p><strong>实用选择建议</strong>：</p>
+<ul>
+<li>最高性能：ResNet34 (94.84%)</li>
+<li>最佳参数效率：ResNet56 (93.05%&#x2F;0.86M)</li>
+<li>最快训练：ResNet20 (26分钟)</li>
+</ul>
+</li>
+<li><p><strong>深度与性能非线性关系</strong>：增加深度收益递减，甚至反向（ResNet56→110），说明网络深度存在最优点</p>
+</li>
+</ol>
+<p>这些发现为深度网络架构设计和性能权衡提供了实用指导，也验证了ResNet作为深度学习里程碑的地位。</p>
+<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><p>完整的项目代码已经上传到GitHub：<a target="_blank" rel="noopener" href="https://github.com/onef1shy/CIFAR10_ResNet">CIFAR10_ResNet</a></p>
+<p>项目包含：</p>
+<ul>
+<li>完整的模型实现</li>
+<li>训练和测试代码</li>
+<li>可视化工具</li>
+<li>详细的文档说明</li>
+</ul>
+<p>如果这个项目对您有帮助，欢迎给仓库点个star⭐️。如有任何问题或建议，也欢迎在评论区留言交流。</p>
+
+  </article>
+
+  <!-- prev and next -->
+  <div class="flex justify-between mt-4 pt-4
+    border-t border-[var(--c-sep)] text-sm
+    gap-2 text-[var(--c-50)]
+  ">
+    <div>
+      
+        <a href="/2024/07/20/Google_Scholar_Crawler/"
+          class="
+            transition-all
+            flex justify-center
+            hover:-translate-x-1
+            hover:text-[var(--c-80)]
+          ">
+          <iconify-icon width="20" icon="mingcute:left-fill" data-inline="false">
+          </iconify-icon>
+          从0到1：构建智能化Google Scholar文献爬虫
+        </a>
+      
+    </div>
+    <div>
+      
+        <a href="/2024/04/22/ResNet/"
+          class="
+            flex 
+            justify-center
+            hover:translate-x-1 
+            transition-transform
+            hover:text-[var(--c-100)]
+          "
+        >
+          深度残差网络(ResNet)论文解读：突破深度神经网络训练瓶颈的里程碑
+          <iconify-icon width="20" icon="mingcute:right-fill" data-inline="false"></iconify-icon>
+        </a>
+      
+    </div>
+  </div>
+
+  <!-- comment -->
+  <div class="article-comments mt-12">
+    
+
+  </div>
+</section>
+<!-- js inspect -->
+
+<script src="/lib/clipboard.min.js"></script>
+
+
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+  });
+</script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  $(document).ready(() => {
+    const maraidConfig = {
+      theme: "default",
+      logLevel: 3,
+      flowchart: { curve: "linear" },
+      gantt: { axisFormat: "%m/%d/%Y" },
+      sequence: { actorMargin: 50 },
+    };
+    mermaid.initialize(maraidConfig);
+  });
+</script>
+
+
+
+<script src="/lib/fancybox/fancybox.umd.min.js"></script>
+
+<script>
+  $(document).ready(() => {
+    $('.post-content').each(function(i){
+      $(this).find('img').each(function(){
+        if ($(this).parent().hasClass('fancybox') || $(this).parent().is('a')) return;
+        var alt = this.alt;
+        var title = this.title;
+        if (alt) $(this).after('<span class="fancybox-alt">' + alt + '</span>');
+        else if (title) $(this).after('<span class="fancybox-title">' + title + '</span>');
+        $(this).wrap('<a class="fancybox-img" href="' + this.src + '" data-fancybox=\"gallery\" data-caption="' + title + '"></a>')
+      });
+      $(this).find('.fancybox').each(function(){
+        $(this).attr('rel', 'article' + i);
+      });
+    });
+
+    Fancybox.bind('[data-fancybox="gallery"]', {
+        // options
+    })
+  })
+</script>
+
+<!-- tocbot begin -->
+
+<script src="/lib/tocbot/tocbot.min.js"></script>
+
+<script>
+  $(document).ready(() => {
+      tocbot.init({
+        // Where to render the table of contents.
+        tocSelector: '.post-toc',
+        // Where to grab the headings to build the table of contents.
+        contentSelector: '.post-content',
+        // Which headings to grab inside of the contentSelector element.
+        headingSelector: 'h1, h2, h3',
+        // For headings inside relative or absolute positioned containers within content.
+        hasInnerContainers: true,
+    });
+  })
+</script>
+<!-- tocbot end -->
+
+  </main>
+  <footer class="flex flex-col mt-18 mb-12 items-center
+  text-[var(--c-50)] text-sm">
+  <div class="flex flex-row items-center my-12">
+    
+    
+        
+        
+            
+            
+            
+        
+        <div class="relative group">
+            <a class="
+                hover:text-[var(--c-theme)]
+                hover:bg-[var(--c-20)]
+                rounded-lg
+                p-2
+                my-1
+                flex flex-row items-center
+                group" title="Github" target="_blank" rel="noopener" href="https://github.com/onef1shy">
+                <iconify-icon width="28" icon="mingcute:github-fill"></iconify-icon>
+            </a>
+            
+        </div>
+    
+        
+        
+            
+            
+            
+        
+        <div class="relative group">
+            <a class="
+                hover:text-[var(--c-theme)]
+                hover:bg-[var(--c-20)]
+                rounded-lg
+                p-2
+                my-1
+                flex flex-row items-center
+                group" title="QQ" href="javascript:void(0)">
+                <iconify-icon width="28" icon="mingcute:qq-fill"></iconify-icon>
+            </a>
+            
+            <div class="absolute left-0 bottom-full mb-2 hidden group-hover:block z-10">
+                <img src="/images/about/qq-qr.png" class="max-w-[150px] rounded-md shadow-lg" alt="QQ QR Code">
+            </div>
+            
+        </div>
+    
+        
+        
+            
+            
+            
+        
+        <div class="relative group">
+            <a class="
+                hover:text-[var(--c-theme)]
+                hover:bg-[var(--c-20)]
+                rounded-lg
+                p-2
+                my-1
+                flex flex-row items-center
+                group" title="WeChat" href="javascript:void(0)">
+                <iconify-icon width="28" icon="mingcute:wechat-fill"></iconify-icon>
+            </a>
+            
+            <div class="absolute left-0 bottom-full mb-2 hidden group-hover:block z-10">
+                <img src="/images/about/wechat-qr.png" class="max-w-[150px] rounded-md shadow-lg" alt="WeChat QR Code">
+            </div>
+            
+        </div>
+    
+
+  </div>
+  <!-- busuanzi -->
+  <div class="mb-6">
+    
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- Busuanzi Analytics -->
+<div class="flex flex-col items-center mb-2">
+  <div class="flex flex-row items-center">
+    <iconify-icon width="16" icon="ic:round-person" width="18"></iconify-icon>
+    <span class="mr-1">访客 Visitors: </span>
+    <span id="busuanzi_value_site_uv"></span>
+  </div>
+  <div class="flex flex-row items-center">
+    <iconify-icon width="16" icon="carbon:view-filled" width="18"></iconify-icon>
+    <span class="mx-1">浏览量 Page Views:</span>
+    <span id="busuanzi_value_site_pv"></span>
+  </div>
+</div>
+<!-- End Busuanzi Analytics -->
+
+
+  </div>
+  <!-- copyright -->
+  <div class="flex flex-row items-center gap-2">
+    <a class="hover:underline"
+      target="_blank"
+      href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    >
+      CC BY-NC-SA 4.0
+    </a>
+    <span>© 2024-2025</span>
+    <a class="hover:underline"
+    href="https://github.com/onef1shy" 
+    target="_blank" 
+    rel="noopener noreferrer">闫泽宇</a>
+  </div>
+  <!-- powered by -->
+  <div class="flex items-center gap-1">
+    <span>Powered by</span>
+    <a class="hover:underline" 
+    href="https://hexo.io/" target="_blank" rel="noopener noreferrer">Hexo</a>
+    <span>&</span>
+    <a href="https://github.com/chen-yingfa/hexo-theme-fengye" 
+    class="hover:underline"
+    target="_blank"
+      rel="noopener noreferrer"
+      >
+      枫叶 Fengye
+    </a>
+  </div>
+
+</footer>
+
+  <div class="
+    back-to-top
+    fixed right-6
+    z-1024
+    -bottom-20
+    rounded-lg
+    font-bold
+    py-1 px-2
+    text-[var(--c-80)]
+    bg-[var(--c-20)]
+    cursor-pointer
+    text-center
+    drop-shadow-md
+  ">
+    <span class="flex justify-center items-center text-sm">
+      <span id="scrollpercent"><span>0</span> %</span>
+      <iconify-icon width="18" icon="mingcute:arrow-to-up-fill" id="go-top"></iconify-icon>
+    </span>
+  </div>
+  
+<script src="/js/main.js"></script>
+
+
+  <div class="fixed top-0 bottom-0 left-0 right-0 pointer-events-none print:hidden" id="maple"></div>
+</body>
+
+</html>

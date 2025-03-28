@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <meta name="author" content="Zeyu Yan">
+
+
+  <meta name="subtitle" content="Recording Academic Journey">
+
+
+  <meta name="description" content="Undergraduate student at Xidian University, passionate about Computer Vision and Data Mining. Focusing on agricultural remote sensing image analysis and predictive modeling. Seeking to advance my knowledge in deep learning through academic research.">
+
+
+  <meta name="keywords" content="academic, blog, research, technology, computer vision, data mining">
+
+
+<title>从0到1：构建智能化Google Scholar文献爬虫 | Zeyu Yan</title>
+
+
+
+<link rel="icon" href="/images/about/redefine-favicon.png">
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css"
+/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/css/search.css">
+
+
+
+<script src="/lib/jquery.min.js"></script>
+
+
+<script src="/lib/iconify-icon.min.js"></script>
+
+
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+  };
+</script>
+
+<script>
+  (function () {
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const setting = localStorage.getItem("hexo-color-scheme") || "auto";
+    if (setting === "dark" || (prefersDark && setting !== "light"))
+      document.documentElement.classList.toggle("dark", true);
+    let isDark = document.documentElement.classList.contains("dark");
+  })();
+
+  $(document).ready(function () {
+    // init icon
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = document.documentElement.classList.contains("dark");
+    $("#theme-icon").attr("icon", isDark ? "ic:round-dark-mode" : "ic:round-light-mode");
+
+    function toggleGiscusTheme() {
+      const isDark = document.documentElement.classList.contains("dark");
+      const giscusFrame = document.querySelector("iframe.giscus-frame");
+      if (giscusFrame) {
+        giscusFrame.contentWindow.postMessage(
+          {
+            giscus: {
+              setConfig: {
+                theme: isDark ? "dark" : "light",
+              },
+            },
+          },
+          "https://giscus.app"
+        );
+      }
+    }
+
+
+    // toggle dark mode
+    function toggleDark() {
+      let isDark = document.documentElement.classList.contains("dark");
+      const setting = localStorage.getItem("hexo-color-scheme") || "auto";
+      isDark = !isDark;
+      document.documentElement.classList.toggle("dark", isDark);
+      $("#theme-icon").attr("icon", isDark ? "ic:round-dark-mode" : "ic:round-light-mode");
+      if (prefersDark === isDark) {
+        localStorage.setItem("hexo-color-scheme", "auto");
+      } else {
+        localStorage.setItem("hexo-color-scheme", isDark ? "dark" : "light");
+      }
+      toggleGiscusTheme();
+    }
+    $("#toggle-dark").click(toggleDark);
+
+    // listen dark mode change
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (e) => {
+        const setting = localStorage.getItem("hexo-color-scheme") || "auto";
+        if (setting === "auto") {
+          document.documentElement.classList.toggle("dark", e.matches);
+          $("#theme-icon").attr(
+            "icon",
+            e.matches ? "ic:round-dark-mode" : "ic:round-light-mode"
+          );
+          toggleGiscusTheme();
+        }
+      });
+  });
+</script>
+
+
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body 
+  class="
+    bg-[var(--c-0)]
+    text-[var(--c-80)]
+  ">
+  <!-- The navigation bar -->
+<header class="
+    flex flex-row items-center
+    w-full
+    pr-4
+    z-10
+    border-b-[1px]
+    border-b-[var(--c-border)]
+    dark:bg-[var(--c-0)]
+    dark:border-b-[var(--c-0)]
+    gap-2
+    h-[var(--h-header)]
+    text-[var(--c-80)]
+">
+  <!-- Left part -->
+  <div class="overflow-hidden h-full flex flex-row items-center">
+    <!-- Site Title on the top left -->
+    <a href="/" class="
+            whitespace-nowrap
+            text-2xl
+            text-[var(--c-theme)]
+            hover:text-[var(--c-theme)]
+            pl-4
+            font-black
+            bg-gradient-to-r from-cyan-500
+            to-blue-500 bg-clip-text text-transparent
+          ">
+      Zeyu Yan
+    </a>
+  </div>
+  <!-- Div for pushing items to both sides -->
+  <div class="flex-1"></div>
+  <!-- Right part -->
+  <div class="flex flex-row items-center z-20 h-full">
+    <!-- Page links -->
+    <div class="hidden sm:flex flex-row h-full">
+      
+        
+        
+          
+          
+        
+      <a href="/./archives" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:inbox-fill" width="22">
+        </iconify-icon>
+        
+        
+        <p>Posts</p>
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./publications" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:science-fill" width="22">
+        </iconify-icon>
+        
+        
+        <p>Publications</p>
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./about" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:user-info-fill" width="22">
+        </iconify-icon>
+        
+        
+        <p>About Me</p>
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./categories" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:classify-2-fill" width="22">
+        </iconify-icon>
+        
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./tags" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:tag-fill" width="22">
+        </iconify-icon>
+        
+        
+      </a>
+      
+        
+        
+          
+          
+        
+      <a href="/./index" class="
+                        flex flex-row items-center
+                        gap-1
+                        hover:underline
+                        hover:bg-[var(--c-20)]
+                        hover:text-[var(--c-theme)]
+                        transition-all
+                        px-2
+                        py-1
+                        my-1
+                        rounded-lg
+                        group
+                        whitespace-nowrap
+                    ">
+        
+        <iconify-icon class="group-hover:scale-125 transition-transform" icon="mingcute:home-2-fill" width="22">
+        </iconify-icon>
+        
+        
+      </a>
+      
+    </div>
+    <!-- Icons on the right -->
+    <div class="flex flex-row items-center justify-center">
+
+      <!-- TODO: Add search icon here -->
+
+      <!-- Dark/light toggle icon -->
+      <a class="flex group p-1" title="toggle theme" id="toggle-dark">
+        <iconify-icon class="transition-transform
+                    group-hover:rotate-[45deg]
+                    group-hover:scale-125
+                    group-hover:text-[var(--c-theme)]" width="24" id="theme-icon">
+        </iconify-icon>
+      </a>
+      <!-- Icon for dropout menu on small screens -->
+      <div class="flex flex-row items-center justify-center p-1 sm:hidden">
+        <a class="w-6 h-6" aria-hidden="true" id="open-menu">
+          <iconify-icon width="24" icon="mingcute:menu-fill" class="transition-transform hover:scale-125 hover:rotate-[5deg]">
+          </iconify-icon>
+        </a>
+        <a class="w-6 h-6 hidden" aria-hidden="true" id="close-menu">
+          <iconify-icon width="24" icon="mingcute:close-circle-fill" class="transition-transform hover:scale-125 hover:rotate-[80deg]">
+          </iconify-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Dropdown menu on small screens -->
+<div id="menu-panel" class="
+        h-0
+        overflow-hidden
+        sm:hidden
+        w-full
+        z-10
+        rounded
+    ">
+  <div id="menu-content" class="
+        flex
+        flex-col
+        font-bold
+        text-xl
+        border-b-[1px]
+        relative
+        z-20
+        border-[var(--c-sep)]
+        px-2
+        py-2
+        -translate-y-full
+        transition-transform
+        duration-200
+        ">
+    
+    
+    
+    <a href="/./archives" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:inbox-fill" width="22">
+      </iconify-icon>
+      <p>
+        Posts
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./publications" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:science-fill" width="22">
+      </iconify-icon>
+      <p>
+        Publications
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./about" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:user-info-fill" width="22">
+      </iconify-icon>
+      <p>
+        About Me
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./categories" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:classify-2-fill" width="22">
+      </iconify-icon>
+      <p>
+        
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./tags" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:tag-fill" width="22">
+      </iconify-icon>
+      <p>
+        
+      </p>
+    </a>
+    
+    
+    
+    
+    <a href="/./index" class="
+                flex flex-row items-center
+                gap-2
+                h-12
+                hover:underline
+                hover:bg-[var(--c-20)]
+                px-3
+                py-1
+                rounded-lg
+            ">
+      <iconify-icon icon="mingcute:home-2-fill" width="22">
+      </iconify-icon>
+      <p>
+        
+      </p>
+    </a>
+    
+    
+  </div>
+</div>
+
+  <main>
+    <!-- css -->
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.min.css">
+
+  
+<link rel="stylesheet" href="/lib/tocbot/tocbot.min.css">
+
+    <!-- toc -->
+    
+  <!-- tocbot -->
+<nav class="post-toc toc text-sm w-40 relative top-32 right-4 opacity-70 hidden lg:block" style="position: fixed !important;"></nav>
+
+
+<section class="px-6 max-w-prose mx-auto md:px-0">
+  <!-- Post header before content -->
+  <header class="py-4">
+    <div class="flex flex-col gap-2 pt-4 md:pt-6">
+      <!-- Title -->
+      <div id="article-title" class="leading-snug">
+        <p class="text-3xl font-bold text-[var(--c-100)] mb-4">从0到1：构建智能化Google Scholar文献爬虫</p>
+      </div>
+      <!-- Meta data -->
+      <div>
+        <section class="
+          flex flex-col gap-x-2 gap-y-1 text-sm text-[var(--c-100)]">
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <!-- Dates -->
+            <div class="flex items-center gap-1">
+              <iconify-icon width="18" icon="mingcute:add-circle-fill" ></iconify-icon>
+              Created: <time class="w-max">2024-07-20</time>
+            </div>
+            <div class="flex items-center gap-1">
+              <iconify-icon width="18" icon="mingcute:refresh-3-fill" ></iconify-icon>
+              Edited: <time class="w-max">2025-03-28</time>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-3">
+            <!-- Author -->
+            
+
+            <!-- Word count -->
+            <span class="flex items-center gap-1">
+              <iconify-icon width="18" icon="mingcute:book-2-fill" ></iconify-icon>
+              <span>2.3k words, 9 min</span>
+            </span>
+            <!-- Categories -->
+            
+              <!-- <span class="text-gray-400">·</span> -->
+              <span class="flex flex-row items-center gap-1 group hover:underline">
+                <iconify-icon class="transition-all group-hover:scale-125 mr-0"
+                  width="18"
+                  icon="mingcute:classify-2-fill">
+                </iconify-icon>
+                <a class="article-category-link" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/">项目实践</a>
+              </span>
+            
+          </div>
+        </section>
+      </div>
+      <!-- tags -->
+      <div>
+        
+<div class="flex flex-wrap gap-1">
+  
+    
+      <a href="/tags/%E7%A7%91%E7%A0%94%E5%B7%A5%E5%85%B7/" 
+        class="
+          tag
+          text-sm
+          rounded-full
+          px-[5px]
+          border-[1px]
+          border-[var(--c-theme)]
+          text-[var(--c-theme)]
+          bg-[var(--c-0)]
+          dark:bg-[var(--c-0)]
+          dark:drop-shadow-none
+          hover:bg-[var(--c-theme)]
+          hover:text-[var(--c-0)]
+          dark:hover:text-[var(--c-10)]
+          dark:hover:bg-[var(--c-theme)]
+        ">
+        科研工具
+      </a>
+    
+  
+</div>
+      </div>
+    </div>
+  </header>
+  <!-- content -->
+  <article class="post-content prose m-auto dark:prose-invert">
+    <h2 id="缘起"><a href="#缘起" class="headerlink" title="缘起"></a>缘起</h2><p>Google Scholar（谷歌学术）作为全球最大的学术搜索引擎之一，已经成为科研工作者不可或缺的文献检索工具。它不仅收录了海量的学术文献，更重要的是构建了完整的文献引用关系网络，这对于理解研究脉络、追踪学术前沿具有重要意义。</p>
+<p>在学术研究中，我们经常需要：</p>
+<ol>
+<li>追踪某个研究领域的发展历程</li>
+<li>分析高影响力论文的引用关系</li>
+<li>了解某位学者的研究方向和成果</li>
+<li>发现研究热点和创新点</li>
+</ol>
+<p>然而，手动在Google Scholar上检索和整理这些信息是一项耗时的工作。特别是当需要分析大量论文的引用关系时，人工操作不仅效率低下，还容易出错。这促使我思考：能否开发一个自动化工具，来高效完成这些任务？</p>
+<p>于是，这个Google Scholar爬虫项目应运而生。这个工具旨在自动化文献信息的采集和整理过程，帮助研究者更专注于学术内容本身的分析和创新。</p>
+<h2 id="核心技术实现"><a href="#核心技术实现" class="headerlink" title="核心技术实现"></a>核心技术实现</h2><h3 id="1-系统架构设计"><a href="#1-系统架构设计" class="headerlink" title="1. 系统架构设计"></a>1. 系统架构设计</h3><p>在开发这个爬虫之前，我们需要解决几个关键问题：</p>
+<ul>
+<li>如何模拟真实用户的浏览行为？</li>
+<li>如何处理Google Scholar的反爬机制？</li>
+<li>如何高效地存储和组织数据？</li>
+</ul>
+<p>基于这些考虑，我们设计了以下系统架构：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Gather</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">        <span class="comment"># 初始化Chrome浏览器选项</span></span><br><span class="line">        option = Options()</span><br><span class="line">        <span class="comment"># option.add_argument(&#x27;--headless&#x27;)  # 可选：启用无头模式</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 使用webdriver_manager自动管理ChromeDriver</span></span><br><span class="line">        service = Service(ChromeDriverManager().install())</span><br><span class="line">        <span class="variable language_">self</span>.driver = webdriver.Chrome(</span><br><span class="line">            service=service, options=option)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 初始化数据存储</span></span><br><span class="line">        <span class="variable language_">self</span>.Passage_name = []  <span class="comment"># 存储文章名称</span></span><br><span class="line">        <span class="variable language_">self</span>.Cited_by = []     <span class="comment"># 存储被引用次数</span></span><br><span class="line">        <span class="variable language_">self</span>.src = []          <span class="comment"># 存储链接</span></span><br><span class="line">        <span class="variable language_">self</span>.name = <span class="string">&quot;&quot;</span>         <span class="comment"># 存储作者名称</span></span><br></pre></td></tr></table></figure>
+
+<p>这段代码中的每个组件都有其特定用途：</p>
+<ol>
+<li><p><strong>浏览器自动化（Selenium WebDriver）</strong></p>
+<ul>
+<li>选择Selenium而不是requests的原因是Google Scholar大量使用JavaScript动态加载内容</li>
+<li><code>webdriver_manager</code>自动下载和管理ChromeDriver，避免版本不匹配问题</li>
+<li>支持无头模式（headless），适合在服务器环境运行</li>
+</ul>
+</li>
+<li><p><strong>数据结构设计</strong></p>
+<ul>
+<li>使用列表存储文章信息，便于动态增长</li>
+<li>分别存储文章名称、引用次数和链接，保持数据的关联性</li>
+<li>实时更新作者信息，确保数据的完整性</li>
+</ul>
+</li>
+</ol>
+<h3 id="2-验证码突破方案"><a href="#2-验证码突破方案" class="headerlink" title="2. 验证码突破方案"></a>2. 验证码突破方案</h3><p>Google Scholar使用reCAPTCHA作为反爬虫机制，这是一个难点。经过多次尝试，我们发现了一个巧妙的解决方案：利用reCAPTCHA的音频验证功能。</p>
+<p>整个验证码突破流程如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">pass_recaptha</span>(<span class="params">self</span>):</span><br><span class="line">    <span class="comment"># 第一步：定位并切换到验证码iframe</span></span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">15</span>, <span class="number">0.5</span>).until(</span><br><span class="line">        EC.visibility_of_element_located((By.XPATH,</span><br><span class="line">                                          <span class="string">&#x27;//*[@id=&quot;gs_captcha_c&quot;]/div/div/iframe&#x27;</span>)))</span><br><span class="line">    <span class="variable language_">self</span>.driver.switch_to.frame(<span class="variable language_">self</span>.driver.find_element(By.XPATH,</span><br><span class="line">                                                         <span class="string">&#x27;//*[@id=&quot;gs_captcha_c&quot;]/div/div/iframe&#x27;</span>))</span><br></pre></td></tr></table></figure>
+
+<p>这里使用了<code>WebDriverWait</code>而不是固定延时，原因是：</p>
+<ul>
+<li>页面加载速度受网络影响，固定延时不可靠</li>
+<li>动态等待可以在元素出现时立即进行下一步</li>
+<li>超时机制可以及时发现异常</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="comment"># 第二步：切换到音频验证模式</span></span><br><span class="line">    <span class="variable language_">self</span>.driver.switch_to.default_content()</span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">15</span>, <span class="number">0.5</span>).until(</span><br><span class="line">        EC.visibility_of_element_located((By.XPATH, <span class="string">&#x27;/html/body/div[2]/div[4]/iframe&#x27;</span>)))</span><br><span class="line">    <span class="variable language_">self</span>.driver.switch_to.frame(<span class="variable language_">self</span>.driver.find_element(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;/html/body/div[2]/div[4]/iframe&#x27;</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 第三步：获取音频文件</span></span><br><span class="line">    button = <span class="variable language_">self</span>.driver.find_element(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;recaptcha-audio-button&quot;]&#x27;</span>)</span><br><span class="line">    button.click()</span><br><span class="line">    msg_url = <span class="variable language_">self</span>.driver.find_element(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;rc-audio&quot;]/div[7]/a&#x27;</span>).get_attribute(<span class="string">&quot;href&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>音频验证的优势：</p>
+<ul>
+<li>相比图像验证码，音频内容更容易识别</li>
+<li>Google对音频验证的限制相对较少</li>
+<li>可以利用成熟的语音识别API</li>
+</ul>
+<h3 id="3-音频识别实现"><a href="#3-音频识别实现" class="headerlink" title="3. 音频识别实现"></a>3. 音频识别实现</h3><p>音频识别使用腾讯云的语音识别服务，这个选择基于以下考虑：</p>
+<ul>
+<li>支持英文音频识别</li>
+<li>API调用简单稳定</li>
+<li>识别准确率高</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">upload</span>(<span class="params">self, msg_url</span>):</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment"># 步骤1：配置腾讯云认证</span></span><br><span class="line">        cred = credential.Credential(<span class="variable language_">self</span>.SecretId, <span class="variable language_">self</span>.SecretKey)</span><br><span class="line">        httpProfile = HttpProfile()</span><br><span class="line">        httpProfile.endpoint = <span class="string">&quot;asr.tencentcloudapi.com&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 步骤2：创建识别任务</span></span><br><span class="line">        client = asr_client.AsrClient(cred, <span class="string">&quot;&quot;</span>, clientProfile)</span><br><span class="line">        req = models.CreateRecTaskRequest()</span><br><span class="line">        params = &#123;</span><br><span class="line">            <span class="string">&quot;EngineModelType&quot;</span>: <span class="string">&quot;16k_en&quot;</span>,  <span class="comment"># 选择英文识别引擎</span></span><br><span class="line">            <span class="string">&quot;ChannelNum&quot;</span>: <span class="number">1</span>,              <span class="comment"># 单声道音频</span></span><br><span class="line">            <span class="string">&quot;ResTextFormat&quot;</span>: <span class="number">0</span>,           <span class="comment"># 文本格式</span></span><br><span class="line">            <span class="string">&quot;SourceType&quot;</span>: <span class="number">0</span>,              <span class="comment"># URL方式上传</span></span><br><span class="line">            <span class="string">&quot;Url&quot;</span>: msg_url</span><br><span class="line">        &#125;</span><br><span class="line">        req.from_json_string(json.dumps(params))</span><br></pre></td></tr></table></figure>
+
+<p>识别过程的关键点：</p>
+<ol>
+<li>选择合适的识别引擎（16k采样率英文模型）</li>
+<li>使用URL方式上传，避免音频文件下载和本地存储</li>
+<li>异步任务处理，避免程序阻塞</li>
+</ol>
+<h3 id="4-数据采集实现"><a href="#4-数据采集实现" class="headerlink" title="4. 数据采集实现"></a>4. 数据采集实现</h3><p>数据采集分为两个主要步骤：获取文章列表和收集引用信息。这里的难点是如何准确定位和提取所需信息。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">JumpInfo</span>(<span class="params">self</span>):</span><br><span class="line">    <span class="comment"># 步骤1：等待页面加载完成</span></span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">3</span>).until(EC.presence_of_element_located(</span><br><span class="line">        (By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[2]/a&#x27;</span>)))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 步骤2：定位关键元素</span></span><br><span class="line">    Passage_name = <span class="variable language_">self</span>.driver.find_elements(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[1]/a&#x27;</span>)</span><br><span class="line">    Cited_by = <span class="variable language_">self</span>.driver.find_elements(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[2]/a&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>XPath定位的优势：</p>
+<ul>
+<li>相比CSS选择器更灵活</li>
+<li>可以准确定位层级关系</li>
+<li>支持复杂的条件筛选</li>
+</ul>
+<p>对于引用信息的收集，我们采用分页处理：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">collectInfo</span>(<span class="params">self, <span class="built_in">id</span></span>):</span><br><span class="line">    base_url = <span class="variable language_">self</span>.src[<span class="built_in">id</span>]</span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> <span class="built_in">range</span>(<span class="variable language_">self</span>.page_no):</span><br><span class="line">        <span class="comment"># 构造分页URL</span></span><br><span class="line">        extend = <span class="string">f&#x27;&amp;start=<span class="subst">&#123;num*<span class="number">10</span>&#125;</span>&#x27;</span></span><br><span class="line">        url = base_url+extend</span><br><span class="line">        HTML = <span class="variable language_">self</span>.get_html(url)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 提取引用文章信息</span></span><br><span class="line">        cite_page_name = HTML.xpath(<span class="string">&#x27;//h3/a&#x27;</span>)</span><br><span class="line">        cite_page_src = HTML.xpath(<span class="string">&#x27;//h3/a/@href&#x27;</span>)</span><br><span class="line">        cite_aut_name = HTML.xpath(</span><br><span class="line">            <span class="string">&#x27;//*[@id=&quot;gs_res_ccl_mid&quot;]/div/div/div[1]&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>数据解析的关键技术：</p>
+<ol>
+<li>使用XPath提取结构化数据</li>
+<li>智能分割作者和出版信息</li>
+<li>实时保存避免数据丢失</li>
+</ol>
+<p>每条引用信息的处理都经过精心设计：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 解析作者和出版信息</span></span><br><span class="line">split_index = aut_name.find(<span class="string">&#x27; - &#x27;</span>)</span><br><span class="line"><span class="keyword">if</span> split_index != -<span class="number">1</span>:</span><br><span class="line">    authors = aut_name[:split_index].strip()</span><br><span class="line">    publication_info = aut_name[split_index + <span class="number">3</span>:].strip()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 格式化输出</span></span><br><span class="line"><span class="variable language_">self</span>.file.write(<span class="string">f&quot;\tCited_By_Passage: <span class="subst">&#123;page_name.text&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Author: <span class="subst">&#123;authors&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Journal: <span class="subst">&#123;publication_info&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这种结构化的存储格式有以下优势：</p>
+<ul>
+<li>便于后续数据分析</li>
+<li>可以轻松转换为其他格式</li>
+<li>保持了数据的层级关系</li>
+</ul>
+<h2 id="踩过的坑"><a href="#踩过的坑" class="headerlink" title="踩过的坑"></a>踩过的坑</h2><p>在开发过程中遇到了一些典型的问题，这里详细分享一下解决思路，希望能帮助到同样遇到这些问题的朋友。</p>
+<h3 id="1-页面元素定位问题"><a href="#1-页面元素定位问题" class="headerlink" title="1. 页面元素定位问题"></a>1. 页面元素定位问题</h3><p>这是使用Selenium最常遇到的问题。最初的代码是这样的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">time.sleep(<span class="number">3</span>)  <span class="comment"># 固定等待3秒</span></span><br><span class="line">element = driver.find_element(By.XPATH, <span class="string">&#x27;...&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这种方式在实际运行中经常出现<code>NoSuchElementException</code>错误，原因是：</p>
+<ul>
+<li>网络速度不同，页面加载时间不固定</li>
+<li>3秒可能太短，元素还没加载出来</li>
+<li>有时候3秒又太长，浪费等待时间</li>
+</ul>
+<p>改进后的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 最多等待15秒，每0.5秒检查一次</span></span><br><span class="line">WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">15</span>, <span class="number">0.5</span>).until(</span><br><span class="line">    EC.visibility_of_element_located((By.XPATH, <span class="string">&#x27;...&#x27;</span>))</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>这样的好处是：</p>
+<ul>
+<li>元素出现就立即操作，不用等待固定时间</li>
+<li>超时会抛出明确的异常，便于处理</li>
+<li>程序运行更加稳定和高效</li>
+</ul>
+<h3 id="2-验证码处理难题"><a href="#2-验证码处理难题" class="headerlink" title="2. 验证码处理难题"></a>2. 验证码处理难题</h3><p>Google Scholar的验证码机制是一大难点。它提供了两种验证方式：</p>
+<ol>
+<li>传统的图片验证码：需要识别图片中的文字或选择特定图片</li>
+<li>音频验证码：播放一段语音，输入听到的内容</li>
+</ol>
+<p>最初我们考虑过图片验证码的方案，但存在以下问题：</p>
+<ul>
+<li>Google会动态调整验证码的难度</li>
+<li>需要处理复杂的图片选择任务</li>
+</ul>
+<p>最终选择音频验证方案的原因：</p>
+<ul>
+<li>语音内容相对清晰，便于识别</li>
+<li>可以利用成熟的语音识别API</li>
+<li>实现逻辑相对简单：下载音频 -&gt; 识别文字 -&gt; 填写结果</li>
+</ul>
+<h3 id="3-数据存储和处理"><a href="#3-数据存储和处理" class="headerlink" title="3. 数据存储和处理"></a>3. 数据存储和处理</h3><p>数据存储看似简单，但要考虑实用性。最初的存储方式是直接写入文本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">file.write(<span class="string">f&quot;<span class="subst">&#123;title&#125;</span> - <span class="subst">&#123;author&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这种方式带来的问题：</p>
+<ul>
+<li>数据格式不统一，难以解析</li>
+<li>无法方便地提取特定信息</li>
+<li>不利于后续的数据分析</li>
+</ul>
+<p>改进后采用了结构化的存储格式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">self</span>.file.write(<span class="string">f&quot;\tCited_By_Passage: <span class="subst">&#123;page_name.text&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Author: <span class="subst">&#123;authors&#125;</span>\n&quot;</span></span><br><span class="line">                <span class="string">f&quot;\tCited_By_Journal: <span class="subst">&#123;publication_info&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这样改进的好处：</p>
+<ul>
+<li>数据结构清晰，易于理解</li>
+<li>可以轻松转换为JSON或CSV格式</li>
+<li>方便后续进行数据分析和可视化</li>
+</ul>
+<h2 id="未来优化方向"><a href="#未来优化方向" class="headerlink" title="未来优化方向"></a>未来优化方向</h2><ol>
+<li><p><strong>并发优化</strong></p>
+<ul>
+<li>实现多线程数据采集</li>
+<li>添加代理IP池支持</li>
+<li>优化请求频率控制</li>
+</ul>
+</li>
+<li><p><strong>数据分析功能</strong></p>
+<ul>
+<li>添加引用网络分析</li>
+<li>实现作者关系图谱</li>
+<li>支持数据可视化导出</li>
+</ul>
+</li>
+</ol>
+<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><p>完整的项目代码已经上传到GitHub：<a target="_blank" rel="noopener" href="https://github.com/onef1shy/Google-Scholar">GitHub - Google-Scholar</a></p>
+<p>如果这个项目对您有帮助，欢迎给仓库点个star⭐️。如有任何问题或建议，也欢迎在评论区留言交流。</p>
+
+  </article>
+
+  <!-- prev and next -->
+  <div class="flex justify-between mt-4 pt-4
+    border-t border-[var(--c-sep)] text-sm
+    gap-2 text-[var(--c-50)]
+  ">
+    <div>
+      
+        <a href="/2024/08/20/Deep_Gaussian_Process_Crop_Yield_Prediction/"
+          class="
+            transition-all
+            flex justify-center
+            hover:-translate-x-1
+            hover:text-[var(--c-80)]
+          ">
+          <iconify-icon width="20" icon="mingcute:left-fill" data-inline="false">
+          </iconify-icon>
+          深度高斯过程：基于遥感数据的作物产量预测技术
+        </a>
+      
+    </div>
+    <div>
+      
+        <a href="/2024/04/27/ResNet-Code/"
+          class="
+            flex 
+            justify-center
+            hover:translate-x-1 
+            transition-transform
+            hover:text-[var(--c-100)]
+          "
+        >
+          深度残差网络(ResNet)代码详解：PyTorch复现CIFAR-10图像分类
+          <iconify-icon width="20" icon="mingcute:right-fill" data-inline="false"></iconify-icon>
+        </a>
+      
+    </div>
+  </div>
+
+  <!-- comment -->
+  <div class="article-comments mt-12">
+    
+
+  </div>
+</section>
+<!-- js inspect -->
+
+<script src="/lib/clipboard.min.js"></script>
+
+
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+  });
+</script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  $(document).ready(() => {
+    const maraidConfig = {
+      theme: "default",
+      logLevel: 3,
+      flowchart: { curve: "linear" },
+      gantt: { axisFormat: "%m/%d/%Y" },
+      sequence: { actorMargin: 50 },
+    };
+    mermaid.initialize(maraidConfig);
+  });
+</script>
+
+
+
+<script src="/lib/fancybox/fancybox.umd.min.js"></script>
+
+<script>
+  $(document).ready(() => {
+    $('.post-content').each(function(i){
+      $(this).find('img').each(function(){
+        if ($(this).parent().hasClass('fancybox') || $(this).parent().is('a')) return;
+        var alt = this.alt;
+        var title = this.title;
+        if (alt) $(this).after('<span class="fancybox-alt">' + alt + '</span>');
+        else if (title) $(this).after('<span class="fancybox-title">' + title + '</span>');
+        $(this).wrap('<a class="fancybox-img" href="' + this.src + '" data-fancybox=\"gallery\" data-caption="' + title + '"></a>')
+      });
+      $(this).find('.fancybox').each(function(){
+        $(this).attr('rel', 'article' + i);
+      });
+    });
+
+    Fancybox.bind('[data-fancybox="gallery"]', {
+        // options
+    })
+  })
+</script>
+
+<!-- tocbot begin -->
+
+<script src="/lib/tocbot/tocbot.min.js"></script>
+
+<script>
+  $(document).ready(() => {
+      tocbot.init({
+        // Where to render the table of contents.
+        tocSelector: '.post-toc',
+        // Where to grab the headings to build the table of contents.
+        contentSelector: '.post-content',
+        // Which headings to grab inside of the contentSelector element.
+        headingSelector: 'h1, h2, h3',
+        // For headings inside relative or absolute positioned containers within content.
+        hasInnerContainers: true,
+    });
+  })
+</script>
+<!-- tocbot end -->
+
+  </main>
+  <footer class="flex flex-col mt-18 mb-12 items-center
+  text-[var(--c-50)] text-sm">
+  <div class="flex flex-row items-center my-12">
+    
+    
+        
+        
+            
+            
+            
+        
+        <div class="relative group">
+            <a class="
+                hover:text-[var(--c-theme)]
+                hover:bg-[var(--c-20)]
+                rounded-lg
+                p-2
+                my-1
+                flex flex-row items-center
+                group" title="Github" target="_blank" rel="noopener" href="https://github.com/onef1shy">
+                <iconify-icon width="28" icon="mingcute:github-fill"></iconify-icon>
+            </a>
+            
+        </div>
+    
+        
+        
+            
+            
+            
+        
+        <div class="relative group">
+            <a class="
+                hover:text-[var(--c-theme)]
+                hover:bg-[var(--c-20)]
+                rounded-lg
+                p-2
+                my-1
+                flex flex-row items-center
+                group" title="QQ" href="javascript:void(0)">
+                <iconify-icon width="28" icon="mingcute:qq-fill"></iconify-icon>
+            </a>
+            
+            <div class="absolute left-0 bottom-full mb-2 hidden group-hover:block z-10">
+                <img src="/images/about/qq-qr.png" class="max-w-[150px] rounded-md shadow-lg" alt="QQ QR Code">
+            </div>
+            
+        </div>
+    
+        
+        
+            
+            
+            
+        
+        <div class="relative group">
+            <a class="
+                hover:text-[var(--c-theme)]
+                hover:bg-[var(--c-20)]
+                rounded-lg
+                p-2
+                my-1
+                flex flex-row items-center
+                group" title="WeChat" href="javascript:void(0)">
+                <iconify-icon width="28" icon="mingcute:wechat-fill"></iconify-icon>
+            </a>
+            
+            <div class="absolute left-0 bottom-full mb-2 hidden group-hover:block z-10">
+                <img src="/images/about/wechat-qr.png" class="max-w-[150px] rounded-md shadow-lg" alt="WeChat QR Code">
+            </div>
+            
+        </div>
+    
+
+  </div>
+  <!-- busuanzi -->
+  <div class="mb-6">
+    
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- Busuanzi Analytics -->
+<div class="flex flex-col items-center mb-2">
+  <div class="flex flex-row items-center">
+    <iconify-icon width="16" icon="ic:round-person" width="18"></iconify-icon>
+    <span class="mr-1">访客 Visitors: </span>
+    <span id="busuanzi_value_site_uv"></span>
+  </div>
+  <div class="flex flex-row items-center">
+    <iconify-icon width="16" icon="carbon:view-filled" width="18"></iconify-icon>
+    <span class="mx-1">浏览量 Page Views:</span>
+    <span id="busuanzi_value_site_pv"></span>
+  </div>
+</div>
+<!-- End Busuanzi Analytics -->
+
+
+  </div>
+  <!-- copyright -->
+  <div class="flex flex-row items-center gap-2">
+    <a class="hover:underline"
+      target="_blank"
+      href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    >
+      CC BY-NC-SA 4.0
+    </a>
+    <span>© 2024-2025</span>
+    <a class="hover:underline"
+    href="https://github.com/onef1shy" 
+    target="_blank" 
+    rel="noopener noreferrer">闫泽宇</a>
+  </div>
+  <!-- powered by -->
+  <div class="flex items-center gap-1">
+    <span>Powered by</span>
+    <a class="hover:underline" 
+    href="https://hexo.io/" target="_blank" rel="noopener noreferrer">Hexo</a>
+    <span>&</span>
+    <a href="https://github.com/chen-yingfa/hexo-theme-fengye" 
+    class="hover:underline"
+    target="_blank"
+      rel="noopener noreferrer"
+      >
+      枫叶 Fengye
+    </a>
+  </div>
+
+</footer>
+
+  <div class="
+    back-to-top
+    fixed right-6
+    z-1024
+    -bottom-20
+    rounded-lg
+    font-bold
+    py-1 px-2
+    text-[var(--c-80)]
+    bg-[var(--c-20)]
+    cursor-pointer
+    text-center
+    drop-shadow-md
+  ">
+    <span class="flex justify-center items-center text-sm">
+      <span id="scrollpercent"><span>0</span> %</span>
+      <iconify-icon width="18" icon="mingcute:arrow-to-up-fill" id="go-top"></iconify-icon>
+    </span>
+  </div>
+  
+<script src="/js/main.js"></script>
+
+
+  <div class="fixed top-0 bottom-0 left-0 right-0 pointer-events-none print:hidden" id="maple"></div>
+</body>
+
+</html>
