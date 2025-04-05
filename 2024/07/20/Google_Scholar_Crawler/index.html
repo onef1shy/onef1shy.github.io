@@ -547,7 +547,7 @@
             </div>
             <div class="flex items-center gap-1">
               <iconify-icon width="18" icon="mingcute:refresh-3-fill" ></iconify-icon>
-              Edited: <time class="w-max">2025-03-28</time>
+              Edited: <time class="w-max">2025-04-06</time>
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-x-3 gap-y-3">
@@ -606,7 +606,7 @@
   </header>
   <!-- content -->
   <article class="post-content prose m-auto dark:prose-invert">
-    <h2 id="缘起"><a href="#缘起" class="headerlink" title="缘起"></a>缘起</h2><p>Google Scholar（谷歌学术）作为全球最大的学术搜索引擎之一，已经成为科研工作者不可或缺的文献检索工具。它不仅收录了海量的学术文献，更重要的是构建了完整的文献引用关系网络，这对于理解研究脉络、追踪学术前沿具有重要意义。</p>
+    <h2 id="1-项目背景与动机"><a href="#1-项目背景与动机" class="headerlink" title="1. 项目背景与动机"></a>1. 项目背景与动机</h2><p>Google Scholar（谷歌学术）作为全球最大的学术搜索引擎之一，已经成为科研工作者不可或缺的文献检索工具。它不仅收录了海量的学术文献，更重要的是构建了完整的文献引用关系网络，这对于理解研究脉络、追踪学术前沿具有重要意义。</p>
 <p>在学术研究中，我们经常需要：</p>
 <ol>
 <li>追踪某个研究领域的发展历程</li>
@@ -616,7 +616,7 @@
 </ol>
 <p>然而，手动在Google Scholar上检索和整理这些信息是一项耗时的工作。特别是当需要分析大量论文的引用关系时，人工操作不仅效率低下，还容易出错。这促使我思考：能否开发一个自动化工具，来高效完成这些任务？</p>
 <p>于是，这个Google Scholar爬虫项目应运而生。这个工具旨在自动化文献信息的采集和整理过程，帮助研究者更专注于学术内容本身的分析和创新。</p>
-<h2 id="核心技术实现"><a href="#核心技术实现" class="headerlink" title="核心技术实现"></a>核心技术实现</h2><h3 id="1-系统架构设计"><a href="#1-系统架构设计" class="headerlink" title="1. 系统架构设计"></a>1. 系统架构设计</h3><p>在开发这个爬虫之前，我们需要解决几个关键问题：</p>
+<h2 id="2-核心技术实现"><a href="#2-核心技术实现" class="headerlink" title="2. 核心技术实现"></a>2. 核心技术实现</h2><h3 id="2-1-系统架构设计"><a href="#2-1-系统架构设计" class="headerlink" title="2.1 系统架构设计"></a>2.1 系统架构设计</h3><p>在开发这个爬虫之前，我们需要解决几个关键问题：</p>
 <ul>
 <li>如何模拟真实用户的浏览行为？</li>
 <li>如何处理Google Scholar的反爬机制？</li>
@@ -642,7 +642,7 @@
 </ul>
 </li>
 </ol>
-<h3 id="2-验证码突破方案"><a href="#2-验证码突破方案" class="headerlink" title="2. 验证码突破方案"></a>2. 验证码突破方案</h3><p>Google Scholar使用reCAPTCHA作为反爬虫机制，这是一个难点。经过多次尝试，我们发现了一个巧妙的解决方案：利用reCAPTCHA的音频验证功能。</p>
+<h3 id="2-2-验证码突破方案"><a href="#2-2-验证码突破方案" class="headerlink" title="2.2 验证码突破方案"></a>2.2 验证码突破方案</h3><p>Google Scholar使用reCAPTCHA作为反爬虫机制，这是一个难点。经过多次尝试，我们发现了一个巧妙的解决方案：利用reCAPTCHA的音频验证功能。</p>
 <p>整个验证码突破流程如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">pass_recaptha</span>(<span class="params">self</span>):</span><br><span class="line">    <span class="comment"># 第一步：定位并切换到验证码iframe</span></span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">15</span>, <span class="number">0.5</span>).until(</span><br><span class="line">        EC.visibility_of_element_located((By.XPATH,</span><br><span class="line">                                          <span class="string">&#x27;//*[@id=&quot;gs_captcha_c&quot;]/div/div/iframe&#x27;</span>)))</span><br><span class="line">    <span class="variable language_">self</span>.driver.switch_to.frame(<span class="variable language_">self</span>.driver.find_element(By.XPATH,</span><br><span class="line">                                                         <span class="string">&#x27;//*[@id=&quot;gs_captcha_c&quot;]/div/div/iframe&#x27;</span>))</span><br></pre></td></tr></table></figure>
 
@@ -660,7 +660,7 @@
 <li>Google对音频验证的限制相对较少</li>
 <li>可以利用成熟的语音识别API</li>
 </ul>
-<h3 id="3-音频识别实现"><a href="#3-音频识别实现" class="headerlink" title="3. 音频识别实现"></a>3. 音频识别实现</h3><p>音频识别使用腾讯云的语音识别服务，这个选择基于以下考虑：</p>
+<h3 id="2-3-音频识别实现"><a href="#2-3-音频识别实现" class="headerlink" title="2.3 音频识别实现"></a>2.3 音频识别实现</h3><p>音频识别使用腾讯云的语音识别服务，这个选择基于以下考虑：</p>
 <ul>
 <li>支持英文音频识别</li>
 <li>API调用简单稳定</li>
@@ -674,7 +674,7 @@
 <li>使用URL方式上传，避免音频文件下载和本地存储</li>
 <li>异步任务处理，避免程序阻塞</li>
 </ol>
-<h3 id="4-数据采集实现"><a href="#4-数据采集实现" class="headerlink" title="4. 数据采集实现"></a>4. 数据采集实现</h3><p>数据采集分为两个主要步骤：获取文章列表和收集引用信息。这里的难点是如何准确定位和提取所需信息。</p>
+<h3 id="2-4-数据采集实现"><a href="#2-4-数据采集实现" class="headerlink" title="2.4 数据采集实现"></a>2.4 数据采集实现</h3><p>数据采集分为两个主要步骤：获取文章列表和收集引用信息。这里的难点是如何准确定位和提取所需信息。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">JumpInfo</span>(<span class="params">self</span>):</span><br><span class="line">    <span class="comment"># 步骤1：等待页面加载完成</span></span><br><span class="line">    WebDriverWait(<span class="variable language_">self</span>.driver, <span class="number">3</span>).until(EC.presence_of_element_located(</span><br><span class="line">        (By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[2]/a&#x27;</span>)))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 步骤2：定位关键元素</span></span><br><span class="line">    Passage_name = <span class="variable language_">self</span>.driver.find_elements(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[1]/a&#x27;</span>)</span><br><span class="line">    Cited_by = <span class="variable language_">self</span>.driver.find_elements(</span><br><span class="line">        By.XPATH, <span class="string">&#x27;//*[@id=&quot;gsc_a_b&quot;]/tr/td[2]/a&#x27;</span>)</span><br></pre></td></tr></table></figure>
 
 <p>XPath定位的优势：</p>
@@ -701,8 +701,8 @@
 <li>可以轻松转换为其他格式</li>
 <li>保持了数据的层级关系</li>
 </ul>
-<h2 id="踩过的坑"><a href="#踩过的坑" class="headerlink" title="踩过的坑"></a>踩过的坑</h2><p>在开发过程中遇到了一些典型的问题，这里详细分享一下解决思路，希望能帮助到同样遇到这些问题的朋友。</p>
-<h3 id="1-页面元素定位问题"><a href="#1-页面元素定位问题" class="headerlink" title="1. 页面元素定位问题"></a>1. 页面元素定位问题</h3><p>这是使用Selenium最常遇到的问题。最初的代码是这样的：</p>
+<h2 id="3-实现过程中的挑战与解决方案"><a href="#3-实现过程中的挑战与解决方案" class="headerlink" title="3. 实现过程中的挑战与解决方案"></a>3. 实现过程中的挑战与解决方案</h2><p>在开发过程中遇到了一些典型的问题，这里详细分享一下解决思路，希望能帮助到同样遇到这些问题的朋友。</p>
+<h3 id="3-1-页面元素定位问题"><a href="#3-1-页面元素定位问题" class="headerlink" title="3.1 页面元素定位问题"></a>3.1 页面元素定位问题</h3><p>这是使用Selenium最常遇到的问题。最初的代码是这样的：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">time.sleep(<span class="number">3</span>)  <span class="comment"># 固定等待3秒</span></span><br><span class="line">element = driver.find_element(By.XPATH, <span class="string">&#x27;...&#x27;</span>)</span><br></pre></td></tr></table></figure>
 
 <p>这种方式在实际运行中经常出现<code>NoSuchElementException</code>错误，原因是：</p>
@@ -720,7 +720,7 @@
 <li>超时会抛出明确的异常，便于处理</li>
 <li>程序运行更加稳定和高效</li>
 </ul>
-<h3 id="2-验证码处理难题"><a href="#2-验证码处理难题" class="headerlink" title="2. 验证码处理难题"></a>2. 验证码处理难题</h3><p>Google Scholar的验证码机制是一大难点。它提供了两种验证方式：</p>
+<h3 id="3-2-验证码处理难题"><a href="#3-2-验证码处理难题" class="headerlink" title="3.2 验证码处理难题"></a>3.2 验证码处理难题</h3><p>Google Scholar的验证码机制是一大难点。它提供了两种验证方式：</p>
 <ol>
 <li>传统的图片验证码：需要识别图片中的文字或选择特定图片</li>
 <li>音频验证码：播放一段语音，输入听到的内容</li>
@@ -736,7 +736,7 @@
 <li>可以利用成熟的语音识别API</li>
 <li>实现逻辑相对简单：下载音频 -&gt; 识别文字 -&gt; 填写结果</li>
 </ul>
-<h3 id="3-数据存储和处理"><a href="#3-数据存储和处理" class="headerlink" title="3. 数据存储和处理"></a>3. 数据存储和处理</h3><p>数据存储看似简单，但要考虑实用性。最初的存储方式是直接写入文本：</p>
+<h3 id="3-3-数据存储和处理"><a href="#3-3-数据存储和处理" class="headerlink" title="3.3 数据存储和处理"></a>3.3 数据存储和处理</h3><p>数据存储看似简单，但要考虑实用性。最初的存储方式是直接写入文本：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">file.write(<span class="string">f&quot;<span class="subst">&#123;title&#125;</span> - <span class="subst">&#123;author&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure>
 
 <p>这种方式带来的问题：</p>
@@ -754,23 +754,17 @@
 <li>可以轻松转换为JSON或CSV格式</li>
 <li>方便后续进行数据分析和可视化</li>
 </ul>
-<h2 id="未来优化方向"><a href="#未来优化方向" class="headerlink" title="未来优化方向"></a>未来优化方向</h2><ol>
-<li><p><strong>并发优化</strong></p>
-<ul>
+<h2 id="4-未来发展方向"><a href="#4-未来发展方向" class="headerlink" title="4. 未来发展方向"></a>4. 未来发展方向</h2><h3 id="4-1-并发优化"><a href="#4-1-并发优化" class="headerlink" title="4.1 并发优化"></a>4.1 并发优化</h3><ul>
 <li>实现多线程数据采集</li>
 <li>添加代理IP池支持</li>
 <li>优化请求频率控制</li>
 </ul>
-</li>
-<li><p><strong>数据分析功能</strong></p>
-<ul>
+<h3 id="4-2-数据分析功能"><a href="#4-2-数据分析功能" class="headerlink" title="4.2 数据分析功能"></a>4.2 数据分析功能</h3><ul>
 <li>添加引用网络分析</li>
 <li>实现作者关系图谱</li>
 <li>支持数据可视化导出</li>
 </ul>
-</li>
-</ol>
-<h2 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h2><p>完整的项目代码已经上传到GitHub：<a target="_blank" rel="noopener" href="https://github.com/onef1shy/Google-Scholar">GitHub - Google-Scholar</a></p>
+<h2 id="5-总结与思考"><a href="#5-总结与思考" class="headerlink" title="5. 总结与思考"></a>5. 总结与思考</h2><p>完整的项目代码已经上传到GitHub：<a target="_blank" rel="noopener" href="https://github.com/onef1shy/Google-Scholar">GitHub - Google-Scholar</a></p>
 <p>如果这个项目对您有帮助，欢迎给仓库点个star⭐️。如有任何问题或建议，也欢迎在评论区留言交流。</p>
 
   </article>
