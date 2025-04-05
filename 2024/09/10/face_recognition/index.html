@@ -557,7 +557,7 @@
             <!-- Word count -->
             <span class="flex items-center gap-1">
               <iconify-icon width="18" icon="mingcute:book-2-fill" ></iconify-icon>
-              <span>4.7k words, 18 min</span>
+              <span>4k words, 16 min</span>
             </span>
             <!-- Categories -->
             
@@ -615,28 +615,29 @@
 </ol>
 <p>整体流程：先采集驾驶员照片 → 提取特征存储 → 实时检测识别身份。</p>
 <p><strong>设计要点</strong>：系统围绕”司机监控”场景设计，只处理检测到的第一个人脸(<code>faces[0]</code>)。由于摄像头通常安装在方向盘柱或仪表盘位置，第一个检测到的人脸很大概率是驾驶员。</p>
-<h2 id="3-技术原理学习记录"><a href="#3-技术原理学习记录" class="headerlink" title="3. 技术原理学习记录"></a>3. 技术原理学习记录</h2><h3 id="3-1-HOG-SVM人脸检测"><a href="#3-1-HOG-SVM人脸检测" class="headerlink" title="3.1 HOG+SVM人脸检测"></a>3.1 HOG+SVM人脸检测</h3><p>选择Dlib库是因为它提供了预训练的人脸检测模型，经过评估发现它在资源受限的ARM平台上能有不错的表现。它的调用非常简单：</p>
+<h2 id="3-技术原理学习记录"><a href="#3-技术原理学习记录" class="headerlink" title="3. 技术原理学习记录"></a>3. 技术原理学习记录</h2><p>在开发这套系统时，我们选择了Dlib库作为系统的基础。Dlib是一个包含机器学习算法的C++开源工具包，在人脸处理领域表现出色，且在资源受限的ARM平台上运行良好。</p>
+<h3 id="3-1-HOG-SVM人脸检测"><a href="#3-1-HOG-SVM人脸检测" class="headerlink" title="3.1 HOG+SVM人脸检测"></a>3.1 HOG+SVM人脸检测</h3><p>Dlib库的人脸检测模型调用非常简单：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">detector = dlib.get_frontal_face_detector()</span><br></pre></td></tr></table></figure>
 
 <p>这个模型背后用的是HOG特征+SVM分类器。HOG特征的原理是计算图像梯度，然后统计梯度方向分布。</p>
-<h4 id="3-1-1-HOG特征提取详解"><a href="#3-1-1-HOG特征提取详解" class="headerlink" title="3.1.1 HOG特征提取详解"></a>3.1.1 HOG特征提取详解</h4><p>HOG（Histogram of Oriented Gradients，方向梯度直方图）是一种用于计算机视觉和图像处理中的特征描述子，特别适合用于检测图像中的物体形状。它的主要优势在于能够捕捉物体的局部形状和外观信息，同时对光照变化和小幅度几何变形具有较强的鲁棒性。</p>
+<h4 id="3-1-1-HOG特征提取详解"><a href="#3-1-1-HOG特征提取详解" class="headerlink" title="3.1.1 HOG特征提取详解"></a>3.1.1 HOG特征提取详解</h4><p>HOG（Histogram of Oriented Gradients，方向梯度直方图）是一种用于计算机视觉的特征描述子，特别适合检测图像中的物体形状。它能捕捉物体的局部形状和外观信息，同时对光照变化和小幅度几何变形具有较强的鲁棒性。</p>
 <p>HOG特征提取的完整过程如下：</p>
 <ol>
 <li><p><strong>图像预处理</strong>：</p>
 <ul>
 <li>将图像转换为灰度图</li>
-<li>可选进行Gamma校正，以减少光照影响</li>
-<li>在ARM平台实现中，我们保持了这一步的简单高效</li>
+<li>可选进行Gamma校正，减少光照影响</li>
+<li>在ARM平台实现中，我们保持这一步简单高效</li>
 </ul>
 </li>
 <li><p><strong>计算梯度</strong>：</p>
 <ul>
 <li><p>对每个像素计算水平和垂直方向的梯度，其中$I$代表图像，$I(x,y)$表示坐标$(x,y)$处的像素灰度值</p>
 </li>
-<li><p><strong>水平方向梯度计算</strong>：<br>水平梯度核矩阵为 $[-1, 0, 1]$，作用是计算水平方向的灰度差异：</p>
+<li><p><strong>水平方向梯度计算</strong>：<br>水平梯度核矩阵为 $[-1, 0, 1]$，计算水平方向的灰度差异：</p>
 <p>$$g_x(x,y) &#x3D; I(x+1,y) - I(x-1,y)$$</p>
 </li>
-<li><p><strong>垂直方向梯度计算</strong>：<br>垂直梯度核矩阵为 $[-1, 0, 1]^T$，作用是计算垂直方向的灰度差异：</p>
+<li><p><strong>垂直方向梯度计算</strong>：<br>垂直梯度核矩阵为 $[-1, 0, 1]^T$，计算垂直方向的灰度差异：</p>
 <p>$$g_y(x,y) &#x3D; I(x,y+1) - I(x,y-1)$$</p>
 </li>
 <li><p><strong>梯度幅值</strong>（表示边缘强度）：</p>
@@ -652,7 +653,7 @@
 <li>将图像分割成小单元格(cell)，典型大小为8×8像素</li>
 <li>对每个单元格中的像素，根据梯度方向将梯度幅值累加到方向直方图的相应bin中</li>
 <li>通常将360°平均分为9个bin，每个bin跨越40°</li>
-<li>bin的设计使得HOG特征对物体小角度旋转具有鲁棒性，因为相似的梯度方向会落在同一个bin中</li>
+<li>这种设计使HOG特征对物体小角度旋转具有鲁棒性</li>
 <li>采用线性插值处理梯度方向落在bin边界的情况，减少量化误差</li>
 </ul>
 </li>
@@ -663,15 +664,13 @@
 <li><p>对块内的单元格直方图进行归一化处理，增强特征对光照变化的鲁棒性</p>
 </li>
 <li><p>归一化公式：</p>
-<p>$$v’ &#x3D; \frac{v}{\sqrt{|v|_2^2 + \epsilon}}$$</p>
+<p>$$v’ &#x3D; \frac{v}{\sqrt{||v||_2^2 + \epsilon}}$$</p>
 <p>其中：</p>
 <ul>
 <li>$v$ 是块内所有特征组成的向量（36维，由2×2个单元格的9个方向bin组成）</li>
-<li>$|v|_2$ 是向量$v$的L2范数</li>
+<li>$||v||_2$ 是向量$v$的L2范数</li>
 <li>$\epsilon$ 是小常数（通常为0.01），防止分母为零</li>
 </ul>
-</li>
-<li><p>归一化使特征对局部光照变化和对比度变化更加鲁棒</p>
 </li>
 </ul>
 </li>
@@ -679,13 +678,13 @@
 <ul>
 <li>将所有块的归一化特征向量连接起来，形成最终的HOG特征向量</li>
 <li>对于64×64像素的检测窗口，典型的HOG特征向量维度约为1764维</li>
-<li>这是由以下计算得出的：<br>$$7 \times 7 \text{ (blocks)} \times 4 \text{ (cells per block)} \times 9 \text{ (orientation bins)} &#x3D; 1764$$</li>
+<li>计算方式：$7 \times 7 \text{ (blocks)} \times 4 \text{ (cells per block)} \times 9 \text{ (orientation bins)} &#x3D; 1764$</li>
 <li>在实际应用中，通常使用主成分分析(PCA)等降维方法减少特征维度</li>
 </ul>
 </li>
 </ol>
-<p>在ARM平台上，我们对HOG参数进行了调优，单元格大小选择8×8像素，块大小为2×2单元格，梯度方向分为9个bin。这些参数在ARM处理器上能取得很好的性能和精度平衡。</p>
-<h4 id="3-1-2-SVM分类器详解"><a href="#3-1-2-SVM分类器详解" class="headerlink" title="3.1.2 SVM分类器详解"></a>3.1.2 SVM分类器详解</h4><p>SVM（Support Vector Machine，支持向量机）是一种二分类器，在人脸检测中用于区分”人脸”和”非人脸”区域。SVM的核心思想是找到一个最优的超平面，使得两类样本的间隔最大化。</p>
+<p>在ARM平台上，我们对HOG参数进行了调优，单元格大小选择8×8像素，块大小为2×2单元格，梯度方向分为9个bin，在性能和精度间取得平衡。</p>
+<h4 id="3-1-2-SVM分类器详解"><a href="#3-1-2-SVM分类器详解" class="headerlink" title="3.1.2 SVM分类器详解"></a>3.1.2 SVM分类器详解</h4><p>SVM（Support Vector Machine，支持向量机）是一种二分类器，在人脸检测中用于区分”人脸”和”非人脸”区域。SVM的核心思想是找到一个最优超平面，使两类样本的间隔最大化。</p>
 <p>具体工作原理如下：</p>
 <ol>
 <li><p><strong>线性可分情况</strong>：</p>
@@ -697,32 +696,22 @@
 </ul>
 </li>
 <li><p>SVM寻找最优超平面 $w \cdot x + b &#x3D; 0$，使得：</p>
-<p>对于正样本（人脸）：<br>$$w \cdot x_i + b \geq +1$$</p>
-<p>对于负样本（非人脸）：<br>$$w \cdot x_i + b \leq -1$$</p>
+<p>对于正样本（人脸）：$w \cdot x_i + b \geq +1$</p>
+<p>对于负样本（非人脸）：$w \cdot x_i + b \leq -1$</p>
 </li>
-<li><p>两类样本之间的间隔为：</p>
-<p>$$\text{margin} &#x3D; \frac{2}{||w||}$$</p>
+<li><p>两类样本之间的间隔为：$\text{margin} &#x3D; \frac{2}{||w||}$</p>
 </li>
-<li><p>优化目标：</p>
-<p>$$\min_{w,b} \frac{1}{2}||w||^2$$</p>
-<p>满足约束：$y_i(w \cdot x_i + b) \geq 1, \forall i$</p>
+<li><p>优化目标：$\min_{w,b} \frac{1}{2}||w||^2$，满足约束：$y_i(w \cdot x_i + b) \geq 1, \forall i$</p>
 </li>
 </ul>
 </li>
 <li><p><strong>软间隔SVM</strong>：</p>
 <ul>
-<li><p>实际人脸数据中存在噪声和可能无法完全线性分离的情况</p>
-</li>
-<li><p>引入松弛变量 $\xi_i \geq 0$ 允许部分样本违反约束条件</p>
-</li>
-<li><p>修改后的约束条件：</p>
-<p>$$y_i(w \cdot x_i + b) \geq 1 - \xi_i, \forall i$$</p>
-</li>
-<li><p>优化目标变为：</p>
-<p>$$\min_{w,b,\xi} \frac{1}{2}||w||^2 + C\sum_{i&#x3D;1}^{n}\xi_i$$</p>
-</li>
-<li><p>参数 $C &gt; 0$ 是惩罚系数：</p>
-<ul>
+<li>实际人脸数据中存在噪声和可能无法完全线性分离的情况</li>
+<li>引入松弛变量 $\xi_i \geq 0$ 允许部分样本违反约束条件</li>
+<li>修改后的约束条件：$y_i(w \cdot x_i + b) \geq 1 - \xi_i, \forall i$</li>
+<li>优化目标变为：$\min_{w,b,\xi} \frac{1}{2}||w||^2 + C\sum_{i&#x3D;1}^{n}\xi_i$</li>
+<li>参数 $C &gt; 0$ 是惩罚系数：<ul>
 <li>$C$ 较大：强制更严格的分类，可能过拟合</li>
 <li>$C$ 较小：允许更多错误，提高泛化能力</li>
 </ul>
@@ -731,26 +720,15 @@
 </li>
 <li><p><strong>核函数</strong>：</p>
 <ul>
-<li><p>对于非线性可分的数据，SVM使用核函数将特征映射到高维空间</p>
-</li>
-<li><p>核函数定义为：</p>
-<p>$$K(x_i,x_j) &#x3D; \langle \phi(x_i), \phi(x_j) \rangle$$</p>
-<p>其中 $\phi$ 是特征空间到高维空间的映射函数</p>
-</li>
-<li><p>常用核函数包括：</p>
-<ul>
+<li>对于非线性可分的数据，SVM使用核函数将特征映射到高维空间</li>
+<li>核函数定义为：$K(x_i,x_j) &#x3D; \langle \phi(x_i), \phi(x_j) \rangle$，其中 $\phi$ 是特征空间到高维空间的映射函数</li>
+<li>常用核函数包括：<ul>
 <li>线性核：$K(x_i,x_j) &#x3D; x_i \cdot x_j$</li>
 <li>RBF核（高斯核）：$K(x_i,x_j) &#x3D; \exp(-\gamma ||x_i - x_j||^2)$</li>
 <li>多项式核：$K(x_i,x_j) &#x3D; (x_i \cdot x_j + c)^d$</li>
 </ul>
 </li>
-<li><p>Dlib人脸检测器使用线性核：</p>
-<ul>
-<li>计算开销小，特别适合ARM平台</li>
-<li>对于HOG特征，线性核通常已足够有效</li>
-<li>训练和预测速度都更快</li>
-</ul>
-</li>
+<li>Dlib人脸检测器使用线性核，计算开销小，特别适合ARM平台</li>
 </ul>
 </li>
 <li><p><strong>决策函数</strong>：</p>
@@ -760,19 +738,14 @@
 </ul>
 </li>
 </ol>
-<p>Dlib实现的HOG+SVM人脸检测器使用了滑动窗口技术，以不同尺度在图像上滑动检测窗口，提取HOG特征并输入SVM分类器进行判断。为了加速检测过程，还采用了图像金字塔和特征金字塔技术：</p>
+<p>Dlib实现的HOG+SVM人脸检测器使用了滑动窗口技术，以不同尺度在图像上移动检测窗口，提取HOG特征并输入SVM分类器进行判断。为了加速检测过程，还采用了图像金字塔技术：</p>
 <ol>
 <li><strong>滑动窗口</strong>：在图像上以固定步长移动检测窗口（通常为64×64像素）</li>
 <li><strong>图像金字塔</strong>：将原始图像逐步缩小，形成不同尺度的图像序列</li>
-<li><strong>缩放系数</strong>：控制图像金字塔中相邻层图像的尺寸比例，例如缩放系数为1.2时，每一层的图像尺寸是上一层的1&#x2F;1.2</li>
+<li><strong>缩放系数</strong>：控制图像金字塔中相邻层图像的尺寸比例</li>
 </ol>
-<p>缩放系数是一个关键参数，它直接影响检测的准确性和速度：</p>
-<ul>
-<li>较小的缩放系数（如1.05）会生成更多层的金字塔，提高检测精度，但计算量增大</li>
-<li>较大的缩放系数（如1.5）会减少层数，加快检测速度，但可能错过某些尺度的人脸</li>
-</ul>
-<p>在我们的ARM平台优化中，将缩放系数从默认的1.1调整到1.3，同时增大滑动窗口步长，牺牲了少量精度换取更高的处理速度，使每帧检测时间降低到约15-20ms，满足实时应用需求。</p>
-<p>HOG特征对光照变化不敏感，计算复杂度相对较低，很适合资源受限的ARM处理器运行。与深度学习方法相比，HOG+SVM方法参数少、计算量小、内存占用低，这对于嵌入式系统尤为重要。</p>
+<p>在ARM平台优化中，我们将缩放系数从默认的1.1调整到1.3，同时增大滑动窗口步长，牺牲少量精度换取更高处理速度，使每帧检测时间降低到约15-20ms。</p>
+<p>HOG+SVM方法参数少、计算量小、内存占用低，与深度学习方法相比，更适合资源受限的嵌入式系统。</p>
 <h3 id="3-2-人脸关键点检测"><a href="#3-2-人脸关键点检测" class="headerlink" title="3.2 人脸关键点检测"></a>3.2 人脸关键点检测</h3><p>检测到人脸后，下一步是找出人脸关键点。本系统采用Dlib的68点模型：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">predictor = dlib.shape_predictor(<span class="string">&#x27;shape_predictor_68_face_landmarks.dat&#x27;</span>)</span><br></pre></td></tr></table></figure>
 
@@ -790,54 +763,46 @@
 </ul>
 <p>在训练集上，模型的平均点间误差约为2.5-3.0像素，在测试集上略高一些，约为3.0-3.5像素。对于实际应用而言，这个精度已经足够支持人脸对齐和后续的特征提取。</p>
 <p>在实际使用中，我们发现该模型在侧脸和光线变化情况下表现依然稳定，这也是选择它作为我们ARM平台解决方案的重要考量。</p>
-<h3 id="3-3-ResNet特征提取"><a href="#3-3-ResNet特征提取" class="headerlink" title="3.3 ResNet特征提取"></a>3.3 ResNet特征提取</h3><p>人脸识别最关键的部分是特征提取。系统选用了Dlib的ResNet模型：</p>
+<h3 id="3-3-ResNet特征提取"><a href="#3-3-ResNet特征提取" class="headerlink" title="3.3 ResNet特征提取"></a>3.3 ResNet特征提取</h3><p>人脸识别的核心是特征提取。我们使用了Dlib的ResNet模型：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">face_reco_model = dlib.face_recognition_model_v1(<span class="string">&quot;dlib_face_recognition_resnet_model_v1.dat&quot;</span>)</span><br></pre></td></tr></table></figure>
 
-<h4 id="3-3-1-ResNet模型训练细节"><a href="#3-3-1-ResNet模型训练细节" class="headerlink" title="3.3.1 ResNet模型训练细节"></a>3.3.1 ResNet模型训练细节</h4><p>Dlib的<code>dlib_face_recognition_resnet_model_v1.dat</code>是一个基于ResNet-34架构的深度卷积神经网络，经过了修改以适合人脸识别任务。它主要在以下数据集上训练：</p>
-<ul>
-<li>FaceScrub数据集（包含超过10万张名人脸部图像）</li>
-<li>VGG-Face数据集（约2.6百万张面部图像）</li>
-<li>部分CASIA-WebFace数据集（约50万张面部图像）</li>
-</ul>
-<p>模型的训练采用三元组损失（Triplet Loss）方式，在验证集上达到了约99.38%的准确率。在标准的LFW（Labeled Faces in the Wild）基准测试上，该模型达到了约99.38%的准确率，这接近当时（2017年发布）最先进的商业系统水平。</p>
-<p>这个模型能把人脸转换成128维的特征向量，同一个人的不同照片生成的特征向量很接近，不同人生成的特征向量则相距较远。虽然它计算量较大，但在评估后发现它在ARM平台上的性能和准确度平衡较好。</p>
-<p>特征提取的代码如下：</p>
+<p>这个基于ResNet-34架构的深度卷积神经网络模型在多个大型数据集（FaceScrub、VGG-Face和部分CASIA-WebFace）上训练，使用三元组损失（Triplet Loss）方式，在LFW基准测试上达到了约99.38%的准确率。</p>
+<p>该模型将人脸转换成128维特征向量，同一人的不同照片生成的向量接近，不同人的向量相距较远。虽然计算量较大，但在ARM平台上性能和准确度平衡良好。</p>
+<p>特征提取代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">identify_face</span>(<span class="params">self, img, face</span>):</span><br><span class="line">    <span class="comment"># 提取特征</span></span><br><span class="line">    shape = predictor(img, face)</span><br><span class="line">    face_feature = face_reco_model.compute_face_descriptor(img, shape)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 计算与数据库中人脸的距离</span></span><br><span class="line">    distances = []</span><br><span class="line">    <span class="keyword">for</span> known_feature <span class="keyword">in</span> <span class="variable language_">self</span>.features_known_list:</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">str</span>(known_feature[<span class="number">0</span>]) != <span class="string">&#x27;0.0&#x27;</span>:</span><br><span class="line">            distance = <span class="variable language_">self</span>.calculate_distance(face_feature, known_feature)</span><br><span class="line">            distances.append(distance)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            distances.append(<span class="number">999999999</span>)</span><br></pre></td></tr></table></figure>
 
-<p>值得注意的是，特征提取始终只针对第一个检测到的人脸进行处理，这符合对驾驶员监控的设计初衷，同时也减轻了ARM处理器的计算负担。</p>
-<p>ResNet的核心是残差块，它的基本思路是让网络学习残差映射而不是直接映射。一个残差块的表示形式为：</p>
-<p>$$y &#x3D; F(x) + x$$</p>
-<p>其中$F(x)$通常是几个卷积层。这种结构加入了跳跃连接（skip connection），有助于解决深度网络的梯度消失问题，使网络能训练得更深。</p>
-<p>Dlib的特征提取网络是用三元组损失（Triplet Loss）训练的。每次训练用三张图片：锚点图片、正样本和负样本。训练目标是使得锚点和正样本之间的距离小于锚点和负样本之间的距离，并且有一个边界：</p>
+<p>值得注意的是，系统只处理第一个检测到的人脸，这符合驾驶员监控的设计初衷，同时减轻了ARM处理器的计算负担。</p>
+<p>ResNet的核心是残差块：$y &#x3D; F(x) + x$，其中$F(x)$通常是几个卷积层。这种结构通过跳跃连接（skip connection）解决了深度网络的梯度消失问题。</p>
+<p>Dlib的特征提取网络使用三元组损失训练，目标是使锚点和正样本间距离小于锚点和负样本间距离：</p>
 <p>$$||f(a) - f(p)||^2 + margin &lt; ||f(a) - f(n)||^2$$</p>
 <p>其中$f$是特征提取函数，$a$是锚点，$p$是正样本，$n$是负样本。</p>
-<h3 id="3-4-人脸匹配与重新识别策略"><a href="#3-4-人脸匹配与重新识别策略" class="headerlink" title="3.4 人脸匹配与重新识别策略"></a>3.4 人脸匹配与重新识别策略</h3><p>有了特征向量后，识别就简单了，计算欧氏距离：</p>
+<h3 id="3-4-人脸匹配与重新识别策略"><a href="#3-4-人脸匹配与重新识别策略" class="headerlink" title="3.4 人脸匹配与重新识别策略"></a>3.4 人脸匹配与重新识别策略</h3><p>有了特征向量后，识别过程就是计算欧氏距离：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">calculate_distance</span>(<span class="params">feature_1, feature_2</span>):</span><br><span class="line">    feature_1 = np.array(feature_1)</span><br><span class="line">    feature_2 = np.array(feature_2)</span><br><span class="line">    <span class="keyword">return</span> np.sqrt(np.<span class="built_in">sum</span>(np.square(feature_1 - feature_2)))</span><br></pre></td></tr></table></figure>
 
-<p>系统设置的阈值是0.4，如果距离小于0.4就认为是同一个人。这个阈值是通过大量测试得出的，针对ARM平台上的运行环境进行了优化。</p>
-<p>核心匹配代码：</p>
+<p>系统设置阈值为0.4，距离小于阈值则认为是同一人。这个阈值经过大量测试得出，为ARM平台优化。</p>
+<p>匹配逻辑：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> min_distance &lt; <span class="number">0.4</span>:  <span class="comment"># 阈值判断</span></span><br><span class="line">    most_similar_idx = distances.index(min_distance)</span><br><span class="line">    <span class="variable language_">self</span>.current_face_name = <span class="variable language_">self</span>.face_name_known_list[most_similar_idx]</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="variable language_">self</span>.current_face_name = <span class="string">&quot;unknown&quot;</span></span><br></pre></td></tr></table></figure>
 
-<p>由于是单人脸场景（专注于驾驶员），识别逻辑进行了简化，只在必要时才进行特征提取和匹配，以减轻处理器负担：</p>
+<p>单人脸场景下，识别逻辑进行了简化，只在必要时进行特征提取和匹配：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 决定是否需要重新识别</span></span><br><span class="line">need_recognition = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 情况1: 人脸首次出现</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> <span class="variable language_">self</span>.last_face_detected:</span><br><span class="line">    need_recognition = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 情况2: 达到重新识别间隔</span></span><br><span class="line"><span class="keyword">elif</span> <span class="variable language_">self</span>.current_face_name == <span class="string">&quot;unknown&quot;</span>:</span><br><span class="line">    <span class="variable language_">self</span>.reclassify_interval_cnt += <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> <span class="variable language_">self</span>.reclassify_interval_cnt &gt;= <span class="variable language_">self</span>.reclassify_interval:</span><br><span class="line">        need_recognition = <span class="literal">True</span></span><br><span class="line">        <span class="variable language_">self</span>.reclassify_interval_cnt = <span class="number">0</span></span><br></pre></td></tr></table></figure>
 
-<h4 id="3-4-1-重新识别间隔的优化设计"><a href="#3-4-1-重新识别间隔的优化设计" class="headerlink" title="3.4.1 重新识别间隔的优化设计"></a>3.4.1 重新识别间隔的优化设计</h4><p>“重新识别间隔”是一个重要的优化机制。当系统检测到人脸但无法识别（显示为”unknown”）时，我们不会每一帧都进行完整的特征提取和识别，因为这些操作计算量大。而是设置了一个间隔（默认为10帧），每隔10帧才会重新尝试一次完整的识别过程。</p>
-<p>这种设计有几个优势：</p>
+<h4 id="3-4-1-重新识别间隔优化"><a href="#3-4-1-重新识别间隔优化" class="headerlink" title="3.4.1 重新识别间隔优化"></a>3.4.1 重新识别间隔优化</h4><p>“重新识别间隔”是一个重要优化机制。当系统无法识别人脸时，不会每帧都进行完整识别，而是设置间隔（默认10帧），定期尝试识别。</p>
+<p>这种设计的优势：</p>
 <ol>
-<li>大大减轻了ARM处理器的计算负担，提高整体帧率</li>
-<li>仍然提供了足够的识别机会 - 如果第一次识别失败，可能是因为光线或角度问题，后续帧还有机会识别成功</li>
-<li>对用户体验影响小 - 在30FPS的视频流中，10帧只有约1&#x2F;3秒，用户几乎感觉不到延迟</li>
+<li>减轻ARM处理器计算负担，提高整体帧率</li>
+<li>提供足够的识别机会 - 后续帧可能因角度或光线变化而识别成功</li>
+<li>对用户体验影响小 - 30FPS视频中，10帧仅约1&#x2F;3秒，延迟几乎不被察觉</li>
 </ol>
-<p>这种策略在保持识别准确性的同时，大大减少了计算量，非常适合在ARM平台上运行。</p>
+<p>这种策略在保持识别准确性的同时大幅减少计算量，适合ARM平台运行。</p>
 <h2 id="4-实际实现"><a href="#4-实际实现" class="headerlink" title="4. 实际实现"></a>4. 实际实现</h2><h3 id="4-1-人脸采集程序"><a href="#4-1-人脸采集程序" class="headerlink" title="4.1 人脸采集程序"></a>4.1 人脸采集程序</h3><p>功能：</p>
 <ul>
 <li>实时显示摄像头画面</li>
 <li>检测和框选人脸</li>
-<li>按N键创建新的人脸文件夹</li>
+<li>按N键创建新人脸文件夹</li>
 <li>按S键保存当前人脸</li>
 </ul>
 <p>关键代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">extract_face_image</span>(<span class="params">self, img, face</span>):</span><br><span class="line">    <span class="comment"># 计算扩展后的人脸区域</span></span><br><span class="line">    height = face.bottom() - face.top()</span><br><span class="line">    width = face.right() - face.left()</span><br><span class="line">    hh, ww = <span class="built_in">int</span>(height/<span class="number">2</span>), <span class="built_in">int</span>(width/<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 检查是否超出图像边界</span></span><br><span class="line">    <span class="keyword">if</span> (face.right()+ww &gt; <span class="number">640</span> <span class="keyword">or</span> face.bottom()+hh &gt; <span class="number">480</span> <span class="keyword">or</span></span><br><span class="line">            face.left()-ww &lt; <span class="number">0</span> <span class="keyword">or</span> face.top()-hh &lt; <span class="number">0</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span>, <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 创建并复制人脸区域</span></span><br><span class="line">    img_face = np.zeros((height*<span class="number">2</span>, width*<span class="number">2</span>, <span class="number">3</span>), np.uint8)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(height*<span class="number">2</span>):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(width*<span class="number">2</span>):</span><br><span class="line">            img_face[i, j] = img[face.top()-hh+i, face.left()-ww+j]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> img_face, <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">extract_face_image</span>(<span class="params">self, img, face</span>):</span><br><span class="line">    <span class="comment"># 计算扩展的人脸区域</span></span><br><span class="line">    height = face.bottom() - face.top()</span><br><span class="line">    width = face.right() - face.left()</span><br><span class="line">    hh, ww = <span class="built_in">int</span>(height/<span class="number">2</span>), <span class="built_in">int</span>(width/<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 检查是否超出图像边界</span></span><br><span class="line">    <span class="keyword">if</span> (face.right()+ww &gt; <span class="number">640</span> <span class="keyword">or</span> face.bottom()+hh &gt; <span class="number">480</span> <span class="keyword">or</span></span><br><span class="line">            face.left()-ww &lt; <span class="number">0</span> <span class="keyword">or</span> face.top()-hh &lt; <span class="number">0</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span>, <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 创建并复制人脸区域</span></span><br><span class="line">    img_face = np.zeros((height*<span class="number">2</span>, width*<span class="number">2</span>, <span class="number">3</span>), np.uint8)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(height*<span class="number">2</span>):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(width*<span class="number">2</span>):</span><br><span class="line">            img_face[i, j] = img[face.top()-hh+i, face.left()-ww+j]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> img_face, <span class="literal">True</span></span><br></pre></td></tr></table></figure>
 
 <h3 id="4-2-特征提取程序"><a href="#4-2-特征提取程序" class="headerlink" title="4.2 特征提取程序"></a>4.2 特征提取程序</h3><p>功能：</p>
 <ul>
@@ -857,10 +822,9 @@
 <li>智能控制识别频率</li>
 </ul>
 <p>核心处理流程：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">process_frame</span>(<span class="params">self, frame</span>):</span><br><span class="line">    <span class="comment"># 检测人脸</span></span><br><span class="line">    faces = detector(frame, <span class="number">0</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 更新人脸检测状态</span></span><br><span class="line">    <span class="variable language_">self</span>.last_face_detected = <span class="variable language_">self</span>.face_detected</span><br><span class="line">    <span class="variable language_">self</span>.face_detected = <span class="built_in">len</span>(faces) &gt; <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable language_">self</span>.face_detected:</span><br><span class="line">        <span class="comment"># 清除当前人脸状态</span></span><br><span class="line">        <span class="keyword">return</span> frame</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 只处理第一个人脸（驾驶员）</span></span><br><span class="line">    face = faces[<span class="number">0</span>]</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 决定是否需要重新识别</span></span><br><span class="line">    need_recognition = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable language_">self</span>.last_face_detected <span class="keyword">or</span> (</span><br><span class="line">            <span class="variable language_">self</span>.current_face_name == <span class="string">&quot;unknown&quot;</span> <span class="keyword">and</span> </span><br><span class="line">            <span class="variable language_">self</span>.reclassify_interval_cnt &gt;= <span class="variable language_">self</span>.reclassify_interval):</span><br><span class="line">        need_recognition = <span class="literal">True</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 执行人脸识别</span></span><br><span class="line">    <span class="keyword">if</span> need_recognition:</span><br><span class="line">        <span class="variable language_">self</span>.identify_face(frame, face)</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">return</span> frame</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">process_frame</span>(<span class="params">self, frame</span>):</span><br><span class="line">    <span class="comment"># 检测人脸</span></span><br><span class="line">    faces = detector(frame, <span class="number">0</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 更新人脸检测状态</span></span><br><span class="line">    <span class="variable language_">self</span>.last_face_detected = <span class="variable language_">self</span>.face_detected</span><br><span class="line">    <span class="variable language_">self</span>.face_detected = <span class="built_in">len</span>(faces) &gt; <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable language_">self</span>.face_detected:</span><br><span class="line">        <span class="keyword">return</span> frame</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 只处理第一个人脸（驾驶员）</span></span><br><span class="line">    face = faces[<span class="number">0</span>]</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 决定是否需要重新识别</span></span><br><span class="line">    need_recognition = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable language_">self</span>.last_face_detected <span class="keyword">or</span> (</span><br><span class="line">            <span class="variable language_">self</span>.current_face_name == <span class="string">&quot;unknown&quot;</span> <span class="keyword">and</span> </span><br><span class="line">            <span class="variable language_">self</span>.reclassify_interval_cnt &gt;= <span class="variable language_">self</span>.reclassify_interval):</span><br><span class="line">        need_recognition = <span class="literal">True</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 执行人脸识别</span></span><br><span class="line">    <span class="keyword">if</span> need_recognition:</span><br><span class="line">        <span class="variable language_">self</span>.identify_face(frame, face)</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">return</span> frame</span><br></pre></td></tr></table></figure>
 
-<p>即使检测到多个人脸，也只处理第一个。重新识别机制避免了每帧都进行特征提取。</p>
-<p>测试结果：在模拟ARM环境中，系统达到15-20FPS，满足部署需求。</p>
+<p>系统在模拟ARM环境中达到15-20FPS，满足部署需求。</p>
 <h2 id="5-总结与反思"><a href="#5-总结与反思" class="headerlink" title="5. 总结与反思"></a>5. 总结与反思</h2><p>通过实现这个人脸认证系统，我对计算机视觉中的特征表示和模式匹配有了更深的理解。HOG特征提取的设计思路其实很朴素，就是找到能够描述物体外观的局部梯度特征，却能有效解决光照变化问题。而SVM的超平面分类思想至今仍被广泛应用，它的数学原理也很有美感。</p>
 <p>ResNet的残差结构设计解决深度网络训练问题的方式很巧妙。网络越深并不一定越好，关键在于让网络学习到有意义的特征映射。三元组损失的设计也很有启发性，通过正负样本对比学习的方式，让模型自动学习到有区分性的特征。</p>
 <p>对于面向特定场景的应用设计，首先要明确需求和约束。在DMS系统中，单人脸处理和重识别策略的设计，正是基于对驾驶员监控场景的理解和对ARM平台性能限制的考虑。算法设计不仅仅是追求理论上的最优，更要考虑实际应用中的平衡。</p>
