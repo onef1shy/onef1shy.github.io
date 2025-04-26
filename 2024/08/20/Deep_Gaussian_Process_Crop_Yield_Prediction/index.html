@@ -547,7 +547,7 @@
             </div>
             <div class="flex items-center gap-1">
               <iconify-icon width="18" icon="mingcute:refresh-3-fill" ></iconify-icon>
-              Edited: <time class="w-max">2025-04-06</time>
+              Edited: <time class="w-max">2025-04-26</time>
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-x-3 gap-y-3">
@@ -557,7 +557,7 @@
             <!-- Word count -->
             <span class="flex items-center gap-1">
               <iconify-icon width="18" icon="mingcute:book-2-fill" ></iconify-icon>
-              <span>4.9k words, 18 min</span>
+              <span>2.6k words, 10 min</span>
             </span>
             <!-- Categories -->
             
@@ -606,471 +606,232 @@
   </header>
   <!-- content -->
   <article class="post-content prose m-auto dark:prose-invert">
-    <h2 id="1-论文背景与动机"><a href="#1-论文背景与动机" class="headerlink" title="1. 论文背景与动机"></a>1. 论文背景与动机</h2><p>《Deep Gaussian Process for Crop Yield Prediction Based on Remote Sensing Data》是由斯坦福大学的Jiaxuan You和同事们于2017年在AAAI会议上发表的一篇开创性论文，该论文荣获AAAI计算可持续性赛道的最佳学生论文奖，以及世界银行大数据创新挑战赛的”最佳大数据解决方案”奖。</p>
-<h3 id="1-1-研究背景"><a href="#1-1-研究背景" class="headerlink" title="1.1 研究背景"></a>1.1 研究背景</h3><p>准确预测作物产量对于全球粮食安全、农业管理和政策制定至关重要。传统的作物产量预测方法主要依赖于地面调查和专家经验，这些方法成本高昂且效率低下。随着遥感技术的发展，利用卫星影像数据预测作物产量成为可能，这提供了一种更加高效、大规模的解决方案。</p>
-<p>然而，遥感数据的高维度、非结构化特性以及作物生长过程的复杂性使得传统的机器学习方法在处理此类问题时面临着巨大挑战。此外，地理空间数据中固有的空间相关性也需要特殊处理。</p>
-<h3 id="1-2-研究动机"><a href="#1-2-研究动机" class="headerlink" title="1.2 研究动机"></a>1.2 研究动机</h3><p>论文的主要动机是解决遥感数据用于作物产量预测中面临的三大挑战：</p>
-<ol>
-<li><p><strong>数据复杂性</strong>：卫星图像数据具有高维度、非结构化的特性，且包含时间序列信息，传统方法难以有效处理。</p>
-</li>
-<li><p><strong>空间相关性</strong>：地理上邻近的区域往往具有相似的土壤、气候和农业管理条件，这种空间相关性是重要的预测信号，但常被传统模型忽略。</p>
-</li>
-<li><p><strong>数据稀疏性</strong>：详细的作物产量标注数据通常较为稀少，尤其是在发展中国家地区。</p>
-</li>
-</ol>
-<h3 id="1-3-解决方案概述"><a href="#1-3-解决方案概述" class="headerlink" title="1.3 解决方案概述"></a>1.3 解决方案概述</h3><p>为了解决上述挑战，论文提出了一种新颖的深度高斯过程模型，将深度神经网络的表达能力与高斯过程的空间建模优势相结合。该方法的核心创新点包括：</p>
-<ol>
-<li><p><strong>两阶段建模框架</strong>：使用深度神经网络提取卫星图像的高级特征，然后使用高斯过程建模空间相关性。</p>
-</li>
-<li><p><strong>直方图特征表示</strong>：创新性地使用直方图表示卫星图像数据，有效减少噪声影响并保留更多统计信息。</p>
-</li>
-<li><p><strong>时空信息联合建模</strong>：采用CNN和LSTM两种网络架构，分别处理空间和时间维度的信息。</p>
-</li>
-</ol>
-<p>通过这种融合方法，模型能够有效处理高维遥感数据，捕捉空间相关性，并在数据稀疏的情况下仍能提供可靠预测。</p>
-<h2 id="2-数据与预处理"><a href="#2-数据与预处理" class="headerlink" title="2. 数据与预处理"></a>2. 数据与预处理</h2><h3 id="2-1-数据来源与处理"><a href="#2-1-数据来源与处理" class="headerlink" title="2.1 数据来源与处理"></a>2.1 数据来源与处理</h3><p>该研究使用了两类主要数据：</p>
-<ol>
-<li><p><strong>遥感数据</strong>：主要来自MODIS (Moderate Resolution Imaging Spectroradiometer) 卫星，提供了包括植被指数、地表温度等多个波段的信息。MODIS提供了250米到1000米分辨率的数据，具体包括：</p>
+    <h2 id="预备知识-Preliminaries"><a href="#预备知识-Preliminaries" class="headerlink" title="预备知识 (Preliminaries)"></a>预备知识 (Preliminaries)</h2><h3 id="1-深度学习模型"><a href="#1-深度学习模型" class="headerlink" title="1. 深度学习模型"></a>1. 深度学习模型</h3><ul>
+<li><strong>深度神经网络（DNN）</strong>：由多层全连接层组成，每层后接激活函数（如ReLU）。</li>
+<li><strong>卷积神经网络（CNN）</strong>：局部感受野和参数共享机制，适合提取空间结构特征。</li>
+<li><strong>长短期记忆网络（LSTM）</strong>：特殊的循环神经网络（RNN），能有效捕捉时间序列的长期依赖信息。</li>
+</ul>
+<h3 id="2-高斯过程回归（Gaussian-Process-Regression）"><a href="#2-高斯过程回归（Gaussian-Process-Regression）" class="headerlink" title="2. 高斯过程回归（Gaussian Process Regression）"></a>2. 高斯过程回归（Gaussian Process Regression）</h3><p>高斯过程是一种非参数贝叶斯模型，定义在函数空间上。对于输入$x$，高斯过程给出：</p>
+<p>$$<br>f(x) \sim \mathcal{GP}(m(x), k(x,x’))<br>$$</p>
+<p>其中$m(x)$为均值函数，$k(x,x’)$为协方差函数。本文使用带线性均值项和RBF核的高斯过程：</p>
+<p>$$<br>g(x) &#x3D; f(x) + h(x)^T \beta<br>$$</p>
+<p>其中$\beta$为线性权重，$f(x)$为零均值高斯过程。</p>
+<p>核函数形式：</p>
+<p>$$<br>k_{\text{SE}}(x, x’) &#x3D; \sigma^2 \exp\left( -\frac{||x - x’||^2}{2r^2} \right)<br>$$</p>
+<p>观测带噪声，因此核函数实际形式为：</p>
+<p>$$<br>k(x,x’) &#x3D; k_{\text{SE}}(x,x’) + \sigma_e^2 \delta_{x,x’}<br>$$</p>
+<p>其中$\delta$为Kronecker delta函数。</p>
+<h2 id="1-引言-Introduction"><a href="#1-引言-Introduction" class="headerlink" title="1. 引言 (Introduction)"></a>1. 引言 (Introduction)</h2><p>作物产量预测对于缓解全球粮食安全问题和优化农业生产至关重要。传统预测方法通常依赖地面调查和专家经验，但这类方法成本高昂，且在数据稀缺的地区（如发展中国家）难以推广。</p>
+<p>随着遥感技术的发展，利用卫星数据进行作物产量预测成为可能。MODIS等卫星系统可以提供高频次、覆盖全球的植被指数和地表温度数据。但原始遥感数据高维且复杂，如何有效提取信息仍是一大挑战。</p>
+<p>为此，本文提出了一种基于深度神经网络与高斯过程结合的深度高斯过程（Deep Gaussian Process, DGP）模型，用于从遥感影像中自动学习表征并建模空间相关性，提升作物产量预测准确性。</p>
+<p>本文的主要贡献包括：</p>
 <ul>
-<li>近红外反射率(841-876nm)和红光反射率(620-670nm)波段，用于计算NDVI</li>
-<li>地表温度数据(LST)</li>
-<li>地表反射率的七个波段</li>
-<li>土地覆盖类型信息</li>
+<li><strong>端到端特征学习</strong>：用深度神经网络（CNN或LSTM）直接从直方图表示的遥感数据中学习特征，避免人工特征设计。</li>
+<li><strong>直方图输入建模</strong>：将遥感数据编码为区域像素分布直方图，简化输入，同时保留空间信息。</li>
+<li><strong>高斯过程残差建模</strong>：在深度特征之上叠加高斯过程，建模地理邻近区域的空间残差结构。</li>
 </ul>
-</li>
-<li><p><strong>产量数据</strong>：来自美国农业部(USDA)的县级大豆产量历史数据，作为模型的标签。这些数据以蒲式耳&#x2F;英亩为单位，通过USDA国家农业统计服务(NASS)收集。</p>
-</li>
-</ol>
-<h4 id="2-1-1-详细数据处理流程"><a href="#2-1-1-详细数据处理流程" class="headerlink" title="2.1.1 详细数据处理流程"></a>2.1.1 详细数据处理流程</h4><ol>
-<li><strong>数据获取</strong>：通过Google Earth Engine API批量下载MODIS卫星数据</li>
-<li><strong>时间窗口选择</strong>：选择每年5月至10月的生长季数据，每8天一个时间点</li>
-<li><strong>空间处理</strong>：<ul>
-<li>使用县级行政边界数据提取每个县的卫星图像</li>
-<li>应用农田掩膜(Cropland Data Layer)，排除非农业用地区域</li>
-<li>将每个县的卫星图像剪裁到统一大小</li>
+<h2 id="2-数据与预处理-Data-and-Preprocessing"><a href="#2-数据与预处理-Data-and-Preprocessing" class="headerlink" title="2. 数据与预处理 (Data and Preprocessing)"></a>2. 数据与预处理 (Data and Preprocessing)</h2><h3 id="2-1-数据来源"><a href="#2-1-数据来源" class="headerlink" title="2.1 数据来源"></a>2.1 数据来源</h3><p>本研究使用了两类主要数据源：</p>
+<ul>
+<li><strong>作物产量数据</strong>：来自美国农业部国家农业统计服务（USDA NASS），提供2003-2015年间美国11个州县级大豆产量数据。</li>
+<li><strong>遥感数据</strong>：来自MODIS传感器，采集多时相植被指数（如NDVI）和地表温度（LST）。</li>
 </ul>
-</li>
+<h3 id="2-2-处理流程"><a href="#2-2-处理流程" class="headerlink" title="2.2 处理流程"></a>2.2 处理流程</h3><ul>
+<li><strong>时间选取</strong>：生长季（5月至10月），每8天一个时间步，提取相关影像。</li>
+<li><strong>空间裁剪</strong>：依据县级行政边界裁剪MODIS影像，仅保留农业用地区域。</li>
 <li><strong>特征提取</strong>：<ul>
-<li>计算归一化植被指数(NDVI): $\text{NDVI} &#x3D; \frac{\text{NIR} - \text{RED}}{\text{NIR} + \text{RED}}$</li>
-<li>提取地表温度(LST)数据</li>
+<li>计算归一化植被指数（NDVI）：<br>$$<br>\text{NDVI} &#x3D; \frac{\text{NIR} - \text{RED}}{\text{NIR} + \text{RED}}<br>$$</li>
 </ul>
 </li>
-<li><strong>数据清洗</strong>：<ul>
-<li>处理云遮挡和其他数据缺失问题</li>
-<li>进行数据插值和异常值检测</li>
-<li>标准化特征以提高模型训练稳定性</li>
+<li><strong>缺失数据处理</strong>：对受云层遮挡的数据点进行插值和标准化处理。</li>
+<li><strong>直方图编码</strong>：将每个县在每个时间步的遥感数据，编码为单变量直方图，描述像素值的分布。每张直方图归一化，以消除县域面积差异影响。</li>
+<li><strong>最终输入</strong>：每个县的输入是随时间变化的一系列直方图，形成时间序列特征。</li>
+</ul>
+<h2 id="3-方法"><a href="#3-方法" class="headerlink" title="3. 方法"></a>3. 方法</h2><h3 id="3-1-模型框架"><a href="#3-1-模型框架" class="headerlink" title="3.1 模型框架"></a>3.1 模型框架</h3><p>本文设计的深度高斯过程模型由两个主要模块组成：深度神经网络特征提取模块和高斯过程回归模块。深度神经网络负责从多时相遥感影像中提取空间和时间特征，高斯过程利用这些特征建模空间相关性并进行产量预测。<br><img src="/images/deep_gaussian/structure.png" alt="模型框架"></p>
+<h3 id="3-2-特征提取网络"><a href="#3-2-特征提取网络" class="headerlink" title="3.2 特征提取网络"></a>3.2 特征提取网络</h3><ul>
+<li><strong>空间特征提取（CNN）</strong>：多层卷积和池化操作提取局部空间信息，生成低维空间表示。</li>
+<li><strong>时间动态建模（LSTM）</strong>：对提取的空间特征序列进行时间依赖建模，捕获作物生长的时序变化。</li>
+</ul>
+<h3 id="3-3-高斯过程回归"><a href="#3-3-高斯过程回归" class="headerlink" title="3.3 高斯过程回归"></a>3.3 高斯过程回归</h3><p>将深度神经网络输出的特征作为输入，高斯过程利用RBF核函数建模特征之间的空间相关性。通过最大化边缘似然联合训练神经网络和GP超参数，实现端到端学习。</p>
+<h3 id="3-4-损失函数与训练"><a href="#3-4-损失函数与训练" class="headerlink" title="3.4 损失函数与训练"></a>3.4 损失函数与训练</h3><p>采用负对数边缘似然作为损失函数，结合Adam优化器进行参数更新。训练过程中，深度神经网络和高斯过程参数共同优化，提高模型泛化能力和不确定性估计准确性。</p>
+<h2 id="4-实验设计与评估"><a href="#4-实验设计与评估" class="headerlink" title="4. 实验设计与评估"></a>4. 实验设计与评估</h2><h3 id="4-1-实验设置-Experimental-Setup"><a href="#4-1-实验设置-Experimental-Setup" class="headerlink" title="4.1 实验设置 (Experimental Setup)"></a>4.1 实验设置 (Experimental Setup)</h3><ul>
+<li><strong>直方图表示</strong>：每个时间步，将NDVI数值划分为20个区间，构建单变量直方图，形成时间序列输入。</li>
+<li><strong>CNN设置</strong>：<ul>
+<li>输入尺寸：$64 \times 64 \times C \times T$，其中$C$是通道数，$T$是时间步。</li>
+<li>卷积核大小：$3 \times 3$。</li>
+<li>激活函数：ReLU。</li>
+<li>优化器：Adam，初始学习率0.001。</li>
 </ul>
 </li>
-</ol>
-<h3 id="2-2-特征工程创新：直方图表示法"><a href="#2-2-特征工程创新：直方图表示法" class="headerlink" title="2.2 特征工程创新：直方图表示法"></a>2.2 特征工程创新：直方图表示法</h3><p>论文中的一个关键创新是使用直方图来表示卫星图像数据，这种方法有几个显著优势：</p>
-<ol>
-<li><p><strong>直方图表示的动机</strong>：</p>
+<li><strong>LSTM设置</strong>：<ul>
+<li>每个时间步输入一个特征向量（直方图）。</li>
+<li>两层堆叠LSTM单元，分别为128和64个隐藏单元。</li>
+<li>Dropout比例0.5。</li>
+</ul>
+</li>
+<li><strong>高斯过程设置</strong>：<ul>
+<li>核函数：RBF核。</li>
+<li>超参数初始化：$\sigma_f^2&#x3D;1.0$，长度尺度$l&#x3D;1.0$，噪声方差$\sigma_n^2&#x3D;0.1$。</li>
+<li>使用GPflow实现高斯过程训练。</li>
+</ul>
+</li>
+<li><strong>训练策略</strong>：<ul>
+<li>留一年出交叉验证（Leave-One-Year-Out Cross Validation, LOYO-CV）。</li>
+<li>每年单独作为测试集，其余年份作为训练集。</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-2-评估指标-Evaluation-Metrics"><a href="#4-2-评估指标-Evaluation-Metrics" class="headerlink" title="4.2 评估指标 (Evaluation Metrics)"></a>4.2 评估指标 (Evaluation Metrics)</h2><ul>
+<li><p><strong>均方根误差 (RMSE)</strong>：<br>$$<br>\text{RMSE} &#x3D; \sqrt{ \frac{1}{n} \sum_{i&#x3D;1}^n (y_i - \hat{y}_i)^2 }<br>$$</p>
+</li>
+<li><p><strong>平均绝对误差 (MAE)</strong>：<br>$$<br>\text{MAE} &#x3D; \frac{1}{n} \sum_{i&#x3D;1}^n | y_i - \hat{y}_i |<br>$$</p>
+</li>
+<li><p><strong>决定系数 ($R^2$ Score)</strong>：<br>$$<br>R^2 &#x3D; 1 - \frac{\text{RSS}}{\text{TSS}}<br>$$</p>
+<p>其中，<br>$$<br>\text{RSS} &#x3D; \sum_{i&#x3D;1}^{n} (y_i - \hat{y}_i)^2<br>$$</p>
+<p>$$<br>\text{TSS} &#x3D; \sum_{i&#x3D;1}^{n} (y_i - \bar{y})^2<br>$$</p>
+</li>
+</ul>
+<h2 id="4-3-Baseline"><a href="#4-3-Baseline" class="headerlink" title="4.3 Baseline"></a>4.3 Baseline</h2><p>为了评估提出的深度高斯过程方法的有效性，本文设置了以下基线（baseline）模型进行对比：</p>
 <ul>
-<li>减少图像噪声的影响</li>
-<li>降低数据维度，提高计算效率</li>
-<li>捕捉区域内像素值的统计分布，而非单一统计量（如均值）</li>
+<li><strong>Ridge Regression</strong>：带有L2正则化的线性回归模型，作为传统机器学习方法的代表。</li>
+<li><strong>Decision Tree Regression</strong>：基于非参数决策树的回归模型，能捕捉特征之间的非线性关系。</li>
+<li><strong>Deep Neural Network (DNN)</strong>：标准的多层感知器（MLP）网络，输入为遥感直方图特征，独立预测每个县的产量。</li>
+<li><strong>Convolutional Neural Network (CNN)</strong>：基于卷积操作建模空间局部相关性，直接从直方图特征中学习空间特征。</li>
+<li><strong>Long Short-Term Memory (LSTM)</strong>：基于时间序列建模的循环神经网络（RNN）变种，学习作物生长季节的动态变化模式。</li>
 </ul>
-</li>
-<li><p><strong>直方图类型详解</strong>：</p>
+<p>此外，本文还评估了将高斯过程（GP）模块结合在深度特征之上的增强模型：</p>
 <ul>
-<li><strong>单变量直方图</strong>：将NDVI值分为多个区间(bins)，计算每个区间像素的频率</li>
-<li><strong>二维联合直方图</strong>：同时考虑NDVI和LST两个变量，创建二维网格，计算落在每个网格的像素数量</li>
-<li><strong>三维联合直方图</strong>：同时考虑三个变量的联合分布，如NDVI、LST和一个反射率波段</li>
+<li><strong>CNN + GP</strong>：在CNN输出特征的基础上，叠加高斯过程以建模空间残差。</li>
+<li><strong>LSTM + GP</strong>：在LSTM输出特征的基础上，叠加高斯过程以建模空间残差。</li>
 </ul>
-</li>
-<li><p><strong>直方图参数选择</strong>：</p>
-<ul>
-<li>单变量直方图通常使用20-30个区间</li>
-<li>二维联合直方图使用$10 \times 10$的网格</li>
-<li>三维联合直方图使用$5 \times 5 \times 5$的网格</li>
-</ul>
-</li>
-<li><p><strong>直方图序列</strong>：对每个时间点计算直方图，形成直方图序列，捕捉作物生长的时间动态：<br>$$H_i &#x3D; [h_{i1}, h_{i2}, …, h_{iT}]$$<br>其中$h_{it}$是第$i$个县在第$t$个时间点的直方图。</p>
-</li>
-<li><p><strong>直方图标准化</strong>：为消除县大小差异的影响，对直方图进行归一化处理，使所有直方图的总和为1。</p>
-</li>
-</ol>
-<h2 id="3-深度高斯过程模型架构"><a href="#3-深度高斯过程模型架构" class="headerlink" title="3. 深度高斯过程模型架构"></a>3. 深度高斯过程模型架构</h2><p>论文提出的深度高斯过程框架由两个核心组件组成：一个深度神经网络用于特征提取，和一个高斯过程回归器用于空间相关性建模。这种两阶段结构设计的关键思想是结合各自的优势。</p>
-<h3 id="3-1-整体模型框架"><a href="#3-1-整体模型框架" class="headerlink" title="3.1 整体模型框架"></a>3.1 整体模型框架</h3><p>模型的整体流程如下：</p>
-<ol>
-<li><strong>输入处理</strong>：将卫星图像数据转换为直方图表示</li>
-<li><strong>特征提取</strong>：使用深度神经网络（CNN或LSTM）提取高级特征</li>
-<li><strong>空间建模</strong>：使用高斯过程建模空间相关性并生成最终预测</li>
-<li><strong>端到端训练</strong>：联合优化神经网络参数和高斯过程超参数</li>
-</ol>
-<h3 id="3-2-深度神经网络组件"><a href="#3-2-深度神经网络组件" class="headerlink" title="3.2 深度神经网络组件"></a>3.2 深度神经网络组件</h3><p>论文探索了两种主要的神经网络架构，分别针对不同的数据特性：</p>
-<h4 id="3-2-1-CNN架构（处理空间结构）"><a href="#3-2-1-CNN架构（处理空间结构）" class="headerlink" title="3.2.1 CNN架构（处理空间结构）"></a>3.2.1 CNN架构（处理空间结构）</h4><p>CNN架构专门设计用于处理卫星图像的空间特征：</p>
-<ul>
-<li><strong>输入层</strong>：接收形状为$(w, h, c, t)$的张量，其中$w$和$h$是空间维度，$c$是通道数，$t$是时间步数</li>
-<li><strong>卷积层结构</strong>：<ul>
-<li>第一层：32个$3\times3$卷积核，步长为1，ReLU激活</li>
-<li>第二层：64个$3\times3$卷积核，步长为2，ReLU激活</li>
-<li>第三层：128个$3\times3$卷积核，步长为2，ReLU激活</li>
-</ul>
-</li>
-<li><strong>池化层</strong>：每个卷积层后使用$2\times2$最大池化</li>
-<li><strong>全连接层</strong>：两个全连接层，分别为1024和512个神经元，使用Dropout(0.5)防止过拟合</li>
-<li><strong>输出层</strong>：最终输出一个低维特征向量(通常为256维)</li>
-</ul>
-<h4 id="3-2-2-LSTM架构（处理时间序列）"><a href="#3-2-2-LSTM架构（处理时间序列）" class="headerlink" title="3.2.2 LSTM架构（处理时间序列）"></a>3.2.2 LSTM架构（处理时间序列）</h4><p>LSTM架构专门设计用于捕捉作物生长的时间动态：</p>
-<ul>
-<li><strong>输入处理</strong>：对每个时间步的卫星图像特征进行空间汇总，得到时间序列表示</li>
-<li><strong>LSTM层</strong>：<ul>
-<li>第一层：128个LSTM单元，返回序列</li>
-<li>第二层：64个LSTM单元，只返回最后时间步的输出</li>
-</ul>
-</li>
-<li><strong>全连接层</strong>：一个256神经元的全连接层，ReLU激活</li>
-<li><strong>输出层</strong>：生成最终特征向量</li>
-</ul>
-<p>这两种架构解决了不同的问题方面：CNN更擅长处理空间模式，而LSTM更擅长捕捉时间依赖关系。特别是在作物生长这样的时序问题上，LSTM的优势尤为明显。</p>
-<h3 id="3-3-高斯过程回归组件"><a href="#3-3-高斯过程回归组件" class="headerlink" title="3.3 高斯过程回归组件"></a>3.3 高斯过程回归组件</h3><p>高斯过程是一种非参数贝叶斯方法，能够建模函数的分布，提供预测的不确定性估计。在本研究中，高斯过程负责建模空间相关性：</p>
-<h4 id="3-3-1-核函数选择"><a href="#3-3-1-核函数选择" class="headerlink" title="3.3.1 核函数选择"></a>3.3.1 核函数选择</h4><p>模型主要使用RBF核函数，但也探索了其他核函数的性能：</p>
-<ul>
-<li><p><strong>径向基函数(RBF)</strong>：<br>$$k(\mathbf{z}_i, \mathbf{z}_j) &#x3D; \sigma_f^2 \exp\left(-\frac{1}{2l^2}||\mathbf{z}_i - \mathbf{z}_j||^2\right)$$</p>
-</li>
-<li><p><strong>Matérn核</strong>：提供更少的平滑假设，对于不太规则的函数更适用</p>
-</li>
-<li><p><strong>周期核</strong>：可以捕捉季节性模式</p>
-</li>
-</ul>
-<h4 id="3-3-2-超参数学习"><a href="#3-3-2-超参数学习" class="headerlink" title="3.3.2 超参数学习"></a>3.3.2 超参数学习</h4><p>通过边缘似然最大化，自动学习核函数的超参数：</p>
-<ul>
-<li>信号方差$\sigma_f^2$控制输出的幅度</li>
-<li>长度尺度$l$控制函数的平滑度</li>
-<li>观测噪声方差$\sigma_n^2$表示数据中的噪声水平</li>
-</ul>
-<h4 id="3-3-3-预测过程"><a href="#3-3-3-预测过程" class="headerlink" title="3.3.3 预测过程"></a>3.3.3 预测过程</h4><p>给定训练数据$X_{train}$、训练标签$y_{train}$和测试输入$X_{test}$，GP预测分布为：</p>
-<p>$$y_{test} | X_{train}, y_{train}, X_{test} \sim \mathcal{N}(\mu_{test}, \Sigma_{test})$$</p>
-<p>其中均值和协方差矩阵计算如下：</p>
-<p>$$\mu_{test} &#x3D; K_{test,train}[K_{train,train} + \sigma_n^2I]^{-1}y_{train}$$</p>
-<p>$$\Sigma_{test} &#x3D; K_{test,test} - K_{test,train}[K_{train,train} + \sigma_n^2I]^{-1}K_{train,test}$$</p>
-<p>GP的优势在于不仅提供点预测，还提供预测的不确定性估计，这在农业决策中尤为重要。</p>
-<h3 id="3-4-端到端学习算法"><a href="#3-4-端到端学习算法" class="headerlink" title="3.4 端到端学习算法"></a>3.4 端到端学习算法</h3><p>深度高斯过程模型采用端到端的学习算法，将神经网络特征提取和高斯过程建模联合优化：</p>
-<ol>
-<li><p><strong>目标函数</strong>：最大化带噪声观测的对数边缘似然：<br>$$\mathcal{L}(\theta, \mathbf{\Phi}) &#x3D; \log p(\mathbf{y}|\mathbf{X}, \theta, \mathbf{\Phi})$$</p>
-<p>其中$\theta$是神经网络参数，$\mathbf{\Phi}$是GP超参数。</p>
-</li>
-<li><p><strong>优化算法</strong>：使用随机梯度下降的变种(如Adam)交替优化神经网络参数和GP超参数：</p>
-<ul>
-<li>对神经网络参数，计算$\frac{\partial \mathcal{L}}{\partial \theta}$并更新$\theta$</li>
-<li>对GP超参数，计算$\frac{\partial \mathcal{L}}{\partial \mathbf{\Phi}}$并更新$\mathbf{\Phi}$</li>
-</ul>
-</li>
-<li><p><strong>计算复杂度</strong>：</p>
-<ul>
-<li>时间复杂度主要由GP部分决定，为$O(n^3)$，其中$n$是训练样本数</li>
-<li>通过小批量训练和稀疏近似方法缓解计算负担</li>
-</ul>
-</li>
-</ol>
-<h2 id="4-实验设置与评估"><a href="#4-实验设置与评估" class="headerlink" title="4. 实验设置与评估"></a>4. 实验设置与评估</h2><h3 id="4-1-实验数据集详情"><a href="#4-1-实验数据集详情" class="headerlink" title="4.1 实验数据集详情"></a>4.1 实验数据集详情</h3><p>实验采用了美国11个主要大豆生产州的县级数据：</p>
-<ol>
-<li><p><strong>空间覆盖</strong>：</p>
-<ul>
-<li>州：Illinois, Indiana, Iowa, Kansas, Michigan, Minnesota, Missouri, Nebraska, North Dakota, Ohio, South Dakota</li>
-<li>县数量：1,123个县</li>
-<li>这些州占美国大豆总产量的82%</li>
-</ul>
-</li>
-<li><p><strong>时间覆盖</strong>：</p>
-<ul>
-<li>年份：2003-2015年（13年）</li>
-<li>生长季：每年5月至10月</li>
-<li>数据频率：每8天一个时间点，每年约24个时间点</li>
-</ul>
-</li>
-<li><p><strong>样本构成</strong>：</p>
-<ul>
-<li>每个样本点代表一个县-年组合</li>
-<li>总样本量：约13,000个县-年样本点(1,123县×13年×89%有效数据率)</li>
-<li>训练&#x2F;测试划分：采用留一年出交叉验证，例如使用2003-2014年数据训练，在2015年测试</li>
-</ul>
-</li>
-</ol>
-<h3 id="4-2-模型实现细节"><a href="#4-2-模型实现细节" class="headerlink" title="4.2 模型实现细节"></a>4.2 模型实现细节</h3><ol>
-<li><p><strong>CNN实现细节</strong>：</p>
-<ul>
-<li>输入：$64 \times 64 \times C \times T$张量，其中$C$是通道数，$T$是时间步</li>
-<li>批量大小：64</li>
-<li>优化器：Adam，学习率0.001，β₁&#x3D;0.9，β₂&#x3D;0.999</li>
-<li>正则化：权重衰减(L2)和Dropout(0.5)</li>
-<li>训练轮数：100轮，提前停止策略</li>
-</ul>
-</li>
-<li><p><strong>LSTM实现细节</strong>：</p>
-<ul>
-<li>输入：$T \times F$张量，其中$T$是时间步，$F$是每个时间步的特征维度</li>
-<li>训练参数与CNN相似，但批量大小为128</li>
-<li>LSTM单元使用tanh激活函数和sigmoid门控函数</li>
-</ul>
-</li>
-<li><p><strong>GP实现</strong>：</p>
-<ul>
-<li>使用GPflow库实现</li>
-<li>核函数：径向基函数(RBF)</li>
-<li>超参数初始化：<ul>
-<li>信号方差$\sigma_f^2 &#x3D; 1.0$</li>
-<li>长度尺度$l &#x3D; 1.0$</li>
-<li>观测噪声方差$\sigma_n^2 &#x3D; 0.1$</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-<h3 id="4-3-评估方法详解"><a href="#4-3-评估方法详解" class="headerlink" title="4.3 评估方法详解"></a>4.3 评估方法详解</h3><ol>
-<li><p><strong>留一年出交叉验证(LOOCV)</strong>：这种方法更符合实际预测场景，因为在实际应用中，我们总是用历史数据预测未来产量。具体流程：</p>
-<ul>
-<li>从13年数据中选择一年作为测试集</li>
-<li>使用其余12年作为训练集</li>
-<li>重复此过程13次，每次选择不同年份作为测试集</li>
-<li>平均所有测试结果</li>
-</ul>
-</li>
-<li><p><strong>评估指标详细说明</strong>：</p>
-<ul>
-<li><strong>RMSE (均方根误差)</strong>：$\sqrt{\frac{1}{n}\sum_{i&#x3D;1}^{n}(y_i - \hat{y}_i)^2}$<br>计量单位为蒲式耳&#x2F;英亩，值越小越好</li>
-<li><strong>MAE (平均绝对误差)</strong>：$\frac{1}{n}\sum_{i&#x3D;1}^{n}|y_i - \hat{y}_i|$<br>同样以蒲式耳&#x2F;英亩为单位</li>
-<li><strong>R² (决定系数)</strong>：$1 - \frac{\sum_{i&#x3D;1}^{n}(y_i - \hat{y}<em>i)^2}{\sum</em>{i&#x3D;1}^{n}(y_i - \bar{y})^2}$<br>范围在[0,1]之间，越接近1表示模型解释的方差比例越高</li>
-</ul>
-</li>
-<li><p><strong>基准模型配置</strong>：</p>
-<ul>
-<li><strong>线性回归</strong>：使用sklearn实现，带L2正则化(Ridge回归)</li>
-<li><strong>决策树</strong>：最大深度10，最小叶子样本数20</li>
-<li><strong>随机森林</strong>：100棵树，最大深度15</li>
-<li><strong>纯GP模型</strong>：直接在原始特征上应用GP回归</li>
-<li><strong>纯深度学习模型</strong>：CNN或LSTM，输出层直接预测产量，不使用GP</li>
-</ul>
-</li>
-</ol>
-<h2 id="5-实验结果与分析"><a href="#5-实验结果与分析" class="headerlink" title="5. 实验结果与分析"></a>5. 实验结果与分析</h2><h3 id="5-1-模型性能全面对比"><a href="#5-1-模型性能全面对比" class="headerlink" title="5.1 模型性能全面对比"></a>5.1 模型性能全面对比</h3><h4 id="5-1-1-整体性能比较"><a href="#5-1-1-整体性能比较" class="headerlink" title="5.1.1 整体性能比较"></a>5.1.1 整体性能比较</h4><p>下表展示了在留一年出交叉验证设置下，不同模型的平均性能：</p>
-<table>
-<thead>
-<tr>
-<th>模型</th>
-<th>RMSE (bu&#x2F;acre)</th>
-<th>MAE (bu&#x2F;acre)</th>
-<th>R²</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>线性回归</td>
-<td>7.47</td>
-<td>5.76</td>
-<td>0.32</td>
-</tr>
-<tr>
-<td>决策树</td>
-<td>7.86</td>
-<td>6.02</td>
-<td>0.29</td>
-</tr>
-<tr>
-<td>随机森林</td>
-<td>6.69</td>
-<td>5.16</td>
-<td>0.47</td>
-</tr>
-<tr>
-<td>纯CNN</td>
-<td>6.11</td>
-<td>4.78</td>
-<td>0.55</td>
-</tr>
-<tr>
-<td>纯LSTM</td>
-<td>6.33</td>
-<td>4.98</td>
-<td>0.53</td>
-</tr>
-<tr>
-<td>纯GP</td>
-<td>6.85</td>
-<td>5.31</td>
-<td>0.44</td>
-</tr>
-<tr>
-<td>CNN+GP</td>
-<td>5.56</td>
-<td>4.35</td>
-<td>0.61</td>
-</tr>
-<tr>
-<td>LSTM+GP</td>
-<td>5.38</td>
-<td>4.13</td>
-<td>0.64</td>
-</tr>
-</tbody></table>
-<p>可以看出，融合了深度学习和高斯过程的模型明显优于单一类型的模型。</p>
-<h4 id="5-1-2-年度性能分析"><a href="#5-1-2-年度性能分析" class="headerlink" title="5.1.2 年度性能分析"></a>5.1.2 年度性能分析</h4><p>下表展示了各年份测试集上CNN+GP和LSTM+GP模型的RMSE(蒲式耳&#x2F;英亩)：</p>
+<p>通过与这些Baseline模型的系统对比，本文验证了深度特征学习与空间建模联合提升产量预测精度的效果。</p>
+<h2 id="4-4-年份对比实验"><a href="#4-4-年份对比实验" class="headerlink" title="4.4 年份对比实验"></a>4.4 年份对比实验</h2><p><strong>表1</strong>：按年份的RMSE比较（县级预测性能，数值越低越好）。</p>
 <table>
 <thead>
 <tr>
 <th>年份</th>
-<th>CNN</th>
-<th>CNN+GP</th>
+<th>Ridge</th>
+<th>Tree</th>
+<th>DNN</th>
 <th>LSTM</th>
 <th>LSTM+GP</th>
-<th>年产量变化情况</th>
+<th>CNN</th>
+<th>CNN+GP</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>2009</td>
-<td>6.07</td>
-<td>5.56</td>
-<td>5.18</td>
-<td>6.37</td>
-<td>正常年</td>
-</tr>
-<tr>
-<td>2010</td>
-<td>6.75</td>
-<td>7.03</td>
-<td>7.27</td>
-<td>7.30</td>
-<td>丰收年</td>
-</tr>
-<tr>
 <td>2011</td>
-<td>6.77</td>
-<td>6.40</td>
-<td>6.82</td>
-<td>6.72</td>
-<td>干旱年</td>
+<td>9.00</td>
+<td>7.98</td>
+<td>9.97</td>
+<td>5.83</td>
+<td>5.77</td>
+<td>5.76</td>
+<td><strong>5.70</strong></td>
 </tr>
 <tr>
 <td>2012</td>
+<td>6.95</td>
+<td>7.40</td>
+<td>7.58</td>
+<td>6.22</td>
+<td>6.23</td>
 <td>5.91</td>
-<td>5.72</td>
-<td>7.01</td>
-<td>6.46</td>
-<td>严重干旱年</td>
+<td><strong>5.68</strong></td>
 </tr>
 <tr>
 <td>2013</td>
-<td>6.41</td>
-<td>6.00</td>
-<td>5.91</td>
+<td>7.31</td>
+<td>8.13</td>
+<td>9.20</td>
+<td>6.39</td>
+<td>5.96</td>
+<td><strong>5.50</strong></td>
 <td>5.83</td>
-<td>正常年</td>
 </tr>
 <tr>
 <td>2014</td>
-<td>5.28</td>
-<td>4.87</td>
-<td>5.99</td>
-<td>4.65</td>
-<td>丰收年</td>
+<td>8.46</td>
+<td>7.50</td>
+<td>7.66</td>
+<td>6.42</td>
+<td>5.70</td>
+<td>5.27</td>
+<td><strong>4.89</strong></td>
 </tr>
 <tr>
 <td>2015</td>
-<td>6.18</td>
-<td>5.36</td>
-<td>6.14</td>
-<td>5.13</td>
-<td>正常年</td>
+<td>8.10</td>
+<td>7.64</td>
+<td>7.19</td>
+<td>6.47</td>
+<td><strong>5.49</strong></td>
+<td>6.40</td>
+<td>5.67</td>
+</tr>
+<tr>
+<td><strong>Avg</strong></td>
+<td>7.96</td>
+<td>7.73</td>
+<td>8.32</td>
+<td>6.27</td>
+<td>5.83</td>
+<td>5.77</td>
+<td><strong>5.55</strong></td>
 </tr>
 </tbody></table>
-<p>这些结果显示：</p>
 <ul>
-<li>不同年份的预测难度不同，与当年的气候和生长条件密切相关</li>
-<li>在极端条件年份(如2012年严重干旱)，CNN+GP表现更好</li>
-<li>在正常和丰收年份，LSTM+GP通常表现更佳</li>
-<li>与纯深度学习模型相比，加入GP组件后，在大多数年份都能显著改善预测性能</li>
+<li>每一年，CNN+GP几乎始终取得最低的RMSE。</li>
 </ul>
-<h3 id="5-2-空间相关性深入分析"><a href="#5-2-空间相关性深入分析" class="headerlink" title="5.2 空间相关性深入分析"></a>5.2 空间相关性深入分析</h3><p>研究通过多种方式验证了高斯过程捕捉空间相关性的能力：</p>
-<ol>
-<li><p><strong>核矩阵可视化</strong>：论文绘制了不同县之间的核矩阵热图，显示：</p>
+<p>为了证明GP具有减少空间相关的误差的能力，作者绘制了2014年的CNN模型的预测误差。如下图，很明显，误差在空间上是相关的（红色表示低估和蓝色的含义过高的含义过高）。添加GP组件后，相关性降低。直观地，我们认为错误是由于遥感图像中无法观察到的属性（例如，由于土壤）。 GP部分从过去的培训数据中学习了这些模式，并有效地纠正了这些模式。</p>
+<p><img src="/images/deep_gaussian/error_map.png" alt="CNN与CNN+GP误差地图"></p>
+<h3 id="4-5-时间动态分析"><a href="#4-5-时间动态分析" class="headerlink" title="4.5 时间动态分析"></a>4.5 时间动态分析</h3><p>逐月计算预测的MAPE变化，结果如下：</p>
+<p><strong>表2</strong>：美国层面作物产量预测的MAPE表现（2009–2015年均值）。</p>
+<table>
+<thead>
+<tr>
+<th>月份</th>
+<th>July (Ours)</th>
+<th>August (USDA)</th>
+<th>August (Ours)</th>
+<th>September (USDA)</th>
+<th>September (Ours)</th>
+<th>October (USDA)</th>
+<th>October (Ours)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MAPE (%)</td>
+<td>5.65</td>
+<td>3.92</td>
+<td><strong>3.37</strong></td>
+<td>4.14</td>
+<td><strong>3.41</strong></td>
+<td><strong>2.48</strong></td>
+<td>3.19</td>
+</tr>
+</tbody></table>
+<p>同时绘制了随时间变化的实时预测RMSE曲线：</p>
+<p><img src="/images/deep_gaussian/realtime_rmse.png" alt="实时预测性能变化图"></p>
 <ul>
-<li>地理上相邻的县通常具有更高的核相似度</li>
-<li>这种相似度模式与实际的农业生产区域分布高度一致</li>
-<li>核矩阵能够自动识别出具有相似农业实践和环境条件的县群</li>
+<li>可以看到，从7月中旬（作物开花期）开始，预测误差迅速下降，到9月进入平台期。</li>
+<li>提前预测的可行性较强，8月底已有接近全年最终准确率。</li>
 </ul>
-</li>
-<li><p><strong>预测误差空间分布</strong>：</p>
+<h3 id="4-6-特征重要性分析"><a href="#4-6-特征重要性分析" class="headerlink" title="4.6 特征重要性分析"></a>4.6 特征重要性分析</h3><p>使用特征置换分析不同波段和时间点的重要性。</p>
+<h4 id="按波段重要性："><a href="#按波段重要性：" class="headerlink" title="按波段重要性："></a>按波段重要性：</h4><p><img src="/images/deep_gaussian/feature_importance_band.png" alt="波段重要性图"></p>
 <ul>
-<li>相邻县域往往有相似的预测误差</li>
-<li>高斯过程能够识别并修正这种空间相关的误差模式</li>
+<li>NDVI和地表温度（LST）是最重要的两个特征。</li>
 </ul>
-</li>
-<li><p><strong>长度尺度分析</strong>：</p>
+<h4 id="按时间步重要性："><a href="#按时间步重要性：" class="headerlink" title="按时间步重要性："></a>按时间步重要性：</h4><p><img src="/images/deep_gaussian/feature_importance_time.png" alt="时间重要性图"></p>
 <ul>
-<li>学习到的GP长度尺度($l$)反映了空间相关性的范围</li>
-<li>不同特征和年份的长度尺度不同，说明空间相关性是动态变化的</li>
-<li>通过分析实验发现，最优长度尺度通常对应约50-100英里的物理距离，这与农业区域的典型尺度相符</li>
+<li>8月（开花和结荚期）的NDVI变化对最终产量预测贡献最大。</li>
 </ul>
-</li>
-</ol>
-<h3 id="5-3-时间模式分析"><a href="#5-3-时间模式分析" class="headerlink" title="5.3 时间模式分析"></a>5.3 时间模式分析</h3><p>研究对作物生长的时间模式进行了详细分析：</p>
-<ol>
-<li><p><strong>关键生长期识别</strong>：</p>
+<h2 id="5-结论-Conclusion"><a href="#5-结论-Conclusion" class="headerlink" title="5. 结论 (Conclusion)"></a>5. 结论 (Conclusion)</h2><p>本文提出了结合深度神经网络与高斯过程的作物产量预测方法，创新性地使用直方图特征和空间相关性建模，在美国大豆数据集上显著提升了预测精度。<br>实验验证了：</p>
 <ul>
-<li>通过分析LSTM的注意力权重，确定了对产量预测最重要的时间阶段</li>
-<li>发现7月中旬至8月初(大豆开花和结荚期)是最关键的预测时期</li>
-<li>这与农学知识一致，因为这一阶段的生长条件对最终产量影响最大</li>
+<li>特征学习比手工特征更有效；</li>
+<li>高斯过程能有效捕捉地理邻近区域间的空间关系；</li>
+<li>结合空间+时间动态建模可实现更早期、准确的产量预测。</li>
 </ul>
-</li>
-<li><p><strong>时间特征重要性</strong>：</p>
-<ul>
-<li>研究计算了每个时间点特征的重要性得分</li>
-<li>重要性随生长季节呈现先升后降的趋势</li>
-</ul>
-</li>
-<li><p><strong>早期预测能力</strong>：</p>
-<ul>
-<li>研究测试了使用不完整生长季数据的预测性能</li>
-<li>发现使用至8月初的数据，模型可以达到接近全季数据的预测准确性</li>
-<li>这说明模型具有早期预测能力，可以在收获前数月提供可靠预测</li>
-</ul>
-</li>
-</ol>
-<h3 id="5-4-特征重要性综合分析"><a href="#5-4-特征重要性综合分析" class="headerlink" title="5.4 特征重要性综合分析"></a>5.4 特征重要性综合分析</h3><p>论文通过多种方法分析了不同遥感特征对预测的贡献：</p>
-<ol>
-<li><p><strong>单一特征表现</strong>：</p>
-<ul>
-<li>NDVI(归一化植被指数)是单独预测性能最好的特征，RMSE为6.41蒲式耳&#x2F;英亩</li>
-<li>LST(地表温度)次之，RMSE为7.19蒲式耳&#x2F;英亩</li>
-<li>各个反射率波段的单独预测性能较差</li>
-</ul>
-</li>
-<li><p><strong>特征组合效果</strong>：</p>
-<ul>
-<li>NDVI+LST的组合显著优于单一特征</li>
-<li>添加更多特征带来的性能提升逐渐减小</li>
-<li>最佳组合是NDVI+LST+近红外反射率，RMSE为5.38蒲式耳&#x2F;英亩</li>
-</ul>
-</li>
-<li><p><strong>不同尺度特征的贡献</strong>：</p>
-<ul>
-<li>县级平均特征提供基线信息</li>
-<li>直方图表示捕捉了县内特征分布，提供更丰富信息</li>
-<li>联合直方图捕捉了特征间的相互关系，进一步提高性能</li>
-</ul>
-</li>
-<li><p><strong>特征与气候条件的交互</strong>：</p>
-<ul>
-<li>在干旱年份，LST的重要性显著增加</li>
-<li>在正常年份，NDVI和其他植被指数更为重要</li>
-<li>这表明模型能够自动适应不同气候条件下的预测策略</li>
-</ul>
-</li>
-</ol>
-<h2 id="6-应用场景与局限性"><a href="#6-应用场景与局限性" class="headerlink" title="6. 应用场景与局限性"></a>6. 应用场景与局限性</h2><h3 id="6-1-潜在应用场景"><a href="#6-1-潜在应用场景" class="headerlink" title="6.1 潜在应用场景"></a>6.1 潜在应用场景</h3><ol>
-<li><strong>早期预警系统</strong>：提前数月预测作物产量，帮助政府和组织准备</li>
-<li><strong>精准农业</strong>：帮助农民优化资源分配</li>
-<li><strong>发展中国家应用</strong>：弥补地面观测不足，提供可靠预测</li>
-</ol>
-<h3 id="6-2-局限性与未来方向"><a href="#6-2-局限性与未来方向" class="headerlink" title="6.2 局限性与未来方向"></a>6.2 局限性与未来方向</h3><ol>
-<li><strong>数据分辨率限制</strong>：MODIS数据分辨率较低</li>
-<li><strong>计算复杂度</strong>：高斯过程计算复杂度高</li>
-<li><strong>未来方向</strong>：多分辨率融合、多作物模型、迁移学习等</li>
-</ol>
-<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><p>本研究通过创新性地结合深度学习和高斯过程，有效解决了遥感数据作物产量预测的关键挑战。实验结果表明，这种融合方法能够显著提高预测准确性，并具有良好的解释性和泛化能力。深度神经网络负责从复杂的遥感数据中提取有意义的特征，而高斯过程则有效建模了空间相关性，两者的结合解决了传统方法难以应对的挑战。</p>
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p>[1] You, J., et al. (2017). Deep Gaussian Process for Crop Yield Prediction Based on Remote Sensing Data. AAAI-17, pp. 4559-4566.</p>
-<p>[2] Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian Processes for Machine Learning. MIT Press.</p>
-<p>[3] Justice, C. O., et al. (1998). The Moderate Resolution Imaging Spectroradiometer (MODIS): land remote sensing for global change research. IEEE Transactions on Geoscience and Remote Sensing, 36(4), 1228-1249. </p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p>[1] Jiaxuan You, Xiaocheng Li, Melvin Low, David Lobell, Stefano Ermon.  <strong>Deep Gaussian Process for Crop Yield Prediction Based on Remote Sensing Data</strong>.  <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, vol. 31, no. 1, 2017.  [Online]. Available: <a target="_blank" rel="noopener" href="https://ojs.aaai.org/index.php/AAAI/article/view/11172">https://ojs.aaai.org/index.php/AAAI/article/view/11172</a></p>
 
   </article>
 
