@@ -284,19 +284,23 @@ class BlogManager {
                 const hashes = headingMatch[1];
                 const content = headingMatch[2];
                 const level = hashes.length;
-                // 清理标题内容，移除可能的编号
+                // 保留原始内容用于显示，但生成ID时包含编号以确保唯一性
                 const cleanContent = content.replace(/^\d+\.\s*/, '').replace(/^\d+\.\d+\s*/, '');
                 console.log(`Processing heading: ${hashes} ${cleanContent}`); // 调试信息
                 
-                // 生成唯一的ID
-                const headingId = this.generateHeadingId(cleanContent);
+                // 生成唯一的ID，使用原始内容以确保唯一性
+                const headingId = this.generateHeadingId(content);
                 processedLines.push(`<h${level} id="${headingId}">${cleanContent}</h${level}>`);
+                
+                // 调试信息
+                console.log(`Heading ID generated: "${headingId}" for "${content}" -> "${cleanContent}"`);
                 
                 // 收集标题信息
                 headings.push({
                     level: level,
-                    text: cleanContent,
-                    id: headingId
+                    text: cleanContent, // 显示清理后的内容
+                    id: headingId,
+                    originalText: content // 保存原始内容用于调试
                 });
             } else {
                 processedLines.push(line);
@@ -597,8 +601,12 @@ class BlogManager {
                     const currentUrl = new URL(window.location);
                     currentUrl.hash = targetId;
                     window.history.replaceState({}, '', currentUrl);
+                    
+                    // 调试信息
+                    console.log(`Successfully scrolled to: ${targetId}`);
                 } else {
                     console.warn('Target element not found:', targetId);
+                    console.log('Available headings:', Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(h => ({id: h.id, text: h.textContent})));
                 }
             });
         });
