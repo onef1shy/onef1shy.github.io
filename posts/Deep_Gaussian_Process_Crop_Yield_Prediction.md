@@ -85,7 +85,7 @@ $$
 ### 3.1 模型框架
 
 本文设计的深度高斯过程模型由两个主要模块组成：深度神经网络特征提取模块和高斯过程回归模块。深度神经网络负责从多时相遥感影像中提取空间和时间特征，高斯过程利用这些特征建模空间相关性并进行产量预测。
-![模型框架](/images/deep_gaussian/structure.png)
+![模型框架](/onef1shy.github.io/images/blog/deep_gaussian/structure.png)
 
 ### 3.2 特征提取网络
 
@@ -179,7 +179,7 @@ $$
 
 为了证明GP具有减少空间相关的误差的能力，作者绘制了2014年的CNN模型的预测误差。如下图，很明显，误差在空间上是相关的（红色表示低估和蓝色的含义过高的含义过高）。添加GP组件后，相关性降低。直观地，我们认为错误是由于遥感图像中无法观察到的属性（例如，由于土壤）。 GP部分从过去的培训数据中学习了这些模式，并有效地纠正了这些模式。
 
-![CNN与CNN+GP误差地图](/images/deep_gaussian/error_map.png)
+![CNN与CNN+GP误差地图](/onef1shy.github.io/images/blog/deep_gaussian/error_map.png)
 
 ### 4.5 时间动态分析
 
@@ -193,7 +193,7 @@ $$
 
 同时绘制了随时间变化的实时预测RMSE曲线：
 
-![实时预测性能变化图](/images/deep_gaussian/realtime_rmse.png)
+![实时预测性能变化图](/onef1shy.github.io/images/blog/deep_gaussian/realtime_rmse.png)
 
 - 可以看到，从7月中旬（作物开花期）开始，预测误差迅速下降，到9月进入平台期。
 - 提前预测的可行性较强，8月底已有接近全年最终准确率。
@@ -204,13 +204,13 @@ $$
 
 #### 按波段重要性：
 
-![波段重要性图](/images/deep_gaussian/feature_importance_band.png)
+![波段重要性图](/onef1shy.github.io/images/blog/deep_gaussian/feature_importance_band.png)
 
 - NDVI和地表温度（LST）是最重要的两个特征。
 
 #### 按时间步重要性：
 
-![时间重要性图](/images/deep_gaussian/feature_importance_time.png)
+![时间重要性图](/onef1shy.github.io/images/blog/deep_gaussian/feature_importance_time.png)
 
 - 8月（开花和结荚期）的NDVI变化对最终产量预测贡献最大。
 

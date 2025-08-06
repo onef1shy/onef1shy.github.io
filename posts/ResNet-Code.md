@@ -331,7 +331,7 @@ scheduler = optim.lr_scheduler.MultiStepLR(
 2. 在训练过程中的特定时间点（原论文中为32k和48k迭代）将学习率除以10
 3. 对于CIFAR-10数据集（50k训练样本）和批量大小128，这相当于约82和123个epoch
 
-![学习率调整曲线](/images/ResNet_Code/resnet_lr_curve.png)
+![学习率调整曲线](/onef1shy.github.io/images/blog/ResNet_Code/resnet_lr_curve.png)
 
 ## 6. 实验结果与分析
 
@@ -341,8 +341,8 @@ scheduler = optim.lr_scheduler.MultiStepLR(
 
 以ResNet20和ResNet110为例，观察其训练曲线的特征：
 
-![ResNet20训练曲线](/images/ResNet_Code/resnet20_loss_acc.png)
-![ResNet110训练曲线](/images/ResNet_Code/resnet110_loss_acc.png)
+![ResNet20训练曲线](/onef1shy.github.io/images/blog/ResNet_Code/resnet20_loss_acc.png)
+![ResNet110训练曲线](/onef1shy.github.io/images/blog/ResNet_Code/resnet110_loss_acc.png)
 
 关键观察：
 1. **学习率影响**：在学习率下降点（约第82和123个epoch）处，所有模型的训练和测试曲线都有明显的下降，验证了学习率调度的有效性
@@ -353,7 +353,7 @@ scheduler = optim.lr_scheduler.MultiStepLR(
 
 下图比较了CIFAR专用ResNet不同深度模型在CIFAR-10测试集上的准确率：
 
-![不同深度ResNet性能比较](/images/ResNet_Code/depth_comparison.png)
+![不同深度ResNet性能比较](/onef1shy.github.io/images/blog/ResNet_Code/depth_comparison.png)
 
 独特发现：
 1. **增深收益递减**：网络深度从20增加到56时，测试准确率有明显提升（91.61% → 93.05%）
@@ -368,7 +368,7 @@ scheduler = optim.lr_scheduler.MultiStepLR(
 
 #### 6.3.1 参数效率与模型性能
 
-![模型大小与准确率比较](/images/ResNet_Code/standard_vs_cifar_comparison.png)
+![模型大小与准确率比较](/onef1shy.github.io/images/blog/ResNet_Code/standard_vs_cifar_comparison.png)
 
 从参数量与性能的角度发现：
 1. **CIFAR专用设计特点**：CIFAR专用ResNet（蓝色圆点）参数量远小于标准ResNet（红色方块），体现了针对小型数据集的轻量化设计思想
@@ -377,7 +377,7 @@ scheduler = optim.lr_scheduler.MultiStepLR(
 
 #### 6.3.2 计算效率与训练成本
 
-![训练时间与准确率比较](/images/ResNet_Code/training_time_comparison.png)
+![训练时间与准确率比较](/onef1shy.github.io/images/blog/ResNet_Code/training_time_comparison.png)
 
 从训练时间与性能角度发现：
 1. **计算成本差异**：训练时间从ResNet20的26分钟到ResNet1202的15小时不等，但性能提升并不成比例
@@ -388,8 +388,8 @@ scheduler = optim.lr_scheduler.MultiStepLR(
 
 通过混淆矩阵比较ResNet20和ResNet34的类别识别能力：
 
-![ResNet20混淆矩阵](/images/ResNet_Code/resnet20_confusion_matrix.png)
-![ResNet34混淆矩阵](/images/ResNet_Code/resnet34_confusion_matrix.png)
+![ResNet20混淆矩阵](/onef1shy.github.io/images/blog/ResNet_Code/resnet20_confusion_matrix.png)
+![ResNet34混淆矩阵](/onef1shy.github.io/images/blog/ResNet_Code/resnet34_confusion_matrix.png)
 
 独特发现：
 1. **困难类别共性**：两种架构都在相同类别对（如"猫"和"狗"）上遇到困难，说明这些类别本身存在语义重叠
@@ -400,8 +400,8 @@ scheduler = optim.lr_scheduler.MultiStepLR(
 
 比较ResNet20和ResNet34对相同测试样本的预测能力：
 
-![ResNet20预测示例](/images/ResNet_Code/resnet20_predictions.png)
-![ResNet34预测示例](/images/ResNet_Code/resnet34_predictions.png)
+![ResNet20预测示例](/onef1shy.github.io/images/blog/ResNet_Code/resnet20_predictions.png)
+![ResNet34预测示例](/onef1shy.github.io/images/blog/ResNet_Code/resnet34_predictions.png)
 
 关键发现：
 1. **细节识别差异**：ResNet34在细节丰富或背景复杂的图像上表现更好

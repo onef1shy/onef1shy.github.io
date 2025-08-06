@@ -13,7 +13,7 @@ MNIST数据集是机器学习领域中最常用的手写数字识别数据集之
 
 让我们先看看数据集中的一些示例图像：
 
-![MNIST数据集示例](/images/mnist/dataset_samples.png)
+![MNIST数据集示例](/onef1shy.github.io/images/blog/mnist/dataset_samples.png)
 
 上图展示了数据集中的10个数字示例，每个数字都是28x28的灰度图像。这些图像经过预处理，像素值已经归一化到[-1, 1]区间。
 
@@ -171,7 +171,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 训练过程的损失变化如下图所示：
 
-![训练损失曲线](/images/mnist/training_loss.png)
+![训练损失曲线](/onef1shy.github.io/images/blog/mnist/training_loss.png)
 
 从图中可以看出，模型的损失值随着训练步数的增加而稳定下降，表明训练过程正常。
 
@@ -179,7 +179,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 下面是模型在测试集上的一些预测结果：
 
-![预测结果示例](/images/mnist/predictions.png)
+![预测结果示例](/onef1shy.github.io/images/blog/mnist/predictions.png)
 
 绿色表示预测正确，红色表示预测错误。从图中可以看出，模型对大多数数字都能正确识别。
 
@@ -187,7 +187,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 最后，让我们看看模型在各个数字上的识别准确率：
 
-![各数字识别准确率](/images/mnist/class_accuracy.png)
+![各数字识别准确率](/onef1shy.github.io/images/blog/mnist/class_accuracy.png)
 
 从柱状图可以看出：
 - 大多数数字的识别准确率都在99%以上

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Zeyu Yan</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/academicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <script src="js/jquery-2.1.3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .blog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .blog-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .blog-header h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .blog-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .blog-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .blog-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        
+        .blog-card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .blog-card-content {
+            padding: 20px;
+        }
+        
+        .blog-card-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .blog-card-excerpt {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .blog-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8em;
+            color: #999;
+        }
+        
+        .blog-card-tags {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .blog-tag {
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            color: #666;
+        }
+        
+        .blog-article {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .blog-article.active {
+            display: block;
+        }
+        
+        .blog-article-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .blog-article-title {
+            font-size: 2.2em;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+        
+        .blog-article-meta {
+            color: #666;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        
+        .blog-article-tags {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .blog-article-content {
+            line-height: 1.8;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .blog-article-content h1,
+        .blog-article-content h2,
+        .blog-article-content h3,
+        .blog-article-content h4,
+        .blog-article-content h5,
+        .blog-article-content h6 {
+            color: #333;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .blog-article-content h1 { font-size: 1.8em; }
+        .blog-article-content h2 { font-size: 1.6em; }
+        .blog-article-content h3 { font-size: 1.4em; }
+        .blog-article-content h4 { font-size: 1.2em; }
+        .blog-article-content h5 { font-size: 1.1em; }
+        .blog-article-content h6 { font-size: 1em; }
+        
+        .blog-article-content p {
+            margin-bottom: 15px;
+        }
+        
+        .blog-article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .blog-article-content code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .blog-article-content pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        .blog-article-content blockquote {
+            border-left: 4px solid #007acc;
+            padding-left: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #666;
+        }
+        
+        .back-to-blog {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+        
+        .back-to-blog:hover {
+            background: #005a9e;
+        }
+        
+        .blog-list-container {
+            display: block;
+        }
+        
+        .blog-list-container.hidden {
+            display: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="wrapper">
+            <nav class="site-nav">
+                <a href="#" class="menu-icon">
+                    <svg viewBox="0 0 18 15">
+                        <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                        <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                        <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                    </svg>
+                </a>
+                <div class="trigger">
+                    <a class="page-link" href="index.html"><b>Home</b></a>
+                    <a class="page-link" href="index.html#bio"><b>Biography</b></a>
+                    <a class="page-link" href="index.html#timeline"><b>Experiences</b></a>
+                    <a class="page-link" href="index.html#publications"><b>Publications</b></a>
+                    <a class="page-link" href="index.html#codebase"><b>GitHub</b></a>
+                    <a class="page-link" href="index.html#awards"><b>Honors & Awards</b></a>
+                    <a class="page-link" href="index.html#academicservices"><b>Academic Services</b></a>
+                    <a class="page-link" href="blog.html"><b>Blog</b></a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="blog-container">
+        <div class="blog-header">
+            <h1><i class="fa fa-book" aria-hidden="true"></i> Blog</h1>
+            <p>Thoughts, tutorials, and research notes</p>
+        </div>
+
+        <div class="blog-list-container" id="blogListContainer">
+            <div class="loading" id="loading">
+                <i class="fa fa-spinner fa-spin"></i> Loading blog posts...
+            </div>
+        </div>
+
+        <div class="blog-article" id="blogArticle">
+            <a href="#" class="back-to-blog" id="backToBlog">
+                <i class="fa fa-arrow-left"></i> Back to Blog List
+            </a>
+            <div class="blog-article-header">
+                <h1 class="blog-article-title" id="articleTitle"></h1>
+                <div class="blog-article-meta" id="articleMeta"></div>
+                <div class="blog-article-tags" id="articleTags"></div>
+            </div>
+            <div class="blog-article-content" id="articleContent"></div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="wrapper">
+            <div class="footer-col-wrapper">
+                <div class="footer-col footer-col-1">
+                    <ul class="contact-list">
+                        <li>Personal Email:</li>
+                        <li><a href="mailto:">zeyuy1011 [at] gmail.com</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col footer-col-2">
+                    <a href="https://scholar.google.com/citations?user=fjLiFtgAAAAJ&hl=en" target="_blank" class="icon-button github">
+                        <i class="ai ai-google-scholar-square icon-github"></i>
+                        <span></span>
+                    </a>
+                    <a href="https://github.com/onef1shy" target="_blank" class="icon-button github">
+                        <i class="fa fa-github icon-github"></i>
+                        <span></span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/yan-zeyu-972b70378/" target="_blank" class="icon-button linkedin">
+                        <i class="fa fa-linkedin icon-linkedin"></i>
+                        <span></span>
+                    </a>
+                    <a href="work/resume-en_US.pdf" target="_blank" class="icon-button github">
+                        <i class="ai ai-cv icon-github"></i>
+                        <span></span>
+                    </a>
+                </div>
+                <div class="footer-col footer-col-3">
+                    <p class="text">Last updated: Aug, 2025.<br>The style of this website is borrowed from <a href='https://cen-jun.com/' target="_blank">Jun CEN's</a>.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 博客文章数据
+        const blogPosts = [
+            {
+                id: 'cnn',
+                title: '卷积神经网络(CNN)综述：从起源到现代架构的演进',
+                date: '2024-03-01',
+                excerpt: '本文旨在提供一个全面而深入的CNN发展综述，不仅介绍各个经典模型的技术细节，更重要的是分析每个模型产生的历史背景、试图解决的关键问题以及对后续研究的影响。',
+                tags: ['卷积神经网络', '论文笔记'],
+                image: 'images/cnn/cnn_basic_structure.jpeg',
+                featured: true,
+                filename: 'CNN.md'
+            },
+            {
+                id: 'resnet',
+                title: 'ResNet深度残差网络详解',
+                date: '2024-02-15',
+                excerpt: 'ResNet通过引入残差连接解决了深层网络的梯度消失问题，使得训练更深的网络成为可能。本文将详细介绍ResNet的设计原理和实现细节。',
+                tags: ['ResNet', '深度学习'],
+                image: 'images/resnet/resnet_structure.png',
+                featured: true,
+                filename: 'ResNet.md'
+            },
+            {
+                id: 'face-recognition',
+                title: '人脸识别技术详解',
+                date: '2024-01-20',
+                excerpt: '人脸识别是计算机视觉领域的重要应用，本文将从基础原理到实际应用，全面介绍人脸识别技术的发展历程和关键技术。',
+                tags: ['人脸识别', '计算机视觉'],
+                image: 'images/face_recognition/face_detection.png',
+                featured: false,
+                filename: 'face_recognition.md'
+            },
+            {
+                id: 'mnist',
+                title: 'MNIST手写数字识别实战',
+                date: '2024-01-10',
+                excerpt: 'MNIST是深度学习入门的经典数据集，本文将通过PyTorch实现一个完整的MNIST手写数字识别系统，从数据预处理到模型训练。',
+                tags: ['MNIST', 'PyTorch', '实战'],
+                image: 'images/mnist/mnist_examples.png',
+                featured: false,
+                filename: 'MNIST.md'
+            },
+            {
+                id: 'google-scholar',
+                title: 'Google Scholar爬虫工具开发',
+                date: '2023-12-15',
+                excerpt: '本文介绍如何开发一个Google Scholar爬虫工具，用于自动化获取学术论文信息和引用数据，提高学术研究效率。',
+                tags: ['爬虫', '学术工具', 'Python'],
+                image: 'images/google_scholar/scholar_logo.png',
+                featured: false,
+                filename: 'Google_Scholar_Crawler.md'
+            },
+            {
+                id: 'deep-gaussian',
+                title: '深度高斯过程在作物产量预测中的应用',
+                date: '2023-11-20',
+                excerpt: '本文探讨深度高斯过程在农业领域的应用，特别是在作物产量预测方面的优势和挑战。',
+                tags: ['高斯过程', '农业', '预测'],
+                image: 'images/deep_gaussian/gaussian_process.png',
+                featured: false,
+                filename: 'Deep_Gaussian_Process_Crop_Yield_Prediction.md'
+            },
+            {
+                id: 'resnet-code',
+                title: 'ResNet代码实现详解',
+                date: '2023-10-15',
+                excerpt: '本文提供ResNet的完整代码实现，包括网络架构设计、训练过程和性能优化技巧。',
+                tags: ['ResNet', '代码实现', 'PyTorch'],
+                image: 'images/ResNet_Code/resnet_implementation.png',
+                featured: false,
+                filename: 'ResNet-Code.md'
+            }
+        ];
+
+        // 渲染博客列表
+        function renderBlogList() {
+            const container = document.getElementById('blogListContainer');
+            container.innerHTML = '';
+            
+            blogPosts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'blog-card';
+                card.onclick = () => loadArticle(post.id);
+                
+                card.innerHTML = `
+                    <img src="${post.image}" alt="${post.title}" class="blog-card-image" onerror="this.src='images/about/avatar.jpg'">
+                    <div class="blog-card-content">
+                        <div class="blog-card-title">${post.title}</div>
+                        <div class="blog-card-excerpt">${post.excerpt}</div>
+                        <div class="blog-card-meta">
+                            <span>${post.date}</span>
+                            <div class="blog-card-tags">
+                                ${post.tags.map(tag => `<span class="blog-tag">${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // 加载文章内容
+        async function loadArticle(postId) {
+            const post = blogPosts.find(p => p.id === postId);
+            if (!post) return;
+
+            // 显示加载状态
+            document.getElementById('blogListContainer').classList.add('hidden');
+            document.getElementById('blogArticle').classList.add('active');
+            
+            // 设置文章标题和元信息
+            document.getElementById('articleTitle').textContent = post.title;
+            document.getElementById('articleMeta').innerHTML = `
+                <i class="fa fa-calendar"></i> ${post.date}
+                ${post.featured ? '<span style="color: #ff6b6b; margin-left: 10px;"><i class="fa fa-star"></i> Featured</span>' : ''}
+            `;
+            document.getElementById('articleTags').innerHTML = 
+                post.tags.map(tag => `<span class="blog-tag">${tag}</span>`).join('');
+
+            try {
+                // 尝试加载文章内容
+                const response = await fetch(`blog-posts/${post.filename}`);
+                if (response.ok) {
+                    const content = await response.text();
+                    // 解析markdown内容
+                    const htmlContent = marked.parse(content);
+                    document.getElementById('articleContent').innerHTML = htmlContent;
+                } else {
+                    // 如果文件不存在，显示占位内容
+                    document.getElementById('articleContent').innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #666;">
+                            <i class="fa fa-file-text-o" style="font-size: 3em; margin-bottom: 20px;"></i>
+                            <h3>文章内容</h3>
+                            <p>${post.excerpt}</p>
+                            <p style="margin-top: 20px; font-size: 0.9em; color: #999;">
+                                这是文章的预览内容。完整的文章内容正在准备中...
+                            </p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading article:', error);
+                document.getElementById('articleContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #d32f2f;">
+                        <i class="fa fa-exclamation-triangle" style="font-size: 3em; margin-bottom: 20px;"></i>
+                        <h3>加载失败</h3>
+                        <p>无法加载文章内容，请稍后重试。</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 返回博客列表
+        function backToBlogList() {
+            document.getElementById('blogArticle').classList.remove('active');
+            document.getElementById('blogListContainer').classList.remove('hidden');
+        }
+
+        // 事件监听
+        document.getElementById('backToBlog').addEventListener('click', function(e) {
+            e.preventDefault();
+            backToBlogList();
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderBlogList();
+        });
+    </script>
+</body>
+</html>
