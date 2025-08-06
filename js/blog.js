@@ -233,6 +233,7 @@ class BlogManager {
 
     convertMarkdownToHtml(markdown) {
         let html = markdown;
+        console.log('Original markdown:', markdown.substring(0, 500)); // 调试信息
 
         // 处理数学公式（行内和块级）
         html = html.replace(/\$\$([\s\S]*?)\$\$/g, '\\[$1\\]');
@@ -242,13 +243,44 @@ class BlogManager {
         html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>');
         html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-        // 处理标题 - 使用更精确的正则表达式
-        html = html.replace(/^(#{1,6})\s+(.+)$/gm, function(match, hashes, content) {
-            const level = hashes.length;
-            // 清理标题内容，移除可能的编号
-            const cleanContent = content.replace(/^\d+\.\s*/, '').replace(/^\d+\.\d+\s*/, '');
-            return `<h${level}>${cleanContent}</h${level}>`;
-        });
+        // 处理标题 - 使用更精确的正则表达式，跳过代码块内的内容
+        const lines = html.split('\n');
+        let inCodeBlock = false;
+        let processedLines = [];
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            
+            // 检查是否进入或离开代码块
+            if (line.includes('<pre><code')) {
+                inCodeBlock = true;
+            } else if (line.includes('</code></pre>')) {
+                inCodeBlock = false;
+            }
+            
+            // 如果在代码块内，直接保留原行
+            if (inCodeBlock) {
+                processedLines.push(line);
+                continue;
+            }
+            
+            // 处理标题，但只在非代码块内
+            const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+            if (headingMatch) {
+                const hashes = headingMatch[1];
+                const content = headingMatch[2];
+                const level = hashes.length;
+                // 清理标题内容，移除可能的编号
+                const cleanContent = content.replace(/^\d+\.\s*/, '').replace(/^\d+\.\d+\s*/, '');
+                console.log(`Processing heading: ${hashes} ${cleanContent}`); // 调试信息
+                processedLines.push(`<h${level}>${cleanContent}</h${level}>`);
+            } else {
+                processedLines.push(line);
+            }
+        }
+
+        html = processedLines.join('\n');
+        console.log('After heading processing:', html.substring(0, 500)); // 调试信息
 
         // 处理粗体和斜体
         html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -289,46 +321,85 @@ class BlogManager {
         html = html.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
 
         // 处理列表 - 改进版本，避免重复
-        const lines = html.split('\n');
+        const listLines = html.split('\n');
         let inList = false;
-        let processedLines = [];
+        let listProcessedLines = [];
 
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            // 跳过已经处理过的列表项
+        for (let i = 0; i < listLines.length; i++) {
+            const line = listLines[i];
+            // 跳过已经处理过的列表项，但保留标题
             if (line.includes('<li>') || line.includes('</ul>')) {
-                processedLines.push(line);
+                listProcessedLines.push(line);
+                continue;
+            }
+            
+            // 如果是标题，直接保留
+            if (line.match(/^<h[1-6]>/) || line.match(/^<\/h[1-6]>/)) {
+                if (inList) {
+                    listProcessedLines.push('</ul>');
+                    inList = false;
+                }
+                listProcessedLines.push(line);
                 continue;
             }
             
             if (line.match(/^[\*\-]\s+/)) {
                 if (!inList) {
-                    processedLines.push('<ul>');
+                    listProcessedLines.push('<ul>');
                     inList = true;
                 }
-                processedLines.push('<li>' + line.replace(/^[\*\-]\s+/, '') + '</li>');
+                listProcessedLines.push('<li>' + line.replace(/^[\*\-]\s+/, '') + '</li>');
             } else {
                 if (inList) {
-                    processedLines.push('</ul>');
+                    listProcessedLines.push('</ul>');
                     inList = false;
                 }
-                processedLines.push(line);
+                listProcessedLines.push(line);
             }
         }
         if (inList) {
-            processedLines.push('</ul>');
+            listProcessedLines.push('</ul>');
         }
 
-        html = processedLines.join('\n');
+        html = listProcessedLines.join('\n');
 
-        // 处理段落
-        html = html.replace(/\n\n/g, '</p><p>');
-        html = '<p>' + html + '</p>';
+        // 处理段落 - 避免将标题包装在p标签中
+        const paragraphLines = html.split('\n');
+        let paragraphProcessedLines = [];
+        let inParagraph = false;
+        
+        for (let i = 0; i < paragraphLines.length; i++) {
+            const line = paragraphLines[i];
+            
+            // 如果是标题、列表、代码块等，结束当前段落
+            if (line.match(/^<h[1-6]>/) || line.match(/^<ul>/) || line.match(/^<pre>/) || 
+                line.match(/^<blockquote>/) || line.match(/^<\/ul>/) || line.match(/^<\/pre>/) || 
+                line.match(/^<\/blockquote>/) || line.trim() === '') {
+                if (inParagraph) {
+                    paragraphProcessedLines.push('</p>');
+                    inParagraph = false;
+                }
+                paragraphProcessedLines.push(line);
+            } else {
+                // 普通文本行
+                if (!inParagraph) {
+                    paragraphProcessedLines.push('<p>');
+                    inParagraph = true;
+                }
+                paragraphProcessedLines.push(line);
+            }
+        }
+        
+        if (inParagraph) {
+            paragraphProcessedLines.push('</p>');
+        }
+        
+        html = paragraphProcessedLines.join('\n');
 
         // 清理多余的标签
         html = html.replace(/<p><\/p>/g, '');
-        html = html.replace(/<p><h[1-6]>/g, '<h$1>');
-        html = html.replace(/<\/h[1-6]><\/p>/g, '</h$1>');
+        html = html.replace(/<p><h([1-6])>/g, '<h$1>');
+        html = html.replace(/<\/h([1-6])><\/p>/g, '</h$1>');
         html = html.replace(/<p><ul>/g, '<ul>');
         html = html.replace(/<\/ul><\/p>/g, '</ul>');
         html = html.replace(/<p><pre>/g, '<pre>');
@@ -336,6 +407,7 @@ class BlogManager {
         html = html.replace(/<p><blockquote>/g, '<blockquote>');
         html = html.replace(/<\/blockquote><\/p>/g, '</blockquote>');
 
+        console.log('Final HTML result:', html.substring(0, 500)); // 调试信息
         return html;
     }
 
