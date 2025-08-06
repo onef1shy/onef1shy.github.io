@@ -206,7 +206,9 @@ class BlogManager {
 
             // 否则重新加载文件 - 使用相对路径
             const filename = post.filename.startsWith('/') ? post.filename.substring(1) : post.filename;
+            console.log(`Loading post file: ${filename}`); // 调试信息
             const response = await fetch(filename);
+            console.log(`Response status: ${response.status} ${response.statusText}`); // 调试信息
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
