@@ -58,20 +58,35 @@
             </div>
 
             <div id="post-content" class="post-section" style="display: none;">
-                <div class="post-container">
-                    <div class="post-header">
-                        <h1 id="post-title" class="post-title"></h1>
-                        <div class="post-meta">
-                            <span class="post-date"></span>
-                            <span class="post-categories"></span>
-                            <span class="post-tags"></span>
+                <div class="post-layout">
+                    <div class="post-main">
+                        <div class="post-container">
+                            <div class="post-header">
+                                <h1 id="post-title" class="post-title"></h1>
+                                <div class="post-meta">
+                                    <span class="post-date"></span>
+                                    <span class="post-categories"></span>
+                                    <span class="post-tags"></span>
+                                </div>
+                            </div>
+                            <div id="post-body" class="post-body">
+                                <!-- 文章内容将通过JavaScript动态加载 -->
+                            </div>
+                            <div class="post-navigation">
+                                <button id="back-to-list" class="btn btn-primary">← Back to Blog List</button>
+                            </div>
                         </div>
                     </div>
-                    <div id="post-body" class="post-body">
-                        <!-- 文章内容将通过JavaScript动态加载 -->
-                    </div>
-                    <div class="post-navigation">
-                        <button id="back-to-list" class="btn btn-primary">← Back to Blog List</button>
+                    <div class="post-sidebar">
+                        <div class="table-of-contents">
+                            <h3 class="toc-title">
+                                <i class="fa fa-list"></i>
+                                目录
+                            </h3>
+                            <nav id="toc-nav" class="toc-nav">
+                                <!-- 目录将通过JavaScript动态生成 -->
+                            </nav>
+                        </div>
                     </div>
                 </div>
             </div>

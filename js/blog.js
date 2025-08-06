@@ -136,6 +136,14 @@ class BlogManager {
                 }
             });
         });
+
+        // 监听浏览器返回/前进按钮
+        window.addEventListener('popstate', (event) => {
+            this.handlePopState(event);
+        });
+
+        // 检查URL中是否有博客文章ID
+        this.checkInitialURL();
     }
 
     displayPosts() {
@@ -154,11 +162,11 @@ class BlogManager {
         card.dataset.postId = post.id;
 
         const categoriesHtml = post.categories.map(cat => 
-            `<a href="#" class="category-link">${cat}</a>`
+            `<span class="category-link">${cat}</span>`
         ).join('');
 
         const tagsHtml = post.tags.map(tag => 
-            `<a href="#" class="tag-link">${tag}</a>`
+            `<span class="tag-link">${tag}</span>`
         ).join('');
 
         card.innerHTML = `
@@ -197,6 +205,11 @@ class BlogManager {
 
     async loadPost(post) {
         try {
+            // 更新URL以包含文章ID
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('post', post.id);
+            window.history.pushState({ type: 'post', postId: post.id }, '', newUrl);
+
             // 检查缓存
             if (this.cache.has(post.id)) {
                 const cachedHtml = this.cache.get(post.id);
@@ -247,6 +260,7 @@ class BlogManager {
         const lines = html.split('\n');
         let inCodeBlock = false;
         let processedLines = [];
+        let headings = []; // 收集标题信息用于生成目录
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
@@ -273,7 +287,17 @@ class BlogManager {
                 // 清理标题内容，移除可能的编号
                 const cleanContent = content.replace(/^\d+\.\s*/, '').replace(/^\d+\.\d+\s*/, '');
                 console.log(`Processing heading: ${hashes} ${cleanContent}`); // 调试信息
-                processedLines.push(`<h${level}>${cleanContent}</h${level}>`);
+                
+                // 生成唯一的ID
+                const headingId = this.generateHeadingId(cleanContent);
+                processedLines.push(`<h${level} id="${headingId}">${cleanContent}</h${level}>`);
+                
+                // 收集标题信息
+                headings.push({
+                    level: level,
+                    text: cleanContent,
+                    id: headingId
+                });
             } else {
                 processedLines.push(line);
             }
@@ -281,6 +305,9 @@ class BlogManager {
 
         html = processedLines.join('\n');
         console.log('After heading processing:', html.substring(0, 500)); // 调试信息
+        
+        // 生成目录
+        this.generateTableOfContents(headings);
 
         // 处理图片 - 必须在链接处理之前，避免被链接正则表达式误匹配
         html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
@@ -493,6 +520,198 @@ class BlogManager {
         return html;
     }
 
+    generateHeadingId(text) {
+        // 生成唯一的标题ID，改进版本
+        let id = text
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '') // 移除特殊字符
+            .replace(/\s+/g, '-') // 空格替换为连字符
+            .replace(/-+/g, '-') // 多个连字符替换为单个
+            .trim();
+        
+        // 确保ID不为空
+        if (!id) {
+            id = 'heading-' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // 确保ID唯一性
+        let counter = 1;
+        let originalId = id;
+        while (document.getElementById(id)) {
+            id = originalId + '-' + counter;
+            counter++;
+        }
+        
+        return id;
+    }
+
+    generateTableOfContents(headings) {
+        const tocNav = document.getElementById('toc-nav');
+        if (!tocNav) {
+            return;
+        }
+
+        if (headings.length === 0) {
+            tocNav.innerHTML = '<p style="text-align: center; color: #586069; font-style: italic; padding: 1rem;">暂无目录</p>';
+            return;
+        }
+
+        let tocHtml = '<ul>';
+        
+        headings.forEach(heading => {
+            const indentClass = `toc-h${heading.level}`;
+            tocHtml += `
+                <li>
+                    <a href="#${heading.id}" class="${indentClass}" data-level="${heading.level}">
+                        ${heading.text}
+                    </a>
+                </li>
+            `;
+        });
+        
+        tocHtml += '</ul>';
+        tocNav.innerHTML = tocHtml;
+
+        // 添加点击事件
+        tocNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    // 计算偏移量，考虑固定头部
+                    const headerHeight = document.querySelector('.site-header')?.offsetHeight || 0;
+                    const offset = targetElement.offsetTop - headerHeight - 20;
+                    
+                    // 平滑滚动到目标位置
+                    window.scrollTo({
+                        top: offset,
+                        behavior: 'smooth'
+                    });
+                    
+                    // 更新活动状态
+                    this.updateActiveTocItem(targetId);
+                    
+                    // 更新URL，但不触发页面跳转
+                    const currentUrl = new URL(window.location);
+                    currentUrl.hash = targetId;
+                    window.history.pushState({}, '', currentUrl);
+                } else {
+                    console.warn('Target element not found:', targetId);
+                }
+            });
+        });
+
+        // 设置滚动监听
+        this.setupScrollSpy();
+    }
+
+    setupScrollSpy() {
+        // 获取所有标题元素
+        const headings = document.querySelectorAll('.post-body h1, .post-body h2, .post-body h3, .post-body h4, .post-body h5, .post-body h6');
+        
+        if (headings.length === 0) return;
+
+        // 创建Intersection Observer来监听标题的可见性
+        const observer = new IntersectionObserver((entries) => {
+            let activeHeading = null;
+            let maxRatio = 0;
+            
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+                    maxRatio = entry.intersectionRatio;
+                    activeHeading = entry.target;
+                }
+            });
+            
+            if (activeHeading) {
+                this.updateActiveTocItem(activeHeading.id);
+            }
+        }, {
+            rootMargin: '-20% 0px -60% 0px', // 调整触发区域，让标题在视口中更早被激活
+            threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] // 更多阈值，提高精度
+        });
+
+        // 观察所有标题
+        headings.forEach(heading => {
+            observer.observe(heading);
+        });
+        
+        // 添加滚动事件监听作为备用，提高响应性
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                this.updateActiveTocItemOnScroll(headings);
+            }, 50); // 减少延迟，提高响应速度
+        });
+    }
+
+    updateActiveTocItem(activeId) {
+        // 移除所有活动状态
+        document.querySelectorAll('#toc-nav a').forEach(link => {
+            link.classList.remove('active');
+        });
+
+        // 添加活动状态到当前项
+        const activeLink = document.querySelector(`#toc-nav a[href="#${activeId}"]`);
+        if (activeLink) {
+            activeLink.classList.add('active');
+            
+            // 确保活动项在视图中可见
+            const tocNav = document.getElementById('toc-nav');
+            if (tocNav) {
+                const linkRect = activeLink.getBoundingClientRect();
+                const navRect = tocNav.getBoundingClientRect();
+                
+                if (linkRect.top < navRect.top || linkRect.bottom > navRect.bottom) {
+                    activeLink.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
+                }
+            }
+        }
+    }
+
+    updateActiveTocItemOnScroll(headings) {
+        const scrollTop = window.pageYOffset;
+        const headerHeight = document.querySelector('.site-header')?.offsetHeight || 0;
+        const offset = headerHeight + 150; // 增加偏移量，让标题更早被激活
+        
+        let activeHeading = null;
+        let minDistance = Infinity;
+        
+        // 找到当前最接近视口顶部的标题
+        headings.forEach(heading => {
+            const headingTop = heading.offsetTop - offset;
+            const distance = Math.abs(scrollTop - headingTop);
+            
+            // 如果标题在视口上方或接近视口顶部，选择距离最小的
+            if (scrollTop >= headingTop - 50 && distance < minDistance) {
+                minDistance = distance;
+                activeHeading = heading;
+            }
+        });
+        
+        // 如果没有找到合适的标题，选择最后一个在视口上方的标题
+        if (!activeHeading) {
+            for (let i = headings.length - 1; i >= 0; i--) {
+                const heading = headings[i];
+                const headingTop = heading.offsetTop - offset;
+                if (scrollTop >= headingTop) {
+                    activeHeading = heading;
+                    break;
+                }
+            }
+        }
+        
+        if (activeHeading) {
+            this.updateActiveTocItem(activeHeading.id);
+        }
+    }
+
     displayPost(post, html) {
         document.getElementById('blog-list').style.display = 'none';
         document.getElementById('post-content').style.display = 'block';
@@ -507,11 +726,11 @@ class BlogManager {
             </span>
             <span class="post-categories">
                 <i class="fa fa-folder"></i>
-                ${post.categories.map(cat => `<a href="#">${cat}</a>`).join('')}
+                ${post.categories.map(cat => `<span>${cat}</span>`).join('')}
             </span>
             <span class="post-tags">
                 <i class="fa fa-tags"></i>
-                ${post.tags.map(tag => `<a href="#">${tag}</a>`).join('')}
+                ${post.tags.map(tag => `<span>${tag}</span>`).join('')}
             </span>
         `;
 
@@ -522,14 +741,46 @@ class BlogManager {
             if (window.MathJax) {
                 MathJax.typesetPromise().then(() => {
                     console.log('MathJax rendering completed');
+                    
+                    // MathJax渲染完成后，处理锚点链接
+                    this.handleAnchorLink();
                 }).catch((err) => {
                     console.log('MathJax error:', err);
+                    this.handleAnchorLink();
                 });
+            } else {
+                this.handleAnchorLink();
             }
         }, 100);
 
-        // 滚动到顶部
-        window.scrollTo(0, 0);
+        // 滚动到顶部（如果没有锚点）
+        if (!window.location.hash) {
+            window.scrollTo(0, 0);
+        }
+
+        // 更新页面标题
+        document.title = `${post.title} - Blog - Zeyu Yan`;
+    }
+
+    handleAnchorLink() {
+        // 检查URL中是否有锚点
+        if (window.location.hash) {
+            const targetId = window.location.hash.substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                // 延迟滚动，确保内容已完全加载
+                setTimeout(() => {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // 更新导引栏活动状态
+                    this.updateActiveTocItem(targetId);
+                }, 500);
+            }
+        }
     }
 
 
@@ -537,6 +788,54 @@ class BlogManager {
     showPostList() {
         document.getElementById('post-content').style.display = 'none';
         document.getElementById('blog-list').style.display = 'block';
+        
+        // 更新URL到博客列表页面
+        const newUrl = new URL(window.location);
+        newUrl.pathname = '/blog.html';
+        newUrl.search = '';
+        newUrl.hash = '';
+        window.history.pushState({ type: 'blog-list' }, '', newUrl);
+        
+        // 更新页面标题
+        document.title = 'Blog - Zeyu Yan';
+    }
+
+    handlePopState(event) {
+        // 处理浏览器返回/前进按钮
+        const url = new URL(window.location);
+        const postId = url.searchParams.get('post');
+        
+        if (postId) {
+            // 如果有文章ID，显示对应的文章
+            const post = this.posts.find(p => p.id === postId);
+            if (post) {
+                this.showLoading();
+                this.loadPost(post);
+            } else {
+                // 如果找不到文章，显示博客列表
+                this.showPostList();
+            }
+        } else {
+            // 如果没有文章ID，显示博客列表
+            this.showPostList();
+        }
+    }
+
+    checkInitialURL() {
+        // 检查初始URL是否包含博客文章ID
+        const url = new URL(window.location);
+        const postId = url.searchParams.get('post');
+        
+        if (postId) {
+            // 如果有文章ID，延迟加载文章（等待文章列表加载完成）
+            setTimeout(() => {
+                const post = this.posts.find(p => p.id === postId);
+                if (post) {
+                    this.showLoading();
+                    this.loadPost(post);
+                }
+            }, 100);
+        }
     }
 }
 

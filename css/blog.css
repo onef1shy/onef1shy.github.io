@@ -52,7 +52,7 @@
     gap: 0.25rem;
 }
 
-.post-categories a, .post-tags a {
+.post-categories a, .post-tags a, .post-categories span, .post-tags span {
     background: #f1f8ff;
     color: #0366d6;
     padding: 0.125rem 0.5rem;
@@ -66,16 +66,189 @@
     background: #dbedff;
 }
 
+.post-categories span, .post-tags span {
+    cursor: default;
+    user-select: none;
+}
+
 /* Post Content Styles */
 .post-section {
     position: relative;
     padding: 2rem 0;
 }
 
+.post-layout {
+    display: flex;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.post-main {
+    flex: 1;
+    min-width: 0;
+}
+
 .post-container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0;
+}
+
+.post-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+}
+
+.table-of-contents {
+    background: transparent;
+    border: 1px solid rgba(225, 228, 232, 0.6);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 2rem;
+    transition: all 0.3s ease;
+}
+
+.table-of-contents:hover {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.toc-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.125rem;
+    color: #24292e;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(241, 243, 244, 0.6);
+}
+
+.toc-nav {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.toc-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc-nav li {
+    margin: 0;
+    padding: 0;
+}
+
+.toc-nav a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: #586069;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.toc-nav a:hover {
+    background: rgba(3, 102, 214, 0.05);
+    color: #0366d6;
+    border-left-color: #0366d6;
+    transform: translateX(2px);
+}
+
+.toc-nav a.active {
+    background: rgba(3, 102, 214, 0.15);
+    color: #0366d6;
+    border-left-color: #0366d6;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(3, 102, 214, 0.2);
+    transform: translateX(3px);
+}
+
+.toc-nav .toc-h1 {
+    font-weight: 600;
+    color: #24292e;
+    padding-left: 0.75rem;
+}
+
+.toc-nav .toc-h2 {
+    padding-left: 1.5rem;
+}
+
+.toc-nav .toc-h3 {
+    padding-left: 2.25rem;
+    font-size: 0.8rem;
+}
+
+.toc-nav .toc-h4 {
+    padding-left: 3rem;
+    font-size: 0.75rem;
+}
+
+.toc-nav .toc-h5, .toc-nav .toc-h6 {
+    padding-left: 3.75rem;
+    font-size: 0.7rem;
+}
+
+/* 导引栏滚动条样式 */
+.toc-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.toc-nav::-webkit-scrollbar-track {
+    background: #f1f3f4;
+    border-radius: 2px;
+}
+
+.toc-nav::-webkit-scrollbar-thumb {
+    background: #c1c5c9;
+    border-radius: 2px;
+}
+
+.toc-nav::-webkit-scrollbar-thumb:hover {
+    background: #a1a5a9;
+}
+
+/* 导引栏空状态 */
+.toc-nav:empty::after {
+    content: "暂无目录";
+    display: block;
+    text-align: center;
+    color: #586069;
+    font-style: italic;
+    padding: 1rem;
+}
+
+/* 导引栏动画效果 */
+.toc-nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: #0366d6;
+    transition: width 0.3s ease;
+}
+
+.toc-nav a:hover::after,
+.toc-nav a.active::after {
+    width: 100%;
 }
 
 .post-header {
@@ -274,6 +447,13 @@
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* 添加表格响应式处理 */
+    overflow-x: auto;
+    display: block;
+    white-space: nowrap;
+    /* 确保表格容器有合适的最大宽度 */
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .post-body th, .post-body td {
@@ -281,6 +461,9 @@
     padding: 1rem;
     text-align: left;
     vertical-align: top;
+    /* 确保表格单元格内容不会换行 */
+    white-space: nowrap;
+    min-width: 120px; /* 设置最小宽度 */
 }
 
 .post-body th {
@@ -296,6 +479,21 @@
 
 .post-body tr:hover {
     background: #f1f3f4;
+}
+
+/* 表格容器样式，确保响应式显示 */
+.post-body .table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin: 2rem 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-body .table-container table {
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .post-navigation {
@@ -367,6 +565,55 @@
     .post-meta {
         flex-direction: column;
         gap: 0.5rem;
+    }
+    
+    .post-layout {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .post-sidebar {
+        width: 100%;
+        position: static;
+        order: -1;
+    }
+    
+    .table-of-contents {
+        position: static;
+        margin-bottom: 1rem;
+    }
+    
+    .toc-nav {
+        max-height: 300px;
+    }
+    
+    /* 移动端表格样式优化 */
+    .post-body table {
+        font-size: 0.9rem;
+        margin: 1.5rem 0;
+    }
+    
+    .post-body th, .post-body td {
+        padding: 0.75rem 0.5rem;
+        min-width: 100px;
+    }
+}
+
+/* 小屏幕设备的表格优化 */
+@media (max-width: 480px) {
+    .post-body table {
+        font-size: 0.85rem;
+        margin: 1rem 0;
+    }
+    
+    .post-body th, .post-body td {
+        padding: 0.5rem 0.25rem;
+        min-width: 80px;
+    }
+    
+    /* 确保表格容器有足够的边距避免与导航栏重合 */
+    .post-container {
+        padding: 0 0.5rem;
     }
 }
 
