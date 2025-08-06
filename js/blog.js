@@ -17,13 +17,13 @@ class BlogManager {
         try {
             // 文章文件列表 - 使用JSON格式，兼容 GitHub Pages
             const postFiles = [
-                'posts/MNIST.json',
-                'posts/CNN.json', 
-                'posts/ResNet.json',
-                'posts/face_recognition.json',
-                'posts/Google_Scholar_Crawler.json',
-                'posts/Deep_Gaussian_Process_Crop_Yield_Prediction.json',
-                'posts/ResNet-Code.json'
+                'posts/json/MNIST.json',
+                'posts/json/CNN.json', 
+                'posts/json/ResNet.json',
+                'posts/json/face_recognition.json',
+                'posts/json/Google_Scholar_Crawler.json',
+                'posts/json/Deep_Gaussian_Process_Crop_Yield_Prediction.json',
+                'posts/json/ResNet-Code.json'
             ];
 
             this.posts = [];
