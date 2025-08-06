@@ -15,15 +15,15 @@ class BlogManager {
 
     async loadPosts() {
         try {
-            // 文章文件列表 - 使用相对路径，兼容 GitHub Pages
+            // 文章文件列表 - 使用JSON格式，兼容 GitHub Pages
             const postFiles = [
-                'posts/MNIST.md',
-                'posts/CNN.md', 
-                'posts/ResNet.md',
-                'posts/face_recognition.md',
-                'posts/Google_Scholar_Crawler.md',
-                'posts/Deep_Gaussian_Process_Crop_Yield_Prediction.md',
-                'posts/ResNet-Code.md'
+                'posts/MNIST.json',
+                'posts/CNN.json', 
+                'posts/ResNet.json',
+                'posts/face_recognition.json',
+                'posts/Google_Scholar_Crawler.json',
+                'posts/Deep_Gaussian_Process_Crop_Yield_Prediction.json',
+                'posts/ResNet-Code.json'
             ];
 
             this.posts = [];
@@ -37,12 +37,20 @@ class BlogManager {
                         continue;
                     }
                     
-                    const content = await response.text();
-                    const post = this.parseMarkdownFrontMatter(content, filename);
-                    if (post) {
-                        this.posts.push(post);
-                        console.log(`Successfully loaded: ${filename}`); // 调试信息
-                    }
+                    const postData = await response.json();
+                    const post = {
+                        id: postData.id,
+                        title: postData.title,
+                        date: postData.date,
+                        categories: postData.categories || [],
+                        tags: postData.tags || [],
+                        excerpt: postData.excerpt,
+                        filename: filename,
+                        body: postData.body
+                    };
+                    
+                    this.posts.push(post);
+                    console.log(`Successfully loaded: ${filename}`); // 调试信息
                 } catch (error) {
                     console.warn(`Error loading ${filename}:`, error);
                 }
