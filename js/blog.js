@@ -15,15 +15,15 @@ class BlogManager {
 
     async loadPosts() {
         try {
-            // 文章文件列表
+            // 文章文件列表 - 使用绝对路径
             const postFiles = [
-                'posts/MNIST.md',
-                'posts/CNN.md', 
-                'posts/ResNet.md',
-                'posts/face_recognition.md',
-                'posts/Google_Scholar_Crawler.md',
-                'posts/Deep_Gaussian_Process_Crop_Yield_Prediction.md',
-                'posts/ResNet-Code.md'
+                '/posts/MNIST.md',
+                '/posts/CNN.md', 
+                '/posts/ResNet.md',
+                '/posts/face_recognition.md',
+                '/posts/Google_Scholar_Crawler.md',
+                '/posts/Deep_Gaussian_Process_Crop_Yield_Prediction.md',
+                '/posts/ResNet-Code.md'
             ];
 
             this.posts = [];
