@@ -596,7 +596,7 @@ class BlogManager {
                     // 更新URL，但不触发页面跳转
                     const currentUrl = new URL(window.location);
                     currentUrl.hash = targetId;
-                    window.history.pushState({}, '', currentUrl);
+                    window.history.replaceState({}, '', currentUrl);
                 } else {
                     console.warn('Target element not found:', targetId);
                 }
@@ -798,6 +798,9 @@ class BlogManager {
         
         // 更新页面标题
         document.title = 'Blog - Zeyu Yan';
+        
+        // 滚动到顶部
+        window.scrollTo(0, 0);
     }
 
     handlePopState(event) {
@@ -805,19 +808,29 @@ class BlogManager {
         const url = new URL(window.location);
         const postId = url.searchParams.get('post');
         
-        if (postId) {
-            // 如果有文章ID，显示对应的文章
-            const post = this.posts.find(p => p.id === postId);
-            if (post) {
-                this.showLoading();
-                this.loadPost(post);
+        // 检查当前页面是否在博客页面
+        const isOnBlogPage = window.location.pathname.includes('blog.html') || 
+                            window.location.pathname.endsWith('/') && window.location.search.includes('post');
+        
+        // 如果当前在博客页面
+        if (isOnBlogPage) {
+            if (postId) {
+                // 如果有文章ID，显示对应的文章
+                const post = this.posts.find(p => p.id === postId);
+                if (post) {
+                    this.showLoading();
+                    this.loadPost(post);
+                } else {
+                    // 如果找不到文章，显示博客列表
+                    this.showPostList();
+                }
             } else {
-                // 如果找不到文章，显示博客列表
+                // 如果没有文章ID，显示博客列表
                 this.showPostList();
             }
         } else {
-            // 如果没有文章ID，显示博客列表
-            this.showPostList();
+            // 如果不在博客页面，不进行任何操作（让浏览器正常导航）
+            return;
         }
     }
 
