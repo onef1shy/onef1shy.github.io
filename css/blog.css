@@ -222,17 +222,37 @@
     color: #24292e;
 }
 
-.post-body img {
+.post-body img, .blog-image {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
     margin: 2rem 0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: transform 0.3s ease;
+    display: block;
 }
 
-.post-body img:hover {
+.post-body img:hover, .blog-image:hover {
     transform: scale(1.02);
+}
+
+/* 图片容器和标题样式 */
+.blog-image-container {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.blog-image-container .blog-image {
+    margin: 0 0 0.5rem 0;
+}
+
+.blog-image-caption {
+    font-size: 0.9rem;
+    color: #586069;
+    font-style: italic;
+    margin-top: 0.5rem;
+    line-height: 1.4;
+    text-align: center;
 }
 
 .post-body a {

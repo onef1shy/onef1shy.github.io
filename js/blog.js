@@ -282,37 +282,49 @@ class BlogManager {
         html = processedLines.join('\n');
         console.log('After heading processing:', html.substring(0, 500)); // 调试信息
 
+        // 处理图片 - 必须在链接处理之前，避免被链接正则表达式误匹配
+        html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+            console.log('Processing image:', src); // 调试信息
+            
+            let imgSrc = src;
+            // 如果路径以 /images 开头，转换为相对路径
+            if (src.startsWith('/images')) {
+                imgSrc = src.substring(1); // 移除开头的 /
+            }
+            // 如果路径以 ../images 开头，保持原样
+            else if (src.startsWith('../images')) {
+                imgSrc = src;
+            }
+            // 如果路径以 images 开头，保持原样
+            else if (src.startsWith('images')) {
+                imgSrc = src;
+            }
+            // 如果是完整的URL，保持原样
+            else if (src.startsWith('http')) {
+                imgSrc = src;
+            }
+            // 其他情况，尝试添加 images 前缀（相对路径）
+            else {
+                imgSrc = `images/${src}`;
+            }
+            
+            // 如果有标题，创建带标题的图片容器
+            if (alt && alt.trim()) {
+                return `<figure class="blog-image-container">
+                    <img src="${imgSrc}" alt="${alt}" class="blog-image">
+                    <figcaption class="blog-image-caption">${alt}</figcaption>
+                </figure>`;
+            } else {
+                return `<img src="${imgSrc}" alt="${alt}" class="blog-image">`;
+            }
+        });
+
         // 处理粗体和斜体
         html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-        // 处理链接
+        // 处理链接 - 在图片处理之后，避免误匹配图片语法
         html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-        // 处理图片 - 修复路径问题，兼容 GitHub Pages
-        html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
-            console.log('Processing image:', src); // 调试信息
-            
-            // 如果路径以 /images 开头，转换为相对路径
-            if (src.startsWith('/images')) {
-                const newSrc = src.substring(1); // 移除开头的 /
-                return `<img src="${newSrc}" alt="${alt}">`;
-            }
-            // 如果路径以 ../images 开头，保持原样
-            if (src.startsWith('../images')) {
-                return `<img src="${src}" alt="${alt}">`;
-            }
-            // 如果路径以 images 开头，保持原样
-            if (src.startsWith('images')) {
-                return `<img src="${src}" alt="${alt}">`;
-            }
-            // 如果是完整的URL，保持原样
-            if (src.startsWith('http')) {
-                return `<img src="${src}" alt="${alt}">`;
-            }
-            // 其他情况，尝试添加 images 前缀（相对路径）
-            return `<img src="images/${src}" alt="${alt}">`;
-        });
 
         // 处理表格
         html = this.processTables(html);
