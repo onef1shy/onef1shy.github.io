@@ -286,7 +286,7 @@ $$\frac{\partial \mathcal{L}}{\partial x_l} = \frac{\partial \mathcal{L}}{\parti
 
 如果你对ResNet或其他深度学习架构有任何想法或疑问，欢迎在评论区留言讨论。
 
-> **延伸阅读**：如果你对ResNet的代码实现感兴趣，可以阅读我的后续文章[《深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类》](/2024/04/27/ResNet-Code/)，其中详细介绍了如何使用PyTorch框架复现ResNet模型，并在CIFAR-10数据集上进行训练和评估。
+> **延伸阅读**：如果你对ResNet的代码实现感兴趣，可以阅读我的后续文章[《深度残差网络(ResNet)代码实现详解：PyTorch复现CIFAR-10图像分类》](https://onef1shy.github.io/blog.html?post=ResNet-Code)，其中详细介绍了如何使用PyTorch框架复现ResNet模型，并在CIFAR-10数据集上进行训练和评估。
 
 ## 参考文献
 

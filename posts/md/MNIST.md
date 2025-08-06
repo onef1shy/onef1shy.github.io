@@ -17,7 +17,7 @@ MNIST数据集是机器学习领域中最常用的手写数字识别数据集之
 
 上图展示了数据集中的10个数字示例，每个数字都是28x28的灰度图像。这些图像经过预处理，像素值已经归一化到[-1, 1]区间。
 
-> 本文假设读者已经对卷积神经网络(CNN)有基本了解。如果您对CNN的基本原理和组件不熟悉，建议先阅读我的[CNN综述](/2024/03/01/CNN/)文章，其中详细介绍了CNN的发展历程、基本组件（如卷积层、池化层、激活函数等）以及经典CNN架构（如LeNet-5、AlexNet、VGG、GoogLeNet和ResNet）和现代CNN架构（如DenseNet、MobileNet和EfficientNet等）。本文将重点关注CNN在MNIST手写数字识别任务中的具体应用，包括模型设计、训练过程和性能分析，以及CNN如何通过层次化特征学习实现手写数字识别。
+> 本文假设读者已经对卷积神经网络(CNN)有基本了解。如果您对CNN的基本原理和组件不熟悉，建议先阅读我的[CNN综述](https://onef1shy.github.io/blog.html?post=CNN)文章，其中详细介绍了CNN的发展历程、基本组件（如卷积层、池化层、激活函数等）以及经典CNN架构（如LeNet-5、AlexNet、VGG、GoogLeNet和ResNet）和现代CNN架构（如DenseNet、MobileNet和EfficientNet等）。本文将重点关注CNN在MNIST手写数字识别任务中的具体应用，包括模型设计、训练过程和性能分析，以及CNN如何通过层次化特征学习实现手写数字识别。
 
 ## 2. 理论基础
 
