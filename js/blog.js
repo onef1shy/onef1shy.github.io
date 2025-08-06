@@ -30,9 +30,10 @@ class BlogManager {
             
             for (const filename of postFiles) {
                 try {
+                    console.log(`Attempting to load: ${filename}`); // 调试信息
                     const response = await fetch(filename);
                     if (!response.ok) {
-                        console.warn(`Failed to load ${filename}`);
+                        console.warn(`Failed to load ${filename}: ${response.status} ${response.statusText}`);
                         continue;
                     }
                     
@@ -40,6 +41,7 @@ class BlogManager {
                     const post = this.parseMarkdownFrontMatter(content, filename);
                     if (post) {
                         this.posts.push(post);
+                        console.log(`Successfully loaded: ${filename}`); // 调试信息
                     }
                 } catch (error) {
                     console.warn(`Error loading ${filename}:`, error);
@@ -202,8 +204,9 @@ class BlogManager {
                 return;
             }
 
-            // 否则重新加载文件
-            const response = await fetch(post.filename);
+            // 否则重新加载文件 - 使用相对路径
+            const filename = post.filename.startsWith('/') ? post.filename.substring(1) : post.filename;
+            const response = await fetch(filename);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
