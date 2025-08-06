@@ -275,14 +275,19 @@ class BlogManager {
         // 处理引用块
         html = html.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
 
-        // 处理列表 - 改进版本
+        // 处理列表 - 改进版本，避免重复
         const lines = html.split('\n');
         let inList = false;
-        let listContent = '';
         let processedLines = [];
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
+            // 跳过已经处理过的列表项
+            if (line.includes('<li>') || line.includes('</ul>')) {
+                processedLines.push(line);
+                continue;
+            }
+            
             if (line.match(/^[\*\-]\s+/)) {
                 if (!inList) {
                     processedLines.push('<ul>');
@@ -370,9 +375,14 @@ class BlogManager {
         
         html += '</tr>\n</thead>\n<tbody>\n';
 
-        // 跳过表头和分隔行
+        // 跳过表头和分隔行（第二行通常是分隔符）
         for (let i = 2; i < tableLines.length; i++) {
             const rowLine = tableLines[i];
+            // 跳过分隔行（只包含 | 和 - 的行）
+            if (rowLine.match(/^\|[\s\-:|]+\|$/)) {
+                continue;
+            }
+            
             const cells = rowLine.split('|').slice(1, -1).map(c => c.trim());
             
             html += '<tr>\n';
