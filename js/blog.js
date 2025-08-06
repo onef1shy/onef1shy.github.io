@@ -15,15 +15,15 @@ class BlogManager {
 
     async loadPosts() {
         try {
-            // 文章文件列表 - 使用绝对路径
+            // 文章文件列表 - 使用相对路径，兼容 GitHub Pages
             const postFiles = [
-                '/posts/MNIST.md',
-                '/posts/CNN.md', 
-                '/posts/ResNet.md',
-                '/posts/face_recognition.md',
-                '/posts/Google_Scholar_Crawler.md',
-                '/posts/Deep_Gaussian_Process_Crop_Yield_Prediction.md',
-                '/posts/ResNet-Code.md'
+                'posts/MNIST.md',
+                'posts/CNN.md', 
+                'posts/ResNet.md',
+                'posts/face_recognition.md',
+                'posts/Google_Scholar_Crawler.md',
+                'posts/Deep_Gaussian_Process_Crop_Yield_Prediction.md',
+                'posts/ResNet-Code.md'
             ];
 
             this.posts = [];
@@ -244,29 +244,29 @@ class BlogManager {
         // 处理链接
         html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-        // 处理图片 - 修复路径问题
+        // 处理图片 - 修复路径问题，兼容 GitHub Pages
         html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
             console.log('Processing image:', src); // 调试信息
             
-            // 如果路径以 /images 开头，保持原样
+            // 如果路径以 /images 开头，转换为相对路径
             if (src.startsWith('/images')) {
-                return `<img src="${src}" alt="${alt}">`;
-            }
-            // 如果路径以 ../images 开头，转换为绝对路径
-            if (src.startsWith('../images')) {
-                const newSrc = src.replace('../images', '/images');
+                const newSrc = src.substring(1); // 移除开头的 /
                 return `<img src="${newSrc}" alt="${alt}">`;
             }
-            // 如果路径以 images 开头，添加 /
+            // 如果路径以 ../images 开头，保持原样
+            if (src.startsWith('../images')) {
+                return `<img src="${src}" alt="${alt}">`;
+            }
+            // 如果路径以 images 开头，保持原样
             if (src.startsWith('images')) {
-                return `<img src="/${src}" alt="${alt}">`;
+                return `<img src="${src}" alt="${alt}">`;
             }
             // 如果是完整的URL，保持原样
             if (src.startsWith('http')) {
                 return `<img src="${src}" alt="${alt}">`;
             }
-            // 其他情况，尝试添加 /images 前缀
-            return `<img src="/images/${src}" alt="${alt}">`;
+            // 其他情况，尝试添加 images 前缀（相对路径）
+            return `<img src="images/${src}" alt="${alt}">`;
         });
 
         // 处理表格

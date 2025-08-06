@@ -24,7 +24,7 @@ tags:
 
 随着神经网络层数的增加，研究人员发现了一个反直觉的现象：网络性能不升反降。论文将这种现象称为"退化问题"(degradation problem)。
 
-![深度网络的退化问题](/onef1shy.github.io/images/blog/resnet/degradation_problem.png)
+![深度网络的退化问题](images/blog/resnet/degradation_problem.png)
 
 上图展示了56层网络的训练误差反而高于20层网络，这与我们期望的"更深的网络应该至少不比浅层网络差"的直觉相悖。
 
@@ -67,7 +67,7 @@ tags:
 
 残差学习的核心思想是：与其直接学习期望的底层映射函数$H(x)$，不如学习残差映射$F(x) = H(x) - x$。这样原始的映射可以重写为$H(x) = F(x) + x$，其中$x$是恒等映射(identity mapping)。
 
-![残差学习框架](/onef1shy.github.io/images/blog/resnet/residual_block.png)
+![残差学习框架](images/blog/resnet/residual_block.png)
 
 ### 2.2 残差块结构
 
@@ -93,7 +93,7 @@ $$y = F(x, \{W_i\}) + x$$
 
 这种设计大大减少了参数量和计算复杂度，同时保持了性能。
 
-![残差块结构](/onef1shy.github.io/images/blog/resnet/two_residual_block.png)
+![残差块结构](images/blog/resnet/two_residual_block.png)
 
 ### 2.3 跳跃连接的类型
 
@@ -104,7 +104,7 @@ $$y = F(x, \{W_i\}) + x$$
 
 实验表明，只在维度变化时使用投影连接是一个好的折中方案。
 
-![不同类型跳跃连接的性能对比](/onef1shy.github.io/images/blog/resnet/shortcut_types.png)
+![不同类型跳跃连接的性能对比](images/blog/resnet/shortcut_types.png)
 
 上图展示了不同类型跳跃连接的性能对比。A表示所有跳跃连接都使用恒等映射，B表示维度增加时使用投影连接，C表示所有跳跃连接都使用投影连接。
 
@@ -120,7 +120,7 @@ ResNet的整体架构如下：
 4. 全局平均池化层
 5. 全连接层和softmax分类器
 
-![ResNet架构](/onef1shy.github.io/images/blog/resnet/resnet_architecture.png)
+![ResNet架构](images/blog/resnet/resnet_architecture.png)
 
 ### 3.2 不同深度的ResNet变体
 
@@ -136,7 +136,7 @@ ResNet的整体架构如下：
 
 下图展示了不同深度ResNet变体的详细架构设计：
 
-![ResNet变体架构详细对比](/onef1shy.github.io/images/blog/resnet/resnet_variants_architecture.png)
+![ResNet变体架构详细对比](images/blog/resnet/resnet_variants_architecture.png)
 
 每个阶段的残差块数量和通道数如下：
 
@@ -154,11 +154,11 @@ ResNet-152: [3, 8, 36, 3]
 
 ResNet在ImageNet数据集上取得了显著的性能提升：
 
-![普通网络与残差网络的训练曲线对比](/onef1shy.github.io/images/blog/resnet/training_curves.png)
+![普通网络与残差网络的训练曲线对比](images/blog/resnet/training_curves.png)
 
 上图展示了普通网络与残差网络在训练过程中的误差曲线对比。可以看到，随着深度增加，普通网络的训练误差和测试误差都上升，而残差网络则能够持续降低误差。
 
-![ImageNet结果](/onef1shy.github.io/images/blog/resnet/imagenet_results.png)
+![ImageNet结果](images/blog/resnet/imagenet_results.png)
 
 ResNet-152达到了4.49%的top-5错误率，比之前的最佳结果提升了约50%。更重要的是，实验证明了增加网络深度确实可以提高性能，这与之前的观察相反。
 
@@ -166,7 +166,7 @@ ResNet-152达到了4.49%的top-5错误率，比之前的最佳结果提升了约
 
 在CIFAR-10数据集上，作者构建了深度从20层到1202层的网络：
 
-![CIFAR-10结果](/onef1shy.github.io/images/blog/resnet/cifar10_results.png)
+![CIFAR-10结果](images/blog/resnet/cifar10_results.png)
 
 实验表明：
 - 残差网络可以轻松训练超过100层的网络
@@ -182,7 +182,7 @@ ResNet-152达到了4.49%的top-5错误率，比之前的最佳结果提升了约
 
 这证明了ResNet作为骨干网络的通用性。
 
-![COCO目标检测结果](/onef1shy.github.io/images/blog/resnet/coco_detection.png)
+![COCO目标检测结果](images/blog/resnet/coco_detection.png)
 
 上图展示了ResNet在COCO目标检测任务上的性能，与其他网络架构相比，ResNet显著提升了检测精度。
 
@@ -200,7 +200,7 @@ ResNet-152达到了4.49%的top-5错误率，比之前的最佳结果提升了约
 2. 更深的残差网络（如ResNet-110）具有比浅层残差网络（如ResNet-20）更小的响应幅度
 3. 当层数增加时，残差网络中的单个层对信号的修改程度变小
 
-![层响应分析](/onef1shy.github.io/images/blog/resnet/layer_responses.png)
+![层响应分析](images/blog/resnet/layer_responses.png)
 
 上图展示了残差网络中各层响应的标准差分布，可以看到残差函数的输出通常具有较小的幅度，这支持了论文的基本动机：残差函数可能更接近于零，比非残差函数更容易优化。
 

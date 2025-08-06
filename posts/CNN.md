@@ -34,7 +34,7 @@ tags:
 
 在深入探讨各种CNN架构之前，我们需要理解CNN的基本组件和工作原理。CNN的设计灵感来源于生物视觉系统，通过局部连接和权重共享的特性，能够有效地处理具有网格状拓扑结构的数据，如图像。
 
-![CNN基本结构](../images/blog/cnn/cnn_basic_structure.jpeg)
+![CNN基本结构](images/blog/cnn/cnn_basic_structure.jpeg)
 
 ### 2.1 卷积层(Convolutional Layer)
 
@@ -328,7 +328,7 @@ $$\frac{\partial L}{\partial w} = x * \frac{\partial L}{\partial z}$$
 
 LeNet-5是由Yann LeCun等人在1998年提出的，是第一个成功应用于实际问题的卷积神经网络架构。它最初被设计用于手写数字识别，在当时的MNIST数据集上取得了显著的成功。
 
-![LeNet-5架构](/images/cnn/lenet5_architecture.png)
+![LeNet-5架构](images/blog/cnn/lenet5_architecture.png)
 
 #### 3.1.1 网络结构
 
@@ -416,7 +416,7 @@ AlexNet是由Alex Krizhevsky、Ilya Sutskever和Geoffrey Hinton在2012年提出�
 
 AlexNet的出现正是为了解决这些问题。它利用ImageNet这一大规模数据集，结合GPU并行计算能力，并引入了ReLU激活函数和Dropout等技术，成功训练了一个8层的深度CNN，证明了深度学习在视觉识别任务上的巨大潜力。
 
-![AlexNet架构](/images/cnn/alexnet_architecture.png)
+![AlexNet架构](images/blog/cnn/alexnet_architecture.png)
 
 #### 3.2.2 网络结构
 
@@ -497,7 +497,7 @@ AlexNet的成功证明了增加网络深度可以提高模型性能，但如何�
 
 VGG网络通过极简主义的设计理念解决了这些问题，它用多个小卷积核堆叠替代大卷积核，创建了一种规整、易于扩展的网络架构模板，为后续更深网络的设计提供了范式。
 
-![VGG网络架构](/images/cnn/vgg_architecture.png)
+![VGG网络架构](images/blog/cnn/vgg_architecture.png)
 
 #### 3.3.2 网络结构
 
@@ -579,7 +579,7 @@ GoogLeNet是由Google研究团队在2014年提出的深度卷积神经网络，�
 
 GoogLeNet通过创新的Inception模块解决了这些问题，它允许网络同时学习多尺度特征，并通过1×1卷积进行降维，大大提高了计算效率。GoogLeNet在保持较低参数量（约700万，仅为VGG的5%）的同时，实现了更高的准确率。
 
-![GoogLeNet架构](/images/cnn/googlenet_architecture.png)
+![GoogLeNet架构](images/blog/cnn/googlenet_architecture.png)
 
 #### 3.4.2 网络结构
 
@@ -624,7 +624,7 @@ Inception模块是GoogLeNet的核心组件，其设计思想是在同一层中�
 3. 1×1卷积 → 5×5卷积
 4. 3×3最大池化 → 1×1卷积
 
-![Inception模块](/images/cnn/inception_module.png)
+![Inception模块](images/blog/cnn/inception_module.png)
 
 其中，1×1卷积主要用于降维，减少计算量。例如，在第二条路径中，如果输入特征图有256个通道，我们可以先用64个1×1的卷积核将通道数降到64，再用128个3×3的卷积核进行卷积，这样计算量比直接用128个3×3的卷积核在256个通道上进行卷积要小得多。
 
@@ -685,7 +685,7 @@ ResNet（残差网络）是由微软研究院的何恺明（Kaiming He）等人�
 
 ResNet通过引入残差连接（跳跃连接）巧妙地解决了这些问题，使得网络可以直接学习残差映射，大大简化了优化过程，成功训练了152层甚至更深的网络。
 
-![ResNet架构](/images/cnn/resnet_architecture.png)
+![ResNet架构](images/blog/cnn/resnet_architecture.png)
 
 #### 3.5.2 网络结构
 
@@ -730,7 +730,7 @@ $$y = F(x, \{W_i\}) + x$$
 
 当输入和输出的维度不同时，跳跃连接需要进行投影变换，通常通过1×1卷积实现。
 
-![残差块](/images/cnn/residual_block.png)
+![残差块](images/blog/cnn/residual_block.png)
 
 #### 3.5.4 数学原理
 
@@ -785,7 +785,7 @@ ResNet的成功证明了创建信息和梯度的直接通路对训练深度网�
 
 DenseNet通过密集连接模式解决了这些问题，它不仅创建了更短的梯度路径，还实现了特征的极致重用，使得网络能够用更少的参数达到更好的性能。DenseNet在图像分类、目标检测等任务上取得了优异成绩，同时具有更好的参数效率和计算效率。
 
-![DenseNet完整架构](/images/cnn/densenet_full_architecture.png)
+![DenseNet完整架构](images/blog/cnn/densenet_full_architecture.png)
 
 #### 4.1.2 网络结构
 
@@ -794,7 +794,7 @@ DenseNet由多个密集块（Dense Block）和过渡层（Transition Layer）组
 1. **密集块**：每一层的输入是前面所有层的特征图的拼接，输出的特征图会被传递给后续所有层作为输入。
 2. **过渡层**：位于两个密集块之间，用于降低特征图的空间维度，包含批量归一化、1×1卷积和2×2平均池化。
 
-![DenseNet密集块结构](/images/cnn/densenet_architecture.png)
+![DenseNet密集块结构](images/blog/cnn/densenet_architecture.png)
 
 DenseNet的数学表达式为：
 
@@ -828,7 +828,7 @@ MobileNet是由Google研究团队开发的一系列轻量级CNN架构，专为�
 
 MobileNet系列通过创新的网络架构设计，特别是深度可分离卷积，成功地在保持较高准确率的同时，大幅降低了计算量和参数量，使得高质量的视觉识别能够在移动设备上实时运行。
 
-![MobileNet架构](/images/cnn/mobilenet_architecture.png)
+![MobileNet架构](images/blog/cnn/mobilenet_architecture.png)
 
 #### 4.2.2 深度可分离卷积
 
@@ -885,7 +885,7 @@ EfficientNet是由Google研究团队在2019年提出的，通过系统地平衡�
 
 EfficientNet通过提出复合缩放方法(Compound Scaling)，系统地研究了深度、宽度和分辨率三个维度的关系，找到了它们之间的最佳平衡点。同时，EfficientNet还使用神经架构搜索技术设计了高效的基础网络(EfficientNet-B0)，然后通过复合缩放方法扩展到不同大小的模型(B1-B7)，在各种计算预算下都取得了最先进的性能。
 
-![EfficientNet架构](/images/cnn/efficientnet_architecture.png)
+![EfficientNet架构](images/blog/cnn/efficientnet_architecture.png)
 
 #### 4.3.2 复合缩放方法
 
