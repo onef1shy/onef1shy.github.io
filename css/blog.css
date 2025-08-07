@@ -9,13 +9,11 @@
     justify-content: center;
     align-items: center;
     min-height: 200px;
-    background: rgba(255, 255, 255, 0.8);
     border-radius: 6px;
     margin: 2rem 0;
     opacity: 1;
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
     position: relative;
-    border: 1px solid rgba(225, 228, 232, 0.5);
 }
 
 .loading-container.fade-out {
