@@ -8,9 +8,43 @@ class BlogManager {
     }
 
     async init() {
+        this.showLoading();
         await this.loadPosts();
         this.setupEventListeners();
         this.displayPosts();
+        this.hideLoading();
+    }
+
+    showLoading() {
+        const loadingContainer = document.getElementById('loading-container');
+        const postsContainer = document.getElementById('posts-container');
+        
+        if (loadingContainer) {
+            loadingContainer.style.display = 'flex';
+            loadingContainer.classList.remove('fade-out');
+        }
+        
+        if (postsContainer) {
+            postsContainer.classList.remove('show');
+        }
+    }
+
+    hideLoading() {
+        const loadingContainer = document.getElementById('loading-container');
+        const postsContainer = document.getElementById('posts-container');
+        
+        if (loadingContainer) {
+            loadingContainer.classList.add('fade-out');
+            setTimeout(() => {
+                loadingContainer.style.display = 'none';
+            }, 500);
+        }
+        
+        if (postsContainer) {
+            setTimeout(() => {
+                postsContainer.classList.add('show');
+            }, 200);
+        }
     }
 
     async loadPosts() {
@@ -189,18 +223,10 @@ class BlogManager {
         `;
 
         card.addEventListener('click', () => {
-            this.showLoading();
             this.loadPost(post);
         });
 
         return card;
-    }
-
-    showLoading() {
-        document.getElementById('post-content').style.display = 'block';
-        document.getElementById('blog-list').style.display = 'none';
-        document.getElementById('post-title').textContent = 'Loading...';
-        document.getElementById('post-body').innerHTML = '<div class="loading">Loading article...</div>';
     }
 
     async loadPost(post) {
@@ -797,6 +823,15 @@ class BlogManager {
         document.getElementById('post-content').style.display = 'none';
         document.getElementById('blog-list').style.display = 'block';
         
+        // 如果文章列表为空，显示loading并重新加载
+        if (this.posts.length === 0) {
+            this.showLoading();
+            this.loadPosts().then(() => {
+                this.displayPosts();
+                this.hideLoading();
+            });
+        }
+        
         // 更新URL到博客列表页面
         const newUrl = new URL(window.location);
         newUrl.pathname = '/blog.html';
@@ -826,7 +861,6 @@ class BlogManager {
                 // 如果有文章ID，显示对应的文章
                 const post = this.posts.find(p => p.id === postId);
                 if (post) {
-                    this.showLoading();
                     this.loadPost(post);
                 } else {
                     // 如果找不到文章，显示博客列表
@@ -852,7 +886,6 @@ class BlogManager {
             setTimeout(() => {
                 const post = this.posts.find(p => p.id === postId);
                 if (post) {
-                    this.showLoading();
                     this.loadPost(post);
                 }
             }, 100);
