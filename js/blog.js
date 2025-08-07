@@ -33,17 +33,20 @@ class BlogManager {
         const loadingContainer = document.getElementById('loading-container');
         const postsContainer = document.getElementById('posts-container');
         
+        // 同时开始两个动画，让它们重叠
         if (loadingContainer) {
             loadingContainer.classList.add('fade-out');
+            // 延长时间，确保所有CSS动画（包括高度变化）完成后再移除
             setTimeout(() => {
                 loadingContainer.style.display = 'none';
-            }, 500);
+            }, 700);
         }
         
         if (postsContainer) {
+            // 在loading开始收缩后立即开始显示内容
             setTimeout(() => {
                 postsContainer.classList.add('show');
-            }, 200);
+            }, 50);
         }
     }
 

@@ -12,13 +12,17 @@
     border-radius: 6px;
     margin: 2rem 0;
     opacity: 1;
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out, height 0.6s ease-out, margin 0.6s ease-out;
     position: relative;
+    overflow: hidden;
 }
 
 .loading-container.fade-out {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-20px) scale(0.98);
+    height: 0;
+    margin: 0;
+    min-height: 0;
 }
 
 .loading-spinner {
@@ -64,13 +68,13 @@
 /* Hide posts container initially */
 #posts-container {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transform: translateY(20px) scale(0.99);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
 }
 
 #posts-container.show {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
 }
 
 .post-card {
