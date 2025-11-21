@@ -165,63 +165,40 @@ h1:before, .anchor:before {
     }
 }
 
-// Clustrmaps responsive styling
-#clustrmaps {
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    display: block;
-    
-    // Ensure the iframe/content is responsive
-    iframe, 
-    > div,
-    > script + div,
-    div[style*="width"] {
-        max-width: 100% !important;
-        width: 100% !important;
-        box-sizing: border-box;
-    }
-}
-
-// Mobile adaptation for profile_box and clustrmaps
+// Mobile adaptation for clustrmaps
 // Make map display on its own line on mobile, like paper-box images
+// Keep avatar, content, and urls-wrapper in their original layout
 @media (max-width: 767px) {
-    // Make clustrmaps display on its own line on mobile, similar to paper-box images
     .profile_box {
         // Allow flex wrapping so clustrmaps can break to new line
         flex-wrap: wrap !important;
-        
-        // Force clustrmaps to take full width and break to new line
-        #clustrmaps {
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 2em 0 1em 0 !important;
-            flex: 0 0 100% !important; // Force it to take full width and break line
-            order: 999 !important; // Put it at the end
-            overflow: hidden;
-            display: block !important;
-            clear: both !important;
-            min-width: 100% !important;
-            
-            // Force responsive behavior for clustrmaps dynamically generated content
-            iframe,
-            > div,
-            div[style],
-            div[style*="width"],
-            script + div,
-            [id*="clustrmaps"] {
-                max-width: 100% !important;
-                width: 100% !important;
-                box-sizing: border-box !important;
-            }
-        }
     }
     
-    // Also apply to sidebar context
-    .sidebar .profile_box {
-        #clustrmaps {
-            margin-top: 2em !important;
-            margin-bottom: 1em !important;
-        }
+    // Force clustrmaps script to break to new line on mobile
+    // Script elements need explicit flex properties to work as flex items
+    .profile_box > script#clustrmaps,
+    .sidebar .profile_box > script#clustrmaps {
+        flex: 0 0 100% !important;
+        flex-basis: 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 2em 0 1em 0 !important;
+        display: block !important;
+        order: 999 !important;
+        clear: both !important;
+    }
+    
+    // Force responsive behavior for clustrmaps dynamically generated content
+    .profile_box #clustrmaps iframe,
+    .profile_box #clustrmaps > div,
+    .profile_box #clustrmaps div,
+    .profile_box script#clustrmaps + div,
+    .profile_box [id*="clustrmaps"],
+    .sidebar .profile_box #clustrmaps iframe,
+    .sidebar .profile_box #clustrmaps > div,
+    .sidebar .profile_box #clustrmaps div {
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 }
