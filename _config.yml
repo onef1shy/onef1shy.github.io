@@ -6,9 +6,9 @@
 # `jekyll serve`. If you change this file, please restart the server process.
 
 # Site Settings
-title                    : "Jiaming Xu（许珈铭）"
-description              : "Focusing on efficient machine learning system(MLSys)."
-repository               : "mathscode/mathscode.github.io"
+title                    : "Zeyu Yan（闫泽宇）"
+description              : "Ph.D. candidate, Zhejiang University. Focusing on Video anomaly detection."
+repository               : "onef1shy/onef1shy.github.io"
 google_scholar_stats_use_cdn : true
 
 # google analytics
@@ -20,14 +20,14 @@ bing_site_verification   :  "5BE4C67C93C083899D8179F33EAEFB83" # get bing_site_v
 baidu_site_verification  :  # get baidu_site_verification from https://ziyuan.baidu.com/login/index?u=/site/index
 # Site Author
 author:
-  name             : "Jiaming Xu 许珈铭"
-  avatar           : "images/person.jpeg"
-  bio              : "Shanghai Jiao Tong University/Shanghai Innovation Institute"
-  location         : "Shanghai, China"
+  name             : "Zeyu Yan 闫泽宇"
+  avatar           : "images/about/avatar.jpg"
+  bio              : "Xidian University"
+  location         : "Xi'an, China"
   employer         :
   pubmed           : 
-  googlescholar    : "https://scholar.google.com/citations?user=ovQFaicAAAAJ"
-  email            : "jiamingxu@sjtu.edu.cn"
+  googlescholar    : "https://scholar.google.com/citations?user=fjLiFtgAAAAJ"
+  email            : "zeyuy1011@gmail.com"
   researchgate     :  # e.g., "https://www.researchgate.net/profile/yourprofile"
   uri              :
   bitbucket        :
@@ -36,13 +36,13 @@ author:
   flickr           :
   facebook         :
   foursquare       :
-  github           : "MathsCode"
+  github           : "onef1shy"
   google_plus      :
   keybase          :
   instagram        :
   impactstory      : # e.g., "https://profiles.impactstory.org/u/xxxx-xxxx-xxxx-xxxx"
   lastfm           :
-  linkedin         : "jiaming-xu-sjtu"
+  linkedin         : "yan-zeyu-972b70378"
   dblp             : # e.g., "https://dblp.org/pid/xx/xxxx.html"
   orcid            : # e.g., "https://orcid.org/xxxx"
   pinterest        :
