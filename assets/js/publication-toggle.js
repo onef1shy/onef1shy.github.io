@@ -19,9 +19,9 @@ $(document).ready(function(){
     return;
   }
   
-  // Load saved preference or default to 'representative'
+  // Load saved preference or default to 'all'
   var savedMode = localStorage.getItem('publicationMode');
-  var currentMode = (savedMode === 'all' || savedMode === 'representative') ? savedMode : 'representative';
+  var currentMode = (savedMode === 'all' || savedMode === 'representative') ? savedMode : 'all';
   
   // Initialize display
   initializeDisplay();

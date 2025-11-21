@@ -29,6 +29,7 @@ My research interests focus on computer vision, primarily AI applications in the
 - *2025.08*: &nbsp;🎉 Our paper **<i>LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning</i>** has been accepted to **CollaborateCom 2025**! I will [present it orally](https://collaboratecom.eai-conferences.org/2025/final-program/) in Shanghai, China this November.
 - *2025.06*: &nbsp;🎉 Our paper **<i>DFYP v1.0: Dynamic CNN and ViT Fusion with Adaptive Sobel-Convolution for Enhanced Crop Yield Prediction</i>** has been accepted to **ICML 2025 Workshop**! The first star on my academic journey!
 
+<span class='anchor' id='-publications'></span>
 # 📝 Publications ( <span id="publication-toggle" class="publication-toggle-link" data-mode="representative">Show Representative</span> / <span id="publication-toggle-all" class="publication-toggle-link" data-mode="all">Show All</span> )
 
 <div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">CollaborateCom 2025</div><img src='images/publications/LADSG.png' alt="sym" width="100%"></div></div>
