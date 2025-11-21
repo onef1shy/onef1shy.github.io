@@ -29,9 +29,9 @@ My research interests focus on computer vision, primarily AI applications in the
 - *2025.08*: &nbsp;🎉 Our paper **<i>LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning</i>** has been accepted to **CollaborateCom 2025**! I will [present it orally](https://collaboratecom.eai-conferences.org/2025/final-program/) in Shanghai, China this November.
 - *2025.06*: &nbsp;🎉 Our paper **<i>DFYP v1.0: Dynamic CNN and ViT Fusion with Adaptive Sobel-Convolution for Enhanced Crop Yield Prediction</i>** has been accepted to **ICML 2025 Workshop**! The first star on my academic journey!
 
-# 📝 Publications 
+# 📝 Publications ( <span id="publication-toggle" class="publication-toggle-link" data-mode="representative">Show Representative</span> / <span id="publication-toggle-all" class="publication-toggle-link" data-mode="all">Show All</span> )
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">CollaborateCom 2025</div><img src='images/publications/LADSG.png' alt="sym" width="100%"></div></div>
+<div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">CollaborateCom 2025</div><img src='images/publications/LADSG.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning](https://arxiv.org/pdf/2506.06742)
@@ -48,7 +48,7 @@ My research interests focus on computer vision, primarily AI applications in the
 [**Code**](https://github.com/onef1shy/mnist-pytorch) ![](https://img.shields.io/github/stars/onef1shy/mnist-pytorch) -->
 
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">Arxiv</div><img src='images/publications/DFYP2.0.png' alt="sym" width="100%"></div></div>
+<div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">Arxiv</div><img src='images/publications/DFYP2.0.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield PredictionEnabling Efficient Sparse Multiplications on GPUs with Heuristic Adaptability](https://arxiv.org/pdf/2507.05849)
@@ -59,7 +59,7 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 </div>
 </div>
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">ICML NewInML 2025</div><img src='images/publications/DFYP1.0.png' alt="sym" width="100%"></div></div>
+<div class='paper-box' data-representative="false"><div class='paper-box-image'><div><div class="badge">ICML NewInML 2025</div><img src='images/publications/DFYP1.0.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [DFYP: Dynamic CNN and ViT Fusion with Adaptive Sobel-Convolution for Enhanced Crop Yield Prediction](https://openreview.net/pdf?id=zciVe6bF9h)

@@ -10,7 +10,8 @@
  *
 */
 
-@import "vendor/breakpoint/breakpoint"; // media query mixins
+// media query mixins
+@import "vendor/breakpoint/breakpoint";
 @import "variables";
 @import "mixins";
 @import "vendor/susy/susy";
@@ -57,6 +58,7 @@
         order: 2;
         img {
             max-width: 400px;
+            width: 100%;
             box-shadow: 3px 3px 6px #888;
             object-fit: cover;
         }
@@ -67,12 +69,42 @@
         order: 1;
     }
     
+    // Mobile specific adjustments
+    @media (max-width: 767px) {
+        padding: 1.5em 0 1.5em 0;
+        gap: 1em !important; // Override inline gap styles on mobile
+        
+        .paper-box-image {
+            // Override inline styles for misc section on mobile
+            flex: 1 1 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            margin-bottom: 1em;
+            order: 2 !important;
+            
+            img {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+        
+        .paper-box-text {
+            flex: 1 1 100% !important;
+            padding-left: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            order: 1 !important;
+        }
+    }
+    
     @include breakpoint($medium) {
         .paper-box-image{
             justify-content: left;
             min-width: 200px;
             max-width: 40%;
             order: 1;
+            flex: 0 0 auto;
         }
         
         .paper-box-text{
@@ -80,6 +112,7 @@
             padding-left: 2em;
             max-width: 60%;
             order: 2;
+            flex: 1 1 auto;
         }
 
     }
@@ -106,4 +139,68 @@ h1:before, .anchor:before {
     color: white;
     background-color: #00369f;
     font-size: .8em;
+}
+
+.publication-toggle-link {
+    color: #0066cc;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+    font-weight: normal;
+    
+    &:hover:not(.active) {
+        color: #0052a3;
+        text-decoration: underline;
+    }
+    
+    &.active {
+        color: #0066cc;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: default;
+        
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}
+
+// Clustrmaps responsive styling
+#clustrmaps {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    display: block;
+    
+    // Ensure the iframe/content is responsive
+    iframe, 
+    > div,
+    > script + div,
+    div[style*="width"] {
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+}
+
+// Wrapper for clustrmaps in sidebar and profile
+.profile_box,
+.sidebar {
+    #clustrmaps {
+        @media (max-width: 767px) {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 1em 0;
+            overflow: hidden;
+            
+            // Force responsive behavior for clustrmaps content
+            iframe,
+            > div,
+            div[style] {
+                max-width: 100% !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+        }
+    }
 }
