@@ -49,27 +49,26 @@ My research interests focus on computer vision, primarily AI applications in the
 [**Code**](https://github.com/onef1shy/mnist-pytorch) ![](https://img.shields.io/github/stars/onef1shy/mnist-pytorch) -->
 
 
-<div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">Arxiv</div><img src='images/publications/DFYP2.0.png' alt="sym" width="100%"></div></div>
+<div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">ICMLW 2025 & Arxiv</div><img src='images/publications/DFYP2.0.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
-[DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield PredictionEnabling Efficient Sparse Multiplications on GPUs with Heuristic Adaptability](https://arxiv.org/pdf/2507.05849)
+**v1.0:** [DFYP: Dynamic CNN and ViT Fusion with Adaptive Sobel-Convolution for Enhanced Crop Yield Prediction](https://openreview.net/pdf?id=zciVe6bF9h)
 
-Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
-
-[**Arxiv**](https://arxiv.org/abs/2507.05849) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:d1gkVwhDpl0C'></span></strong> 
-</div>
-</div>
-
-<div class='paper-box' data-representative="false"><div class='paper-box-image'><div><div class="badge">ICML NewInML 2025</div><img src='images/publications/DFYP1.0.png' alt="sym" width="100%"></div></div>
-<div class='paper-box-text' markdown="1">
-
-[DFYP: Dynamic CNN and ViT Fusion with Adaptive Sobel-Convolution for Enhanced Crop Yield Prediction](https://openreview.net/pdf?id=zciVe6bF9h)
-
-**Zeyu Yan**, Juli Zhang*, Jing Zhang, Qiguang Miao, Quan Wang
+**Zeyu Yan**, Juli Zhang, Jing Zhang, Qiguang Miao, Quan Wang
 
 <span style="color: red;">ICML NewInML 2025 (CCF-A Workshop)</span>
 
 [**Paper**](https://openreview.net/pdf?id=zciVe6bF9h) <strong>|</strong> [**Project**](https://icml.cc/virtual/2025/50441)
+
+---
+
+**v2.0:** [DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield Prediction](https://arxiv.org/pdf/2507.05849)
+
+Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
+
+<span style="color: blue;">Arxiv 2025</span>
+
+[**Arxiv**](https://arxiv.org/abs/2507.05849) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:d1gkVwhDpl0C'></span></strong>
 </div>
 </div>
 
