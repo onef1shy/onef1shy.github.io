@@ -100,7 +100,7 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
 Beyond academics and research, I enjoy exploring life's simple pleasures. Here are some of my personal interests and favorite discoveries:
 
-<div class='paper-box' style="gap: 15px;"><div class='paper-box-image' style="flex: 0 0 200px;"><div><img src='images/misc/food.png' alt="Food" width="100%"></div></div>
+<div class='paper-box compact' style="gap: 15px;"><div class='paper-box-image' style="flex: 0 0 200px;"><div><img src='images/misc/food.png' alt="Food" width="100%"></div></div>
 <div class='paper-box-text' markdown="1" style="padding-left: 0;">
 
 - 🍽️ **Food:** Love exploring different cuisines and discovering local food gems

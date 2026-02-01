@@ -48,7 +48,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     border-bottom: 1px #efefef solid;
-    padding: 2em 0 2em 0;
+    padding: 1.5em 0 1.5em 0;
     
 
     .paper-box-image{
@@ -120,6 +120,11 @@
 
 }
 
+// Tighter vertical spacing when needed without affecting default paper boxes
+.paper-box.compact {
+    padding: 0.35em 0 0.35em 0;
+}
+
 $scroll_offset : 2em;
 h1:before, .anchor:before { 
     content: ''; 
@@ -145,12 +150,13 @@ h1:before, .anchor:before {
     max-height: 160px; // about 5-6 lines of content
     overflow-y: auto;
     padding: 1rem 1.25rem;
-    margin: 0.5rem auto 1.5rem auto;
-    max-width: 780px;
-    border: 1px solid #e6e9f0;
-    border-radius: 10px;
-    background: #f9fbff;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    margin: 0.5rem auto 0.75rem auto;
+    width: 100%;
+    max-width: none;
+    border: 1px solid #e4e8ef;
+    border-radius: 12px;
+    background: #f9fbff; // subtle tint against white page
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 
     ul {
         margin: 0;
@@ -162,7 +168,12 @@ h1:before, .anchor:before {
         line-height: 1.5;
     }
 
+    // hide scrollbar until hover
     &::-webkit-scrollbar {
+        width: 0;
+    }
+
+    &:hover::-webkit-scrollbar {
         width: 8px;
     }
 
@@ -171,12 +182,12 @@ h1:before, .anchor:before {
     }
 
     &::-webkit-scrollbar-thumb {
-        background: #c7d3e5;
+        background: #d0d6df;
         border-radius: 10px;
     }
 
     &::-webkit-scrollbar-thumb:hover {
-        background: #aabbd8;
+        background: #b8bdc4;
     }
 }
 
