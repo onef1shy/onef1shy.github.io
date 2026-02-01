@@ -26,8 +26,13 @@ My research interests focus on computer vision, primarily AI applications in the
 - *2022.09 - 2026.07*, B.Eng. in Computer Science and Technology, Xidian University
 
 # 🔥 News
+<div class="news-panel" markdown="1">
+- *2025.12*: &nbsp;🏆 Received the **National Scholarship** (国家奖学金), Ministry of Education of China.
+- *2025.11*: &nbsp;🏆 Awarded the **BYD Scholarship** (比亚迪奖学金), Xidian University.
 - *2025.08*: &nbsp;🎉 Our paper **<i>LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning</i>** has been accepted to **CollaborateCom 2025**! I will [present it orally](https://collaboratecom.eai-conferences.org/2025/final-program/) in Shanghai, China this November.
 - *2025.06*: &nbsp;🎉 Our paper **<i>DFYP v1.0: Dynamic CNN and ViT Fusion with Adaptive Sobel-Convolution for Enhanced Crop Yield Prediction</i>** has been accepted to **ICML 2025 Workshop**! The first star on my academic journey!
+- *2024.12*: &nbsp;🏆  Received the **National Scholarship** (国家奖学金), Ministry of Education of China.
+</div>
 
 <span class='anchor' id='-publications'></span>
 # 📝 Publications ( <span id="publication-toggle" class="publication-toggle-link" data-mode="representative">Show Representative</span> / <span id="publication-toggle-all" class="publication-toggle-link" data-mode="all">Show All</span> )
@@ -52,23 +57,15 @@ My research interests focus on computer vision, primarily AI applications in the
 <div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">ICMLW 2025 & Arxiv</div><img src='images/publications/DFYP2.0.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
-**v1.0:** [DFYP: Dynamic CNN and ViT Fusion with Adaptive Sobel-Convolution for Enhanced Crop Yield Prediction](https://openreview.net/pdf?id=zciVe6bF9h)
-
-**Zeyu Yan**, Juli Zhang, Jing Zhang, Qiguang Miao, Quan Wang
-
-<span style="color: red;">ICML NewInML 2025 (CCF-A Workshop)</span>
-
-[**Paper**](https://openreview.net/pdf?id=zciVe6bF9h) <strong>|</strong> [**Project**](https://icml.cc/virtual/2025/50441)
-
----
-
-**v2.0:** [DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield Prediction](https://arxiv.org/pdf/2507.05849)
+[DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield Prediction](https://arxiv.org/pdf/2507.05849)
 
 Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
-<span style="color: blue;">Arxiv 2025</span>
+**v1.0** <span style="color: red;">ICML NewInML 2025 (CCF-A Workshop)</span>
 
-[**Arxiv**](https://arxiv.org/abs/2507.05849) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:d1gkVwhDpl0C'></span></strong>
+**v2.0** <span style="color: blue;">Arxiv 2025</span>
+
+[**Arxiv**](https://arxiv.org/abs/2507.05849) <strong>|</strong> [**Project**](https://icml.cc/virtual/2025/50441) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:d1gkVwhDpl0C'></span></strong>
 </div>
 </div>
 
@@ -77,7 +74,7 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
 # 🎖 Honors and Awards
 - *2025.12* <span style="color: red;">National Scholarship</span> (Top 1%), Ministry of Education of The People's Republic of China.
-- *2025.11* BYD Scholarship (比亚迪奖学金) (1/9), Xidian University.
+- *2025.11* BYD Scholarship (比亚迪奖学金), Xidian University.
 - *2025.10* Outstanding Student, Xidian University.
 - *2025.10* First-Class Scholarship, Xidian University.
 - *2025.07* Provincial Third Prize, National College Student Statistical Modeling Competition
