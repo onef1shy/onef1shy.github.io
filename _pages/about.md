@@ -17,22 +17,24 @@ redirect_from:
 
 <span class='anchor' id='about-me'></span>
 
-I am a senior undergraduate student at [School of Computer Science and Technology, Xidian University](https://cs.xidian.edu.cn/English/Home.htm) ([西安电子科技大学计算机科学与技术学院](https://cs.xidian.edu.cn/)). During my undergraduate studies, I have been honored to work at [AAIR](https://aai.xidian.edu.cn/en/) under the supervision of [Dr. Juli Zhang (张菊莉)](https://scholar.google.com/citations?user=UonVWe4AAAAJ&hl=en), and at [ISN](https://isn.xidian.edu.cn/) under the supervision of [Prof. Kai Fan (樊凯)](https://web.xidian.edu.cn/fankai/). Meanwhile, I am also a Ph.D. candidate at [School of Computer Science and Technology, Zhejiang University](http://www.en.cs.zju.edu.cn/) ([浙江大学计算机科学与技术学院](https://www.cs.zju.edu.cn/)), supervised by [Prof. Dongxiang Zhang (张东祥)](https://person.zju.edu.cn/zhangdongxiang). 
+<div class="welcome-banner">Hi there <span class="welcome-banner__wave">👋</span> Welcome to my homepage!</div>
 
-My research interests focus on computer vision, primarily AI applications in the visual domain. During my undergraduate studies, I explored remote sensing imagery and distributed systems. Currently, I am exploring its applications in video analysis, with a particular focus on video anomaly detection. I'm always looking for related collaboration. If you are interested to chat with me, feel free to drop me an [email](mailto:zeyuy1011@gmail.com).
+I am a Ph.D. student at [School of Computer Science and Technology, Zhejiang University](http://www.en.cs.zju.edu.cn/) ([浙江大学计算机科学与技术学院](https://www.cs.zju.edu.cn/)), supervised by [Prof. Dongxiang Zhang (张东祥)](https://person.zju.edu.cn/zhangdongxiang).
+
+Before joining Zhejiang University, I received my B.Eng. from [School of Computer Science and Technology, Xidian University](https://cs.xidian.edu.cn/English/Home.htm) ([西安电子科技大学计算机科学与技术学院](https://cs.xidian.edu.cn/)) and worked at [AAIR](https://aai.xidian.edu.cn/en/) with [Dr. Juli Zhang (张菊莉)](https://scholar.google.com/citations?user=UonVWe4AAAAJ&hl=en) and at [ISN](https://isn.xidian.edu.cn/) with [Prof. Kai Fan (樊凯)](https://web.xidian.edu.cn/fankai/).
+
+My research focuses on multimodal learning, especially concept drift and anomaly detection. I am also interested in robust and trustworthy machine learning under real-world distribution shifts. Feel free to reach out by [email](mailto:zeyuy1011@gmail.com).
 
 
 # 📖 Educations
 - *2022.09 - 2026.07*, B.Eng. in Computer Science and Technology, Xidian University
 
 # 🔥 News
-<div class="news-panel" markdown="1">
 - *2025.12*: &nbsp;🏆 Received the **National Scholarship** (国家奖学金), Ministry of Education of China.
 - *2025.11*: &nbsp;🏆 Awarded the **BYD Scholarship** (比亚迪奖学金), Xidian University.
 - *2025.08*: &nbsp;🎉 Our paper **<i>LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning</i>** has been accepted to **CollaborateCom 2025**! I will [present it orally](https://collaboratecom.eai-conferences.org/2025/final-program/) in Shanghai, China this November.
 - *2025.06*: &nbsp;🎉 Our paper **<i>DFYP v1.0: Dynamic CNN and ViT Fusion with Adaptive Sobel-Convolution for Enhanced Crop Yield Prediction</i>** has been accepted to **ICML 2025 Workshop**! The first star on my academic journey!
 - *2024.12*: &nbsp;🏆  Received the **National Scholarship** (国家奖学金), Ministry of Education of China.
-</div>
 
 <span class='anchor' id='-publications'></span>
 # 📝 Publications ( <span id="publication-toggle" class="publication-toggle-link" data-mode="representative">Show Representative</span> / <span id="publication-toggle-all" class="publication-toggle-link" data-mode="all">Show All</span> )
@@ -95,18 +97,3 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
 # 💻 Service
 - *2023.09 - 2024.09*, Captain of Debate Team, School of Network and Information Security, Xidian University
-
-# 💖 Miscellaneous
-
-Beyond academics and research, I enjoy exploring life's simple pleasures. Here are some of my personal interests and favorite discoveries:
-
-<div class='paper-box compact' style="gap: 15px;"><div class='paper-box-image' style="flex: 0 0 200px;"><div><img src='images/misc/food.png' alt="Food" width="100%"></div></div>
-<div class='paper-box-text' markdown="1" style="padding-left: 0;">
-
-- 🍽️ **Food:** Love exploring different cuisines and discovering local food gems
-- 📸 **Photography:** Capturing beautiful moments and landscapes during travels
-- ✈️ **Travel:** Cities I've explored - Qingdao, Hangzhou, Shanghai, Zhangjiajie, Changsha, Xi'an, Guilin
-- 🏓 **Sports:** Enjoy playing table tennis and badminton (though my skills are still developing!)
-
-</div>
-</div>

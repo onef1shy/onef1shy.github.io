@@ -7,7 +7,7 @@
 
 # Site Settings
 title                    : "Zeyu Yan（闫泽宇）"
-description              : "Ph.D. candidate, Zhejiang University. Focusing on Video anomaly detection."
+description              : "Ph.D. student, Zhejiang University. Focusing on multimodal concept drift and anomaly detection."
 repository               : "onef1shy/onef1shy.github.io"
 google_scholar_stats_use_cdn : true
 
@@ -22,8 +22,8 @@ baidu_site_verification  :  # get baidu_site_verification from https://ziyuan.ba
 author:
   name             : "Zeyu Yan 闫泽宇"
   avatar           : "images/about/avatar.jpg"
-  bio              : "Xidian University"
-  location         : "Xi'an, China"
+  bio              : "Zhejiang University"
+  location         : "Hangzhou, China"
   employer         :
   pubmed           : 
   googlescholar    : "https://scholar.google.com/citations?user=fjLiFtgAAAAJ"
@@ -160,4 +160,3 @@ compress_html:
   clippings: all
   ignore:
     envs: development
-
