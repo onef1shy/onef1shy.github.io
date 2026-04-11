@@ -65,7 +65,7 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
 <span style="color: red;">CollaborateCom 2025 (CCF-C)</span>
 
-[**Paper**](https://arxiv.org/pdf/2506.06742)<strong>|</strong>[**Arxiv**](https://arxiv.org/abs/2506.06742) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:qjMakFHDy7sC'></span></strong> 
+[**Paper**](https://doi.org/10.1007/978-3-032-21171-2_11)<strong>|</strong>[**Arxiv**](https://arxiv.org/abs/2506.06742) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:qjMakFHDy7sC'></span></strong> 
 </div>
 </div>
 
