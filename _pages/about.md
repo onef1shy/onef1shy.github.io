@@ -21,7 +21,7 @@ redirect_from:
 
 I am a Ph.D. student at [School of Computer Science and Technology, Zhejiang University](http://www.en.cs.zju.edu.cn/) ([浙江大学计算机科学与技术学院](https://www.cs.zju.edu.cn/)), supervised by [Prof. Dongxiang Zhang (张东祥)](https://person.zju.edu.cn/zhangdongxiang).
 
-Before joining Zhejiang University, I received my B.Eng. from [School of Computer Science and Technology, Xidian University](https://cs.xidian.edu.cn/English/Home.htm) ([西安电子科技大学计算机科学与技术学院](https://cs.xidian.edu.cn/)) and worked at [AAIR](https://aai.xidian.edu.cn/en/) with [Dr. Juli Zhang (张菊莉)](https://scholar.google.com/citations?user=UonVWe4AAAAJ&hl=en) and at [ISN](https://isn.xidian.edu.cn/) with [Prof. Kai Fan (樊凯)](https://web.xidian.edu.cn/fankai/).
+Before joining Zhejiang University, I received my B.Eng. from [School of Computer Science and Technology, Xidian University](https://cs.xidian.edu.cn/English/Home.htm) ([西安电子科技大学计算机科学与技术学院](https://cs.xidian.edu.cn/)) and worked at [AAIR](https://aai.xidian.edu.cn/en/) with Dr. Juli Zhang (张菊莉) and at [ISN](https://isn.xidian.edu.cn/) with [Prof. Kai Fan (樊凯)](https://web.xidian.edu.cn/fankai/).
 
 My research focuses on multimodal learning, especially concept drift and anomaly detection. I am also interested in robust and trustworthy machine learning under real-world distribution shifts. Feel free to reach out by [email](mailto:zeyuy1011@gmail.com).
 
@@ -30,6 +30,7 @@ My research focuses on multimodal learning, especially concept drift and anomaly
 - *2022.09 - 2026.07*, B.Eng. in Computer Science and Technology, Xidian University
 
 # 🔥 News
+- *2026.04*: &nbsp;🎉 Our paper **<i>DFYP v2.0: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield Prediction</i>** has been accepted to **IEEE TGRS 2026**!
 - *2025.12*: &nbsp;🏆 Received the **National Scholarship** (国家奖学金), Ministry of Education of China.
 - *2025.11*: &nbsp;🏆 Awarded the **BYD Scholarship** (比亚迪奖学金), Xidian University.
 - *2025.08*: &nbsp;🎉 Our paper **<i>LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning</i>** has been accepted to **CollaborateCom 2025**! I will [present it orally](https://collaboratecom.eai-conferences.org/2025/final-program/) in Shanghai, China this November.
@@ -38,6 +39,22 @@ My research focuses on multimodal learning, especially concept drift and anomaly
 
 <span class='anchor' id='-publications'></span>
 # 📝 Publications ( <span id="publication-toggle" class="publication-toggle-link" data-mode="representative">Show Representative</span> / <span id="publication-toggle-all" class="publication-toggle-link" data-mode="all">Show All</span> )
+
+<div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">ICMLW 2025 & TGRS 2026</div><img src='images/publications/DFYP2.0.png' alt="sym" width="100%"></div></div>
+<div class='paper-box-text' markdown="1">
+
+[DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield Prediction](https://arxiv.org/pdf/2507.05849)
+
+Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
+
+**v1.0** <span style="color: red;">ICML NewInML 2025 (CCF-A Workshop)</span>
+
+**v2.0** <span style="color: red;">IEEE TGRS 2026 (SCI Q1, JCR Q1)</span>
+
+[**Arxiv**](https://arxiv.org/abs/2507.05849) <strong>|</strong> [**Project**](https://icml.cc/virtual/2025/50441) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:d1gkVwhDpl0C'></span></strong>
+</div>
+</div>
+
 
 <div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">CollaborateCom 2025</div><img src='images/publications/LADSG.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
@@ -54,22 +71,6 @@ My research focuses on multimodal learning, especially concept drift and anomaly
 
 <!-- Code
 [**Code**](https://github.com/onef1shy/mnist-pytorch) ![](https://img.shields.io/github/stars/onef1shy/mnist-pytorch) -->
-
-
-<div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">ICMLW 2025 & Arxiv</div><img src='images/publications/DFYP2.0.png' alt="sym" width="100%"></div></div>
-<div class='paper-box-text' markdown="1">
-
-[DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield Prediction](https://arxiv.org/pdf/2507.05849)
-
-Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
-
-**v1.0** <span style="color: red;">ICML NewInML 2025 (CCF-A Workshop)</span>
-
-**v2.0** <span style="color: blue;">Arxiv 2025</span>
-
-[**Arxiv**](https://arxiv.org/abs/2507.05849) <strong>|</strong> [**Project**](https://icml.cc/virtual/2025/50441) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:d1gkVwhDpl0C'></span></strong>
-</div>
-</div>
 
 
 <!-- - [Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet](https://github.com), A, B, C, **CVPR 2020** -->
