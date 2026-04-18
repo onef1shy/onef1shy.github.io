@@ -43,7 +43,7 @@ My research focuses on multimodal learning, especially concept drift and anomaly
 <div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">ICMLW 2025 & TGRS 2026</div><img src='images/publications/DFYP2.0.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
-[DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield Prediction](https://arxiv.org/pdf/2507.05849)
+[DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield Prediction](https://doi.org/10.1109/TGRS.2026.3684831)
 
 Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
@@ -51,7 +51,7 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
 **v2.0** <span style="color: red;">IEEE TGRS 2026 (SCI Q1, JCR Q1)</span>
 
-[**Arxiv**](https://arxiv.org/abs/2507.05849) <strong>|</strong> [**Project**](https://icml.cc/virtual/2025/50441) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:d1gkVwhDpl0C'></span></strong>
+[**Paper**](https://doi.org/10.1109/TGRS.2026.3684831) <strong>|</strong> [**Arxiv**](https://arxiv.org/abs/2507.05849) <strong>|</strong> [**Workshop**](https://icml.cc/virtual/2025/50441) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:d1gkVwhDpl0C'></span></strong>
 </div>
 </div>
 
@@ -59,13 +59,13 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 <div class='paper-box' data-representative="true"><div class='paper-box-image'><div><div class="badge">CollaborateCom 2025</div><img src='images/publications/LADSG.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
-[LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning](https://arxiv.org/pdf/2506.06742)
+[LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning](https://doi.org/10.1007/978-3-032-21171-2_11)
 
 **Zeyu Yan†**, Yanfei Yao†, Xuanbing Wen, Shixiong Zhang, Juli Zhang*, Kai Fan
 
 <span style="color: red;">CollaborateCom 2025 (CCF-C)</span>
 
-[**Paper**](https://doi.org/10.1007/978-3-032-21171-2_11)<strong>|</strong>[**Arxiv**](https://arxiv.org/abs/2506.06742) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:qjMakFHDy7sC'></span></strong> 
+[**Paper**](https://doi.org/10.1007/978-3-032-21171-2_11)<strong>|</strong>[**Arxiv**](https://arxiv.org/abs/2506.06742) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:WF5omc3nYNoC'></span></strong> 
 </div>
 </div>
 
