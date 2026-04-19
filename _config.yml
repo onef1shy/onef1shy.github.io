@@ -28,7 +28,7 @@ author:
   pubmed           : 
   googlescholar    : "https://scholar.google.com/citations?user=fjLiFtgAAAAJ"
   email            : "zeyuy1011@gmail.com"
-  researchgate     :  https://www.researchgate.net/profile/Zeyu-Yan-4?ev=hdr_xprf
+  researchgate     :
   uri              :
   bitbucket        :
   codepen          :
@@ -42,7 +42,7 @@ author:
   instagram        :
   impactstory      : # e.g., "https://profiles.impactstory.org/u/xxxx-xxxx-xxxx-xxxx"
   lastfm           :
-  linkedin         : "yan-zeyu-972b70378"
+  linkedin         :
   dblp             : # e.g., "https://dblp.org/pid/xx/xxxx.html"
   orcid            : https://orcid.org/0009-0006-8001-5908
   pinterest        :
@@ -54,7 +54,7 @@ author:
   vine             :
   weibo            :
   xing             :
-  youtube          : UCHbMcJ3wDb8lIE-DR6o-vvA
+  youtube          :
   wikipedia        :
 
 
