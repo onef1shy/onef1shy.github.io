@@ -1,72 +1,80 @@
 
-<h1 align="center">
-AcadHomepage
-</h1>
+# onef1shy.github.io
 
-<div align="center">
+我的个人学术主页源码仓库：<https://onef1shy.github.io/>
 
-[![](https://img.shields.io/github/stars/RayeRen/acad-homepage.github.io)](https://github.com/RayeRen/acad-homepage.github.io)
-[![](https://img.shields.io/github/forks/RayeRen/acad-homepage.github.io)](https://github.com/RayeRen/acad-homepage.github.io)
-[![](https://img.shields.io/github/issues/RayeRen/acad-homepage.github.io)](https://github.com/RayeRen/acad-homepage.github.io)
-[![](https://img.shields.io/github/license/RayeRen/acad-homepage.github.io)](https://github.com/RayeRen/acad-homepage.github.io/blob/main/LICENSE)  | [中文文档](./docs/README-zh.md) 
-</div>
+## 主要文件
 
-<p align="center">A Modern and Responsive Academic Personal Homepage</p>
+- `_pages/about.md`：主页正文内容
+- `_config.yml`：站点配置、Google Scholar 数据源配置
+- `_includes/fetch_google_scholar_stats.html`：论文引用数渲染逻辑
+- `.github/workflows/google_scholar_crawler.yaml`：定时抓取 Google Scholar 数据
+- `google_scholar_crawler/`：爬虫脚本，结果会推送到 `google-scholar-stats` 分支
 
-<p align="center">
-    <br>
-    <img src="docs/screenshot.png" width="100%"/>
-    <br>
-</p>
+## Google Scholar 引用显示
 
-Some examples:
-- [Demo Page](https://rayeren.github.io/acad-homepage.github.io/)
-- [Personal Homepage of the author](https://rayeren.github.io/)
+页面通过下面这类标签渲染单篇论文引用数：
 
-## Key Features
-- **Automatically update google scholar citations**: using the google scholar crawler and github action, this REPO can update the author citations and publication citations automatically.
-- **Support Google analytics**: you can trace the traffics of your homepage by easy configuration.
-- **Responsive**: this homepage automatically adjust for different screen sizes and viewports.
-- **Beautiful and Simple Design**: this homepage is beautiful and simple, which is very suitable for academic personal homepage.
-- **SEO**: search Engine Optimization (SEO) helps search engines find the information you publish on your homepage easily, then rank it against similar websites.
+```html
+<span class='show_paper_citations' data='SCHOLAR_PAPER_ID'></span>
+```
 
-## Quick Start
+`data` 的值需要和 `gs_data.json` 里的论文键一致，例如：
 
-1. Fork this REPO and rename to `USERNAME.github.io`, where `USERNAME` is your github USERNAME.
-1. Configure the google scholar citation crawler:
-    1. Find your google scholar ID in the url of your google scholar page (e.g., https://scholar.google.com/citations?user=SCHOLAR_ID), where `SCHOLAR_ID` is your google scholar ID.
-    1. Set GOOGLE_SCHOLAR_ID variable to your google scholar ID in `Settings -> Secrets -> Actions -> New repository secret` of the REPO website with `name=GOOGLE_SCHOLAR_ID` and `value=SCHOLAR_ID`.
-    1. Click the `Action` of the REPO website and enable the workflows by clicking *"I understand my workflows, go ahead and enable them"*. This github action will generate google scholar citation stats data `gs_data.json` in `google-scholar-stats` branch of your REPO. When you update your main branch, this action will be triggered. This action will also be trigger 08:00 UTC everyday.
-1. Generate favicon using [favicon-generator](https://redketchup.io/favicon-generator) and download all generated files to `REPO/images`.
-1. Modify the configuration of your homepage `_config.yml`:
-    1. `title`: the title of your homepage
-    1. `description`: the description of your homepage
-    1. `repository`: USER_NAME/REPO_NAME  
-    1. `google_analytics_id` (optional): google analytics ID
-    1. SEO Related keys (optional): get these keys from search engine consoles (e.g. Google, Bing and Baidu) and paste here.
-    1. `author`: the author information of this homepage, including some other websites, emails, city and univeristy.
-    1. More configuration details are described in the comments.
-1. Add your homepage content in `_pages/about.md`.
-    1. You can use html+markdown syntax just same as jekyll.
-    1. You can use a `<span>` tag with class `show_paper_citations` and attribute `data` to display the citations of your paper. Set the data to the google scholar paper ID. For
-        ```html
-        <span class='show_paper_citations' data='DhtAFkwAAAAJ:ALROH1vI_8AC'></span>
-        ``` 
-        > Q: How to get the google scholar paper ID?   
-        > A: Enter your google scholar homepage and click the paper name. Then you can see the paper ID from `citation_for_view=XXXX`, where `XXXX` is the required paper ID.
-1. Your page will be published at `https://USERNAME.github.io`.
+```text
+fjLiFtgAAAAJ:d1gkVwhDpl0C
+```
 
-## Debug Locally
+获取方式：
 
-1. Clone your REPO to local using `git clone`.
-1. Install Jekyll building environment, including `Ruby`, `RubyGems`, `GCC` and `Make` following [the installation guide](https://jekyllrb.com/docs/installation/#requirements).
-1. Run `bash run_server.sh` to start Jekyll livereload server.
-1. Open http://127.0.0.1:4000 in your browser.
-1. If you change the source code of the website, the livereload server will automatically refresh.
-1. When you finish the modification of your homepage, `commit` your changings and `push` to your remote REPO using `git` command.
+1. 打开自己的 Google Scholar 主页
+2. 点击具体论文
+3. 在地址栏中找到 `citation_for_view=...`
+4. 使用后面的完整值作为 `data`
 
-# Acknowledges
+注意：Google Scholar 可能在条目合并、重建索引或正式出版后更换 paper ID。
 
-- AcadHomepage incorporates Font Awesome, which is distributed under the terms of the SIL OFL 1.1 and MIT License.
-- AcadHomepage is influenced by the github repo [mmistakes/minimal-mistakes](https://github.com/mmistakes/minimal-mistakes), which is distributed under the MIT License.
-- AcadHomepage is influenced by the github repo [academicpages/academicpages.github.io](https://github.com/academicpages/academicpages.github.io), which is distributed under the MIT License.
+## Google Scholar 数据源
+
+当前站点建议直接读取 GitHub Raw：
+
+```text
+https://raw.githubusercontent.com/onef1shy/onef1shy.github.io/google-scholar-stats/gs_data.json
+```
+
+对应配置在 `_config.yml`：
+
+```yml
+google_scholar_stats_use_cdn : false
+```
+
+这样更新更及时，也更容易排查问题。
+
+## jsDelivr CDN 刷新
+
+如果以后重新启用 CDN：
+
+```yml
+google_scholar_stats_use_cdn : true
+```
+
+当 `gs_data.json` 更新后，可在 jsDelivr 官方工具里手动清缓存：
+
+1. 打开 <https://www.jsdelivr.com/tools/purge>
+2. 输入下面这个 URL 并 purge：
+
+```text
+https://cdn.jsdelivr.net/gh/onef1shy/onef1shy.github.io@google-scholar-stats/gs_data.json
+```
+
+## 本地调试
+
+1. 安装 Jekyll 依赖环境：<https://jekyllrb.com/docs/installation/>
+2. 运行：
+
+```bash
+bash run_server.sh
+```
+
+3. 打开 <http://127.0.0.1:4000>
+4. 如果修改了 `_config.yml`，需要重启本地服务

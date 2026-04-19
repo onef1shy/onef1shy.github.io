@@ -98,4 +98,3 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
 # 💻 Service
 - *2023.09 - 2024.09*, Captain of Debate Team, School of Network and Information Security, Xidian University
-
