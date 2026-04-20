@@ -9,7 +9,7 @@
 title                    : "Zeyu Yan（闫泽宇）"
 description              : "Ph.D. student, Zhejiang University. Focusing on multimodal concept drift and anomaly detection."
 repository               : "onef1shy/onef1shy.github.io"
-google_scholar_stats_use_cdn : true
+google_scholar_stats_use_cdn : false
 
 # google analytics
 google_analytics_id      :  "G-D35RRKX3JC" # get google_analytics_id from https://analytics.google.com/analytics/

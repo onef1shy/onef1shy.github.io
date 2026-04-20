@@ -51,7 +51,7 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
 **v2.0** <span style="color: red;">IEEE TGRS 2026 (SCI Q1, JCR Q1)</span>
 
-[**Paper**](https://doi.org/10.1109/TGRS.2026.3684831) <strong>|</strong> [**Arxiv**](https://arxiv.org/abs/2507.05849) <strong>|</strong> [**Workshop**](https://icml.cc/virtual/2025/50441) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:d1gkVwhDpl0C'></span></strong>
+[**Paper**](https://doi.org/10.1109/TGRS.2026.3684831) <strong>|</strong> [**Arxiv**](https://arxiv.org/abs/2507.05849) <strong>|</strong> [**Workshop**](https://icml.cc/virtual/2025/50441) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:ufrVoPGSRksC'></span></strong>
 </div>
 </div>
 
