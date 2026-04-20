@@ -100,6 +100,9 @@
       {% if author.codepen %}
         <li><a href="https://codepen.io/{{ author.codepen }}"><i class="fab fa-fw fa-codepen" aria-hidden="true"></i> CodePen</a></li>
       {% endif %}
+      {% if author.huggingface %}
+        <li><a href="https://huggingface.co/{{ author.huggingface }}"><img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo-monochrome.svg" alt="" aria-hidden="true" style="width: 1.15em; height: 1.15em; vertical-align: -0.15em; margin-right: 0.25em;">Hugging Face</a></li>
+      {% endif %}
       {% if author.vine %}
         <li><a href="https://vine.co/u/{{ author.vine }}"><i class="fab fa-fw fa-vine" aria-hidden="true"></i> Vine</a></li>
       {% endif %}
@@ -194,6 +197,9 @@
       {% endif %}
       {% if author.codepen %}
         <a href="https://codepen.io/{{ author.codepen }}"><i class="fab fa-fw fa-codepen" aria-hidden="true"></i></a>
+      {% endif %}
+      {% if author.huggingface %}
+        <a href="https://huggingface.co/{{ author.huggingface }}"><img src="https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo-monochrome.svg" alt="" aria-hidden="true" style="width: 1.15em; height: 1.15em; vertical-align: -0.15em;"></a>
       {% endif %}
       {% if author.vine %}
         <a href="https://vine.co/u/{{ author.vine }}"><i class="fab fa-fw fa-vine" aria-hidden="true"></i></a>

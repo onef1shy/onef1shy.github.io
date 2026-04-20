@@ -3,7 +3,7 @@ permalink: /
 title: ""
 excerpt: ""
 author_profile: true
-redirect_from: 
+redirect_from:
   - /about/
   - /about.html
 ---
@@ -35,7 +35,7 @@ My research focuses on multimodal learning, especially concept drift and anomaly
 - *2025.11*: &nbsp;🏆 Awarded the **BYD Scholarship** (比亚迪奖学金), Xidian University.
 - *2025.08*: &nbsp;🎉 Our paper **<i>LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning</i>** has been accepted to **CollaborateCom 2025**! I will [present it orally](https://collaboratecom.eai-conferences.org/2025/final-program/) in Shanghai, China this November.
 - *2025.06*: &nbsp;🎉 Our paper **<i>DFYP v1.0: Dynamic CNN and ViT Fusion with Adaptive Sobel-Convolution for Enhanced Crop Yield Prediction</i>** has been accepted to **ICML 2025 Workshop**! The first star on my academic journey!
-- *2024.12*: &nbsp;🏆  Received the **National Scholarship** (国家奖学金), Ministry of Education of China.
+- *2024.12*: &nbsp;🏆 Received the **National Scholarship** (国家奖学金), Ministry of Education of China.
 
 <span class='anchor' id='-publications'></span>
 # 📝 Publications ( <span id="publication-toggle" class="publication-toggle-link" data-mode="representative">Show Representative</span> / <span id="publication-toggle-all" class="publication-toggle-link" data-mode="all">Show All</span> )
@@ -51,7 +51,7 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
 **v2.0** <span style="color: red;">IEEE TGRS 2026 (SCI Q1, JCR Q1)</span>
 
-[**Paper**](https://doi.org/10.1109/TGRS.2026.3684831) <strong>|</strong> [**Arxiv**](https://arxiv.org/abs/2507.05849) <strong>|</strong> [**Workshop**](https://icml.cc/virtual/2025/50441) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:ufrVoPGSRksC'></span></strong>
+[**Paper**](https://doi.org/10.1109/TGRS.2026.3684831) <strong>|</strong> [**Arxiv**](https://arxiv.org/abs/2507.05849) <strong>|</strong> [**Workshop**](https://icml.cc/virtual/2025/50441) <strong>|</strong> [**Code**](https://github.com/onef1shy/DFYP) ![](https://img.shields.io/github/stars/onef1shy/DFYP) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:ufrVoPGSRksC'></span></strong>
 </div>
 </div>
 
@@ -65,7 +65,7 @@ Juli Zhang, **Zeyu Yan**, Jing Zhang, Qiguang Miao*, Quan Wang
 
 <span style="color: red;">CollaborateCom 2025 (CCF-C)</span>
 
-[**Paper**](https://doi.org/10.1007/978-3-032-21171-2_11)<strong>|</strong>[**Arxiv**](https://arxiv.org/abs/2506.06742) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:WF5omc3nYNoC'></span></strong> 
+[**Paper**](https://doi.org/10.1007/978-3-032-21171-2_11) <strong>|</strong> [**Arxiv**](https://arxiv.org/abs/2506.06742) <strong><span class='show_paper_citations' data='fjLiFtgAAAAJ:WF5omc3nYNoC'></span></strong>
 </div>
 </div>
 
