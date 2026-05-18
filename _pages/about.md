@@ -19,13 +19,13 @@ redirect_from:
 
 <div class="welcome-banner">Hi there <span class="welcome-banner__wave">👋</span> Welcome to my homepage!</div>
 
-I am a Ph.D. student at [School of Computer Science and Technology, Zhejiang University](http://www.en.cs.zju.edu.cn/) ([浙江大学计算机科学与技术学院](https://www.cs.zju.edu.cn/)), supervised by [Prof. Dongxiang Zhang (张东祥)](https://person.zju.edu.cn/zhangdongxiang). Before joining Zhejiang University, I received my B.Eng. from [School of Computer Science and Technology, Xidian University](https://cs.xidian.edu.cn/English/Home.htm) ([西安电子科技大学计算机科学与技术学院](https://cs.xidian.edu.cn/)) and worked at [AAIR](https://aai.xidian.edu.cn/en/) and [ISN](https://isn.xidian.edu.cn/).
+I am a Ph.D. student at [School of Computer Science and Technology, Zhejiang University](http://www.en.cs.zju.edu.cn/) ([浙江大学计算机科学与技术学院](https://www.cs.zju.edu.cn/)), supervised by [Prof. Dongxiang Zhang (张东祥)](https://person.zju.edu.cn/zhangdongxiang). Before joining Zhejiang University, I was an undergraduate student at [School of Computer Science and Technology, Xidian University](https://cs.xidian.edu.cn/English/Home.htm) ([西安电子科技大学计算机科学与技术学院](https://cs.xidian.edu.cn/)) from 2022 to 2026.
 
 My research focuses on multimodal learning, especially concept drift and anomaly detection. I am also interested in robust and trustworthy machine learning under real-world distribution shifts. Feel free to reach out by [email](mailto:zeyuy1011@gmail.com).
 
 
 # 📖 Educations
-- *2022.09 - 2026.07*, B.Eng. in Computer Science and Technology, Xidian University
+- *2022.09 - 2026.07*, Undergraduate student in Computer Science and Technology, Xidian University
 
 # 🔥 News
 - *2026.04*: &nbsp;🎉 Our paper **<i>DFYP v2.0: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator learning for Crop Yield Prediction</i>** has been accepted to **IEEE TGRS 2026**!
