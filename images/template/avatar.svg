@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract profile placeholder</title>
+  <desc id="desc">A geometric, non-photorealistic portrait that does not depict a real person.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff4dc"/>
+      <stop offset="1" stop-color="#d8e8df"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#314f5b"/>
+      <stop offset="1" stop-color="#172f39"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="760" rx="28" fill="url(#bg)"/>
+  <circle cx="470" cy="135" r="72" fill="#edae49" opacity=".75"/>
+  <path d="M0 590C140 500 244 540 342 473c94-65 174-47 258-11v298H0z" fill="#b8d1c3"/>
+  <ellipse cx="300" cy="710" rx="232" ry="190" fill="url(#shirt)"/>
+  <path d="M239 471h122v137c-37 28-85 28-122 0z" fill="#c98658"/>
+  <ellipse cx="300" cy="317" rx="138" ry="174" fill="#dda173"/>
+  <path d="M166 304c-7-117 50-200 145-200 107 0 158 77 130 208-17-81-67-117-142-114-66 2-107 40-133 106z" fill="#252b32"/>
+  <path d="M174 276c24-83 78-122 151-115 59 5 100 40 122 102-45-34-90-48-137-43-52 5-97 24-136 56z" fill="#37424b"/>
+  <ellipse cx="246" cy="325" rx="10" ry="12" fill="#26333a"/>
+  <ellipse cx="354" cy="325" rx="10" ry="12" fill="#26333a"/>
+  <path d="M269 395c22 15 42 15 64 0" fill="none" stroke="#814f42" stroke-width="7" stroke-linecap="round"/>
+  <path d="M300 338l-13 37h25" fill="none" stroke="#b97858" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="98" cy="119" r="20" fill="#537d73"/>
+  <path d="M82 169h91" stroke="#537d73" stroke-width="8" stroke-linecap="round" opacity=".65"/>
+</svg>
