@@ -450,6 +450,7 @@
 	              toggle.setAttribute('aria-expanded', 'false');
 	              toggle.setAttribute('aria-label', 'Expand author list');
 	              toggle.title = 'Expand author list';
+	              toggle.hidden = true;
 
 	              shell.appendChild(authors);
 	              shell.appendChild(toggle);
@@ -471,9 +472,11 @@
 	                var authors = shell.querySelector('.publication-authors');
 	                var toggle = shell.querySelector('.publication-authors-toggle');
 	                var wasExpanded = shell.classList.contains('expanded');
-	                if (wasExpanded) shell.classList.remove('expanded');
-	                var hasOverflow = authors.scrollHeight > authors.clientHeight + 1;
-	                if (wasExpanded) shell.classList.add('expanded');
+	                if (!wasExpanded) shell.classList.add('expanded');
+	                var naturalHeight = authors.getBoundingClientRect().height;
+	                var lineHeight = parseFloat(window.getComputedStyle(authors).lineHeight);
+	                var hasOverflow = naturalHeight > lineHeight * 1.5;
+	                if (!wasExpanded) shell.classList.remove('expanded');
 	                toggle.hidden = !hasOverflow;
 	              });
 	            }
@@ -488,6 +491,11 @@
 	              authors.innerHTML = sampleAuthors[index] || sampleAuthors[0];
 	            });
 	            requestAnimationFrame(updateAuthorToggles);
+	            if (document.fonts && document.fonts.ready) {
+	              document.fonts.ready.then(function() {
+	                requestAnimationFrame(updateAuthorToggles);
+	              });
+	            }
 	            var resizeFrame;
 	            window.addEventListener('resize', function() {
 	              cancelAnimationFrame(resizeFrame);
