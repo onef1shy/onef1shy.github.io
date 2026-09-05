@@ -4,38 +4,36 @@
   <title>Zeyu Yan | 闫泽宇</title>
   <meta name="author" content="Zeyu Yan">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  <link rel="preload" href="fonts/long-cang-name.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css?v=20260905-25">
   <link rel="icon" type="image/png" href="images/favicon/favicon-32x32.png">
-  <style>
-    body, * {
-      cursor: url('images/icon/cursor.png'), auto;
-    }
-    a, a * {
-      cursor: url('images/icon/cursor-pointer.png'), pointer !important;
-    }
-  </style>
 </head>
 <body>
-  <table id="about" class="page-section" style="width:100%;max-width:800px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+  <table id="about" class="page-section" style="width:calc(100% - 16px);max-width:var(--content-width);border:0px;border-spacing:0px;border-collapse:separate;margin-top:8px;margin-right:auto;margin-left:auto;"><tbody>
     <tr style="padding:0px">
       <td style="padding:0px">
-        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+        <table class="profile-table" style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
           <tr style="padding:0px">
             <td style="padding:2.5%;width:68%;vertical-align:middle">
               <p style="text-align:center">
-                <name>Zeyu Yan &nbsp | &nbsp 闫泽宇<span id="astronaut-btn" style="cursor: pointer; margin-left: 5px;" title="Copy bio">🧑‍🚀</span></name>
+                <name>Zeyu Yan &nbsp | &nbsp <span class="name-signature"><span class="name-cn" lang="zh-CN">闫泽<span class="name-cn-last">宇</span></span><button id="bio-copy-btn" class="bio-copy-btn" type="button" title="Copy bio" aria-label="Copy personal biography">
+                  <svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 6 15 13 23 3 21 16 27 13 31 15 26 16 21 23 14 20 5 26 8 17Z" fill="currentColor" fill-opacity="0.08"></path>
+                    <path d="m4 6 10 14L23 3M8 17l13 6M15 13l6 3"></path>
+                  </svg>
+                </button></span></name>
               </p>
 			<p>
 			  I am a Ph.D. student at the
-			  <span style="position:relative;display:inline-block;width:1.15em;height:1.15em;overflow:hidden;vertical-align:-0.2em;margin-right:4px;"><img src="images/school/zju-logo.png" alt="Zhejiang University logo" style="position:absolute;top:50%;left:50%;width:2em;height:auto;max-width:none;transform:translate(-50%,-50%);"></span>
+			  <span style="position:relative;display:inline-block;width:1.15em;height:1.15em;overflow:hidden;vertical-align:-0.2em;margin-right:4px;"><img class="zju-logo" src="images/school/zju-logo.png" alt="Zhejiang University logo" style="position:absolute;top:50%;left:50%;width:2em;height:auto;max-width:none;transform:translate(-50%,-50%);"></span>
 			  <a href="http://www.en.cs.zju.edu.cn/">School of Computer Science and Technology, Zhejiang University</a>, supervised by Prof.
-				  <a href="https://person.zju.edu.cn/zhangdongxiang">Dongxiang Zhang (张东祥)</a>. Previously, I studied Computer Science and Technology at
-				  <span style="display:inline-block;width:1.15em;height:1.15em;vertical-align:-0.2em;margin-right:4px;"><img src="images/school/xidian-logo-hd.png" alt="Xidian University logo" style="display:block;width:100%;height:100%;object-fit:contain;"></span><a href="https://cs.xidian.edu.cn/English/Home.htm">Xidian University</a> (2022-2026).
+				  <a href="https://person.zju.edu.cn/zhangdongxiang">Dongxiang Zhang (张东祥)</a>. Previously, I received my B.Eng. in Computer Science and Technology from
+				  <span style="display:inline-block;width:1.15em;height:1.15em;vertical-align:-0.2em;margin-right:4px;"><img src="images/school/xidian-logo-hd.png" alt="Xidian University logo" style="display:block;width:100%;height:100%;object-fit:contain;"></span><a href="https://cs.xidian.edu.cn/English/Home.htm">Xidian University</a> (2022-2026), where I worked with Dr. <a href="https://scholar.google.com/citations?view_op=list_works&amp;hl=zh-CN&amp;user=UonVWe4AAAAJ">Juli Zhang</a>.
 			</p>
 			<p>
-					My research focuses on <strong>multimodal learning</strong>, particularly concept drift, anomaly detection, and AI for Science (AI4Science). Feel free to reach out by <a href="mailto:zeyuy1011@gmail.com">email</a>.
+					My research focuses on <strong>multimodal learning</strong>, particularly concept drift, anomaly detection, and AI for Science (AI4Science). I am especially interested in building robust and trustworthy models that remain reliable as data distributions change in real-world applications. I welcome discussions and collaborations on these topics. Feel free to reach out by <a href="mailto:zeyuy1011@gmail.com">email</a>.
 			</p>
-			<div style="width: 100%; height: 1px; background: linear-gradient(to right, transparent, #ccc 20%, #ccc 80%, transparent); margin: 10px 0;"></div>
+			<div class="profile-divider"></div>
 
               <p class="contact-links">
                 <span class="contact-line">
@@ -84,14 +82,14 @@
 
 			<table id="news" class="page-section" style="width:96%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
 	          <tr>
-	              <heading>News</heading>
+	              <heading><span class="section-heading-mark" aria-hidden="true">✦</span><span class="section-heading-label">News</span></heading>
 	            <br>
 	            <td style="padding:0px;width:100%;vertical-align:middle">
 			  <p class="news-row news-first-entry">
 	                <span class="news-entry"><span class="news-date-badge">Jun. 2026</span> Named a <strong>Graduate Star</strong> at Xidian University.</span>
 	              </p>
 			  <p class="news-row">
-	                <span class="news-entry"><span class="news-date-badge">Apr. 2026</span> Our paper <strong>DFYP v2.0</strong> was accepted to <span class="news-highlight">IEEE TGRS 2026</span>.</span>
+	                <span class="news-entry"><span class="news-date-badge">Apr. 2026</span> Our paper <strong>DFYP v2.0</strong> was accepted to <strong class="news-highlight">IEEE TGRS 2026</strong>.</span>
 	              </p>
 			  <p class="news-row">
 	                <span class="news-entry"><span class="news-date-badge">Dec. 2025</span> Received the <strong>National Scholarship</strong> from the Ministry of Education of China.</span>
@@ -100,16 +98,16 @@
 	                <span class="news-entry"><span class="news-date-badge">Nov. 2025</span> Awarded the <strong>BYD Scholarship</strong> at Xidian University.</span>
 	              </p>
 	              <p class="news-row">
-	                <span class="news-entry"><span class="news-date-badge">Aug. 2025</span> Our paper <strong>LADSG</strong> was accepted to <span class="news-highlight">CollaborateCom 2025</span> for an oral presentation in Shanghai.</span>
+	                <span class="news-entry"><span class="news-date-badge">Aug. 2025</span> Our paper <strong>LADSG</strong> was accepted to <strong class="news-highlight">CollaborateCom 2025</strong> for an oral presentation in Shanghai.</span>
 	              </p>
 	              <p class="news-row">
-	                <span class="news-entry"><span class="news-date-badge">Jun. 2025</span> Our paper <strong>DFYP v1.0</strong> was accepted to the <span class="news-highlight">ICML 2025 NewInML Workshop</span>.</span>
+	                <span class="news-entry"><span class="news-date-badge">Jun. 2025</span> Our paper <strong>DFYP v1.0</strong> was accepted to the <strong class="news-highlight">ICML 2025 NewInML Workshop</strong>.</span>
 	              </p>
 	              <p class="news-row">
 	                <span class="news-entry"><span class="news-date-badge">Dec. 2024</span> Received the <strong>National Scholarship</strong> from the Ministry of Education of China.</span>
 	              </p>
 	              <p id="news-toggle-row" style="margin-top:8px;">
-	                <button id="news-toggle" type="button" aria-expanded="false" style="padding:0;border:0;background:none;color:#f49300;font:inherit;cursor:url('images/icon/cursor-pointer.png'), pointer;">Show all</button>
+	                <button id="news-toggle" type="button" aria-expanded="false">Show all</button>
 	              </p>
 	            </td>
 	          </tr>
@@ -146,101 +144,11 @@
 	        </script>
 	        
 			<table id="publications" class="publications-table page-section" style="width:96%;border:0px;border-spacing:0 16px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-          <heading>Publications</heading>
+          <heading><span class="section-heading-mark" aria-hidden="true">✦</span><span class="section-heading-label">Publications</span></heading>
     <br>
-   <p>† Equal contribution. * Corresponding author. The leading papers are <span style="background-color: #FFFEE0;">highlighted</span>.</p>
+   <p>† Equal contribution. * Corresponding author. The leading papers are <span class="publication-highlight-key">highlighted</span>.</p>
           
           <!-- Research Interests Tag Filter -->
-          <style>
-            .tag-filter {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 8px;
-              margin: 16px auto 0;
-              justify-content: center;
-            }
-            .tag-btn {
-              padding: 5px 14px;
-              border-radius: 20px;
-              border: 1px solid rgba(17, 17, 17, 0.18);
-              background: rgba(251, 165, 36, 0.06);
-              color: #6e3519;
-              font-size: 13px;
-              cursor: pointer;
-              transition: all 0.2s;
-            }
-            .tag-btn:hover {
-              border-color: rgba(17, 17, 17, 0.36);
-              background: rgba(251, 165, 36, 0.1);
-              color: #6e3519;
-            }
-            .tag-btn.active {
-              background: #ad7020;
-              color: #fff;
-              border-color: rgba(17, 17, 17, 0.62);
-              box-shadow: 0 2px 8px rgba(173, 112, 32, 0.22);
-            }
-            .tag-count {
-              display: inline-block;
-              background: rgba(0,0,0,0.15);
-              color: inherit;
-              font-size: 11px;
-              font-weight: bold;
-              width: 18px;
-              height: 18px;
-              line-height: 18px;
-              border-radius: 50%;
-              text-align: center;
-              margin-left: 5px;
-              vertical-align: middle;
-            }
-            .tag-btn.active .tag-count {
-              background: rgba(255, 255, 255, 0.22);
-              color: #fff;
-            }
-            .tag-btn:not(.active) .tag-count {
-              background: rgba(251, 165, 36, 0.14);
-              color: #6e3519;
-            }
-            .publications-table tr[data-tags] > td {
-              border-top: 1px solid rgba(0, 0, 0, 0.14);
-              border-bottom: 1px solid rgba(0, 0, 0, 0.14);
-              background: #fff;
-            }
-            .publications-table tr[data-tags] > td:first-child {
-              border-left: 1px solid rgba(0, 0, 0, 0.14);
-              border-radius: 8px 0 0 8px;
-            }
-            .publications-table tr[data-tags] > td:last-child {
-              border-right: 1px solid rgba(0, 0, 0, 0.14);
-              border-radius: 0 8px 8px 0;
-            }
-            .publications-table tr[data-tags][style*="lightyellow"] > td {
-              background: lightyellow;
-            }
-
-            /* 自定义复制提示框样式 */
-            .toast-message {
-              position: fixed;
-              top: var(--toast-y, 20px);
-              left: var(--toast-x, 50%);
-              transform: translate(-50%, -120%);
-              background: rgba(255, 255, 255, 0.8);
-              color: #333;
-              padding: 8px 16px;
-              border-radius: 20px;
-              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-              z-index: 2000;
-              opacity: 0;
-              transition: all 0.3s ease;
-              pointer-events: none;
-              border: 1px solid rgba(0,0,0,0.05);
-            }
-            .toast-message.show {
-              opacity: 1;
-              transform: translate(-50%, -135%);
-            }
-          </style>
           
           <div class="tag-filter" id="tagFilter">
             <button class="tag-btn active" data-tag="all">All</button>
@@ -270,6 +178,7 @@
               document.querySelectorAll('tr[data-tags]').forEach(function(row) {
                 row.style.display = (tag === 'all' || row.dataset.tags.split(',').includes(tag)) ? '' : 'none';
               });
+              document.dispatchEvent(new Event('publication-filter-change'));
             });
 
             function copyText(text, event) {
@@ -288,28 +197,38 @@
                 }, 2000);
               };
 
-              navigator.clipboard.writeText(text).then(function() {
-                showToast();
-              }).catch(function(err) {
-                console.error('无法复制: ', err);
-                // 降级方案
+              function fallbackCopy() {
+                const previousFocus = document.activeElement;
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
+                textArea.readOnly = true;
+                textArea.style.cssText = 'position:fixed;left:-9999px;top:0;';
                 document.body.appendChild(textArea);
                 textArea.select();
+                let copied = false;
                 try {
-                  document.execCommand('copy');
-                  showToast();
+                  copied = document.execCommand('copy');
+                  if (copied) showToast();
                 } catch (err) {
                   console.error('降级复制失败: ', err);
+                } finally {
+                  textArea.remove();
+                  if (previousFocus) previousFocus.focus({ preventScroll: true });
                 }
-                document.body.removeChild(textArea);
-              });
+                return copied;
+              }
+
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text).then(function() {
+                  showToast();
+                  return true;
+                }).catch(fallbackCopy);
+              }
+              return Promise.resolve(fallbackCopy());
             }
 
-            // 复制简介功能
-            document.getElementById('astronaut-btn').addEventListener('click', function(e) {
-              const text = "Zeyu Yan is a Ph.D. student at Zhejiang University. His research focuses on multimodal learning, especially concept drift and anomaly detection, as well as robust and trustworthy machine learning under real-world distribution shifts.";
+            document.getElementById('bio-copy-btn').addEventListener('click', function(e) {
+              const text = "Zeyu Yan is a Ph.D. student at Zhejiang University. His research focuses on multimodal learning, including concept drift, anomaly detection, and AI for Science, as well as robust and trustworthy machine learning under real-world distribution shifts.";
               copyText(text, e);
             });
 
@@ -320,8 +239,8 @@
             
           </script>
 
-	          <tr style="background-color: lightyellow;" data-tags="drift">
-	            <td style="padding:20px;width:30%;vertical-align:middle">
+	          <tr class="publication-featured" data-tags="drift">
+	            <td class="publication-media">
 	              <div class="one" style="width:160px;height:160px;margin:0 auto;">
 	                <div class="two" id="dfyp_image" style="width:160px;height:160px;">
 	                  <img src="images/publications/DFYP2.0.png" alt="DFYP framework" style="display:block;width:100%;height:100%;object-fit:contain;transform:scale(1.1);">
@@ -338,36 +257,29 @@
 	                dfyp_stop()
 	              </script>
 	            </td>
-	            <td style="padding:20px;width:70%;vertical-align:middle">
-	              <span class="publication-title-line"><a href="https://doi.org/10.1109/TGRS.2026.3684831">
-	                <papertitle>DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator Learning for Crop Yield Prediction</papertitle>
-	              </a></span>
-	              <br>
-	              <a:focus>Juli Zhang*</a:focus>,
-	              <a:focus><strong>Zeyu Yan</strong></a:focus>,
-	              <a:focus>Jing Zhang</a:focus>,
-	              <a:focus>Qiguang Miao*</a:focus>,
-	              <a:focus>Quan Wang</a:focus>
-	              <br>
-	              <a href="https://doi.org/10.1109/TGRS.2026.3684831">Paper</a>
-	              /
-	              <a href="https://arxiv.org/abs/2507.05849">Arxiv</a>
-	              /
-	              <a href="https://icml.cc/virtual/2025/50441">Workshop</a>
-				  /
-	              <a href="https://github.com/onef1shy/DFYP">Code</a>
-	              /
-	              <a href="https://huggingface.co/datasets/onef1shy/Crop-Yield-Prediction-MODIS">Dataset</a>
-	              <br>
-	              <span style="color: red;"><em><strong>ICML NewInML 2025 &amp; IEEE TGRS 2026</strong></em></span>
-	              <p></p>
-	              <p>
-	              A dynamic CNN-ViT fusion framework with spectral channel attention and adaptive operator learning for crop yield prediction.
+	            <td class="publication-details">
+                  <div class="publication-content">
+                    <div class="publication-title-line"><a href="https://doi.org/10.1109/TGRS.2026.3684831">
+                      <papertitle>DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator Learning for Crop Yield Prediction</papertitle>
+                    </a></div>
+                    <div class="publication-authors-shell">
+                      <p class="publication-authors">Juli Zhang*, <strong>Zeyu Yan</strong>, Jing Zhang, Qiguang Miao*, Quan Wang</p>
+                    </div>
+                    <p class="publication-abstract">A dynamic CNN-ViT fusion framework with spectral channel attention and adaptive operator learning for crop yield prediction.</p>
+                    <span class="publication-venue">ICML NewInML 2025 &amp; IEEE TGRS 2026</span>
+                    <div class="publication-links">
+                      <a href="https://doi.org/10.1109/TGRS.2026.3684831">Paper</a> /
+                      <a href="https://arxiv.org/abs/2507.05849">Arxiv</a> /
+                      <a href="https://icml.cc/virtual/2025/50441">Workshop</a> /
+                      <a href="https://github.com/onef1shy/DFYP">Code</a> /
+                      <a href="https://huggingface.co/datasets/onef1shy/Crop-Yield-Prediction-MODIS">Dataset</a>
+                    </div>
+                  </div>
 	            </td>
 	          </tr>
 
 	          <tr data-tags="security">
-            <td style="padding:20px;width:30%;vertical-align:middle">
+            <td class="publication-media">
               <div class="one" style="width:160px;height:160px;margin:0 auto;">
 	                <div class="two" id='ladsg_image' style="width:160px;height:160px;">
 	                  <img src='images/publications/LADSG.png' alt="LADSG framework" style="display:block;width:100%;height:100%;object-fit:contain;transform:scale(1.1);"></div>
@@ -383,24 +295,21 @@
 	                ladsg_stop()
               </script>
             </td>
-            <td style="padding:20px;width:70%;vertical-align:middle">
-	              <span class="publication-title-line"><a href="https://doi.org/10.1007/978-3-032-21171-2_11">
-	                <papertitle>LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning</papertitle>
-	              </a></span>
-              <br>
-	              <a:focus><strong>Zeyu Yan†</strong></a:focus>,
-	              <a:focus>Yanfei Yao†</a:focus>,
-	              <a:focus>Xuanbing Wen</a:focus>,
-	              <a:focus>Shixiong Zhang</a:focus>,
-	              <a:focus>Juli Zhang*</a:focus>,
-	              <a:focus>Kai Fan</a:focus>
-              <br>
-	              <a href="https://doi.org/10.1007/978-3-032-21171-2_11">Paper</a>&nbsp;/&nbsp;<a href="https://arxiv.org/abs/2506.06742">Arxiv</a>
-              <br>
-		              <span style="color: red;"><em><strong>CollaborateCom 2025 (Oral)</strong></em></span>
-              <p></p>
-              <p>
-	              A label privacy framework for vertical federated learning based on label-anonymized distillation and similar gradient substitution.
+            <td class="publication-details">
+                <div class="publication-content">
+                  <div class="publication-title-line"><a href="https://doi.org/10.1007/978-3-032-21171-2_11">
+                    <papertitle>LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning</papertitle>
+                  </a></div>
+                  <div class="publication-authors-shell">
+                    <p class="publication-authors"><strong>Zeyu Yan†</strong>, Yanfei Yao†, Xuanbing Wen, Shixiong Zhang, Juli Zhang*, Kai Fan</p>
+                  </div>
+                  <p class="publication-abstract">A label privacy framework for vertical federated learning based on label-anonymized distillation and similar gradient substitution.</p>
+                  <span class="publication-venue">CollaborateCom 2025 (Oral)</span>
+                  <div class="publication-links">
+                    <a href="https://doi.org/10.1007/978-3-032-21171-2_11">Paper</a> /
+                    <a href="https://arxiv.org/abs/2506.06742">Arxiv</a>
+                  </div>
+                </div>
               </td>
           </tr>
 
@@ -410,37 +319,10 @@
 	            var rows = document.querySelectorAll('.publications-table tr[data-tags]');
 
 	            rows.forEach(function(row, index) {
-	              var title = row.querySelector('papertitle');
-	              if (!title) return;
-
-	              var titleContainer = title.closest('.publication-title-line') || title.closest('a') || title;
-	              var firstBreak = titleContainer.nextElementSibling;
-	              while (firstBreak && firstBreak.tagName !== 'BR') {
-	                firstBreak = firstBreak.nextElementSibling;
-	              }
-	              if (!firstBreak) return;
-
-	              var lastBreak = firstBreak.nextElementSibling;
-	              while (lastBreak && lastBreak.tagName !== 'BR') {
-	                lastBreak = lastBreak.nextElementSibling;
-	              }
-	              if (!lastBreak) return;
-
-	              var authorNodes = [];
-	              var node = firstBreak.nextSibling;
-	              while (node && node !== lastBreak) {
-	                authorNodes.push(node);
-	                node = node.nextSibling;
-	              }
-
-	              var shell = document.createElement('div');
-	              shell.className = 'publication-authors-shell';
-	              var authors = document.createElement('div');
-	              authors.className = 'publication-authors';
+	              var shell = row.querySelector('.publication-authors-shell');
+	              if (!shell) return;
+	              var authors = shell.querySelector('.publication-authors');
 	              authors.id = 'publication-authors-' + index;
-	              authorNodes.forEach(function(authorNode) {
-	                authors.appendChild(authorNode);
-	              });
 
 	              var toggle = document.createElement('button');
 	              toggle.type = 'button';
@@ -452,11 +334,7 @@
 	              toggle.title = 'Expand author list';
 	              toggle.hidden = true;
 
-	              shell.appendChild(authors);
 	              shell.appendChild(toggle);
-	              firstBreak.parentNode.insertBefore(shell, firstBreak);
-	              firstBreak.remove();
-	              lastBreak.remove();
 
 	              toggle.addEventListener('click', function() {
 	                var expanded = shell.classList.toggle('expanded');
@@ -469,6 +347,7 @@
 
 	            function updateAuthorToggles() {
 	              document.querySelectorAll('.publication-authors-shell').forEach(function(shell) {
+	                if (!shell.getClientRects().length) return;
 	                var authors = shell.querySelector('.publication-authors');
 	                var toggle = shell.querySelector('.publication-authors-toggle');
 	                var wasExpanded = shell.classList.contains('expanded');
@@ -483,13 +362,7 @@
 
 	            updateAuthorToggles();
 
-	            var sampleAuthors = [
-	              'Juli Zhang*, <strong>Zeyu Yan</strong>, Jing Zhang, Qiguang Miao*, Quan Wang',
-	              '<strong>Zeyu Yan†</strong>, Yanfei Yao†, Xuanbing Wen, Shixiong Zhang, Juli Zhang*, Kai Fan'
-	            ];
-	            document.querySelectorAll('.publication-authors').forEach(function(authors, index) {
-	              authors.innerHTML = sampleAuthors[index] || sampleAuthors[0];
-	            });
+	            document.addEventListener('publication-filter-change', updateAuthorToggles);
 	            requestAnimationFrame(updateAuthorToggles);
 	            if (document.fonts && document.fonts.ready) {
 	              document.fonts.ready.then(function() {
@@ -506,7 +379,7 @@
 
 	        <table id="experience" class="page-section" width="96%" align="center" border="0" cellpadding="10"><tbody>
           <br>
-              <heading>Experience</heading>
+              <heading><span class="section-heading-mark" aria-hidden="true">✦</span><span class="section-heading-label">Experience</span></heading>
 	          <br>
 	          <tr>
 	            <td style="padding:16px 12px 16px 20px;width:96px;vertical-align:middle">
@@ -514,26 +387,26 @@
 	            </td>
 		            <td style="padding:16px 20px 16px 8px;vertical-align:middle;line-height:1.45">
 	              <strong>Ant Group</strong>
-	              <span style="display:inline-block;margin-left:10px;color:#777;">2026.07 - 2026.10</span>
+	              <span style="display:inline-block;margin-left:10px;color:var(--muted);">2026.07 - 2026.10</span>
 	              <br> <strong>Academic Collaboration Intern</strong>
-	              <br> <span style="color:#555;">Research on Algorithms for Long-Term Health Risk Prediction</span>
+	              <br> <span style="color:var(--muted);">Research on Algorithms for Long-Term Health Risk Prediction</span>
 	            </td>
           </tr>
         </tbody></table>
 
 	        <table id="education" class="page-section" width="96%" align="center" border="0" cellpadding="10"><tbody>
           <br>
-              <heading>Education</heading>
+              <heading><span class="section-heading-mark" aria-hidden="true">✦</span><span class="section-heading-label">Education</span></heading>
 	          <br>
 	          <tr>
 	            <td style="padding:16px 12px 16px 20px;width:96px;vertical-align:middle">
-	              <span style="position:relative;display:block;width:68px;height:68px;overflow:hidden;"><img src="images/school/zju-logo.png" alt="Zhejiang University logo" style="position:absolute;top:50%;left:50%;width:118px;height:auto;max-width:none;transform:translate(-50%,-50%);"></span>
+	              <span style="position:relative;display:block;width:68px;height:68px;overflow:hidden;"><img class="zju-logo" src="images/school/zju-logo.png" alt="Zhejiang University logo" style="position:absolute;top:50%;left:50%;width:118px;height:auto;max-width:none;transform:translate(-50%,-50%);"></span>
 	            </td>
 	            <td style="padding:16px 20px 16px 8px;vertical-align:middle;line-height:1.45">
 	              <strong>Zhejiang University</strong>
-	              <span style="display:inline-block;margin-left:10px;color:#777;">2026.09 - Present</span>
+	              <span style="display:inline-block;margin-left:10px;color:var(--muted);">2026.09 - Present</span>
 	              <br> <strong>Ph.D. Student, Computer Science and Technology</strong>
-	              <br> <span style="color:#555;">Research Advisor: Prof. <a href="https://person.zju.edu.cn/zhangdongxiang">Dongxiang Zhang</a></span>
+	              <br> <span style="color:var(--muted);">Research Advisor: Prof. <a href="https://person.zju.edu.cn/zhangdongxiang">Dongxiang Zhang</a></span>
 	            </td>
 	          </tr>
 	          <tr>
@@ -542,9 +415,9 @@
 	            </td>
 	            <td style="padding:16px 20px 16px 8px;vertical-align:middle;line-height:1.45">
 	              <strong>Xidian University</strong>
-	              <span style="display:inline-block;margin-left:10px;color:#777;">2022.09 - 2026.06</span>
+	              <span style="display:inline-block;margin-left:10px;color:var(--muted);">2022.09 - 2026.06</span>
 	              <br> <strong>B.Eng. in Computer Science and Technology</strong>
-	              <br> <span style="color:#555;">Research Advisor: Dr. <a href="https://scholar.google.com/citations?view_op=list_works&amp;hl=zh-CN&amp;user=UonVWe4AAAAJ">Juli Zhang</a></span>
+	              <br> <span style="color:var(--muted);">Research Advisor: Dr. <a href="https://scholar.google.com/citations?view_op=list_works&amp;hl=zh-CN&amp;user=UonVWe4AAAAJ">Juli Zhang</a></span>
 	            </td>
           </tr>
         </tbody></table>
@@ -553,7 +426,7 @@
 		<table id="service" class="page-section" style="width:96%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
 	          <tr>
 	            <br>
-	            <heading>Service and Teaching</heading>
+	            <heading><span class="section-heading-mark" aria-hidden="true">✦</span><span class="section-heading-label">Service and Teaching</span></heading>
 	            <br>
 	          <td style="padding:0px;width:100%;vertical-align:middle">
 			<p style="margin:1em 0 0;line-height:1.45;"><strong>Journal Reviewer:</strong> <a href="https://www.embs.org/jbhi/">JBHI</a>, <a href="https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=42">TMI</a></p>
@@ -566,10 +439,10 @@
 		<table id="awards" class="page-section" style="width:96%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
               <tr>
                 <br>
-	                <heading>Awards and Honors</heading>
+	                <heading><span class="section-heading-mark" aria-hidden="true">✦</span><span class="section-heading-label">Awards and Honors</span></heading>
 	                <br>
 	              <td style="padding:0px;width:100%;vertical-align:middle">
-				<ul style="margin:1em 0 0;padding-left:20px;line-height:1.45;">
+				<ul class="awards-list">
 				  <li>2026.06: <strong>Graduate Star</strong>, Xidian University</li>
 				  <li>2025.12: <strong>National Scholarship</strong> (Top 1%), Ministry of Education of China</li>
 				  <li>2025.11: <strong>BYD Scholarship</strong>, Xidian University</li>
@@ -585,31 +458,15 @@
     </tr>
   </table>
 
-  <section class="mountain-footer" aria-label="Footer landscape">
-    <div class="mountain-stage">
-      <picture>
-        <source type="image/webp" srcset="images/experience/background-960.webp 960w, images/experience/background-1440.webp 1440w, images/experience/background-1920.webp 1920w" sizes="100vw">
-        <img class="mountain-img" src="images/experience/background.jpeg" alt="Snow-covered Namcha Barwa glowing in golden sunrise light" loading="lazy" decoding="async" fetchpriority="low"
-             onerror="this.style.display='none'; this.closest('picture').nextElementSibling.style.display='block';">
-      </picture>
-      <div class="mountain-fallback" style="display:none;"></div>
-      <div class="mountain-content">
-        <h2>Keep Exploring</h2>
-        <p class="mountain-sub">It is not that I'm so smart, it's just that I stay with problems longer.</p>
-        <a href="mailto:zeyuy1011@gmail.com" class="mountain-cta">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-          <span>Get in Touch</span>
-        </a>
-        <p class="mountain-footnote">
-          <span>Zeyu Yan | 闫泽宇</span>
-          <span class="mountain-updated">Last updated: <!-- LAST_UPDATED_START -->August 10, 2026<!-- LAST_UPDATED_END -->.</span>
-          <span class="mountain-template">
-            Ph.D. student at Zhejiang University · Hangzhou, China
-          </span>
-        </p>
+  <footer class="site-footer" aria-label="Site information">
+    <div class="site-footer-inner">
+      <div class="site-footer-meta">
+        <p class="site-footer-signature">Zeyu Yan <span class="signature-separator" aria-hidden="true">/</span> <span class="name-cn" lang="zh-CN">闫泽<span class="name-cn-last">宇</span></span></p>
+        <p>Ph.D. student at Zhejiang University · Hangzhou, China</p>
+        <p class="site-footer-updated">Last updated: <!-- LAST_UPDATED_START -->August 10, 2026<!-- LAST_UPDATED_END -->.</p>
       </div>
     </div>
-  </section>
+  </footer>
 
   <!-- Back to Top Button -->
   <button id="backToTop" onclick="scrollToTop()" title="Back to top">
@@ -618,14 +475,14 @@
     </svg>
   </button>
 
-  <div id="toast" class="toast-message">✅复制完成</div>
+  <div id="toast" class="toast-message" role="status" aria-live="polite">已复制</div>
 
   <script>
     // Back to Top
     (function() {
       var btn = document.getElementById('backToTop');
       var sectionNav = document.querySelector('.section-drip-nav');
-      var footer = document.querySelector('.mountain-footer');
+      var footer = document.querySelector('.site-footer');
 
       function updateSectionNav() {
         if (!sectionNav || !footer) return;
