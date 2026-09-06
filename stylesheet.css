@@ -86,6 +86,11 @@ body {
   color: var(--accent-hover);
 }
 
+.publication-note {
+  width: 96%;
+  margin: 1em auto;
+}
+
 .publication-highlight-key {
   background: var(--highlight);
   padding: 1px 4px;
