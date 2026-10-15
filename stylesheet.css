@@ -835,6 +835,17 @@ papertitle {
   outline: none;
 }
 
+.publication-authors-toggle svg {
+  width: 11px;
+  height: 11px;
+  fill: currentColor;
+  vertical-align: middle;
+}
+
+.publication-authors-toggle[aria-expanded="true"] svg {
+  transform: rotate(90deg);
+}
+
 name {
   font-family: var(--serif);
   color: #000;
