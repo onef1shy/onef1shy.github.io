@@ -1304,9 +1304,114 @@ span.highlight {
   margin: 24px auto 0;
 }
 
+.visitor-map-canvas {
+  position: relative;
+  aspect-ratio: 2.04 / 1;
+}
+
+.visitor-map-world {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  background: #2d78ad;
+}
+
+.visitor-map-points {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.visitor-map-marker {
+  fill: #ff1717;
+  stroke: #ffffff;
+  stroke-width: 0.9;
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.visitor-map-marker.is-online {
+  fill: #f79a00;
+}
+
+.visitor-map-marker:hover,
+.visitor-map-marker:focus-visible,
+.visitor-map-marker[aria-pressed="true"] {
+  outline: none;
+  stroke: #ffffff;
+  stroke-width: 3;
+}
+
+.visitor-map-tooltip {
+  position: absolute;
+  z-index: 2;
+  box-sizing: border-box;
+  max-width: calc(100% - 8px);
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #ffffff;
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 12.5px;
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.visitor-map-tooltip strong,
+.visitor-map-tooltip span {
+  display: block;
+  font-size: inherit;
+}
+
+.visitor-map-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 0;
+  text-align: center;
+}
+
+.visitor-map-metrics dt {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.visitor-map-metrics dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.visitor-map-status {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.visitor-map-description {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 @media (max-width: 540px) {
   .site-footer {
-    padding-bottom: 28px;
+    padding-bottom: 76px;
   }
 
   .site-footer-meta {

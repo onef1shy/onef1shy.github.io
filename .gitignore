@@ -1,0 +1,28 @@
+# Local dependencies and Cloudflare development state.
+node_modules/
+.wrangler/
+
+# Secrets stay on this computer; placeholder examples are safe to version.
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.env
+.env.*
+!.env.example
+
+# Generated sites, test reports, logs, and local database backups.
+_site/
+.jekyll-cache/
+.sass-cache/
+.jekyll-metadata
+test-results/
+playwright-report/
+coverage/
+*.log
+*.sqlite
+*.sqlite-*
+*.db
+/analytics/backups/
+
+# macOS metadata.
+.DS_Store

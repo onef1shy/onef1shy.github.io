@@ -1,0 +1,37 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "onef1shy-visitor-map",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "map.onef1shy.top", "custom_domain": true }
+  ],
+  "vars": {
+    "ALLOWED_ORIGINS": "https://onef1shy.top,https://www.onef1shy.top,https://onef1shy.github.io,http://127.0.0.1:5500",
+    "IPINFO_MONTHLY_LIMIT": "45000",
+    "IP_CACHE_TTL_SECONDS": "86400",
+    "TRACK_RATE_LIMIT": "10",
+    "STATS_CACHE_SECONDS": "0"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "visitor_map",
+      "database_id": "defd4f0f-36b5-467c-9dd7-74e0ebc8a493",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": {
+    "crons": ["17 * * * *"]
+  },
+  "observability": {
+    "enabled": false
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "VISITOR_HUB", "class_name": "VisitorHub" }]
+  },
+  "migrations": [
+    { "tag": "v1-visitor-live", "new_sqlite_classes": ["VisitorHub"] }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "onef1shy-homepage",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test analytics/test/*.test.js",
+    "test:browser": "node analytics/test/browser-smoke.js",
+    "analytics:dev": "wrangler dev --config analytics/wrangler.jsonc",
+    "analytics:migrate:local": "wrangler d1 migrations apply visitor_map --local --config analytics/wrangler.jsonc",
+    "analytics:verify-token": "node analytics/scripts/verify-ipinfo.js",
+    "analytics:upload-secrets": "node analytics/scripts/upload-secrets.js",
+    "analytics:build": "wrangler deploy --dry-run --config analytics/wrangler.jsonc --outdir ../.wrangler/build",
+    "map:build": "node scripts/build-visitor-map.js"
+  },
+  "devDependencies": {
+    "d3-geo": "3.1.1",
+    "playwright": "1.64.1",
+    "topojson-client": "3.1.0",
+    "wrangler": "4.151.0"
+  }
+}

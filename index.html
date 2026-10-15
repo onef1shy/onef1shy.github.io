@@ -4,11 +4,14 @@
   <title>Zeyu Yan | 闫泽宇</title>
   <meta name="author" content="Zeyu Yan">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="canonical" href="https://onef1shy.top/">
   <link rel="preload" href="fonts/nunito-latin.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="fonts/kalam-navigation.ttf?v=2" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="fonts/caveat-name.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="fonts/ma-shan-zheng-name.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" type="text/css" href="stylesheet.css?v=20261015-navigation-all-kalam">
+  <link rel="stylesheet" type="text/css" href="stylesheet.css?v=20261016-live-presence">
+  <script type="module" src="assets/visitor-map/track.js?v=20261016-live-presence"></script>
+  <script type="module" src="assets/visitor-map/map.js?v=20261016-no-antarctica"></script>
   <link rel="icon" type="image/png" href="images/favicon/favicon-32x32.png">
 </head>
 <body>
@@ -475,9 +478,20 @@
         <p class="site-footer-signature"><span class="name-en">Zeyu Yan</span> <span class="signature-separator" aria-hidden="true">/</span> <span class="name-cn" lang="zh-CN">闫泽<span class="name-cn-last">宇</span></span></p>
         <p>Ph.D. student at Zhejiang University · Hangzhou, China</p>
       </div>
-      <div class="site-footer-map" role="group" aria-label="Visitor map">
-        <script async type="text/javascript" id="mapmyvisitors" src="https://mapmyvisitors.com/map.js?cl=ffffff&amp;w=a&amp;t=tt&amp;d=lnzoU7tuKi5O2ftMc3uHpafAb8Cv1q1v8zhTtNSHIQk&amp;cmo=ff1717&amp;cmn=f79a00"></script>
-      </div>
+      <figure class="site-footer-map" data-visitor-map aria-label="Cumulative visitor map">
+        <div class="visitor-map-canvas">
+          <img class="visitor-map-world" src="images/visitor-map/world.svg?v=20261016-country-borders" width="900" height="441" loading="lazy" decoding="async" alt="" aria-hidden="true">
+          <svg class="visitor-map-points" viewBox="0 0 900 441.1764705882353" role="group" aria-label="Visitor locations"></svg>
+          <div class="visitor-map-tooltip" role="status" hidden></div>
+        </div>
+        <figcaption class="visitor-map-description">Visitor locations estimated from IP addresses. Red: past visits. Orange: visitors online now.</figcaption>
+        <dl class="visitor-map-metrics">
+          <div><dt>Total Pageviews</dt><dd data-stat="pageviews">—</dd></div>
+          <div><dt>Countries</dt><dd data-stat="countries">—</dd></div>
+          <div><dt>Cities</dt><dd data-stat="cities">—</dd></div>
+        </dl>
+        <p class="visitor-map-status" role="status" hidden></p>
+      </figure>
     </div>
   </footer>
 

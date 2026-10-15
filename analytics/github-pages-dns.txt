@@ -1,0 +1,8 @@
+; Homepage DNS for GitHub Pages. Set the custom domain in GitHub Pages first.
+; Import in Cloudflare DNS > Records > Import and Export.
+; The map.onef1shy.top record is created separately by the Worker binding.
+onef1shy.top. 300 IN A 185.199.108.153 ; cf_tags=cf-proxied:false
+onef1shy.top. 300 IN A 185.199.109.153 ; cf_tags=cf-proxied:false
+onef1shy.top. 300 IN A 185.199.110.153 ; cf_tags=cf-proxied:false
+onef1shy.top. 300 IN A 185.199.111.153 ; cf_tags=cf-proxied:false
+www.onef1shy.top. 300 IN CNAME onef1shy.github.io. ; cf_tags=cf-proxied:false

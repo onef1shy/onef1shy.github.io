@@ -1,0 +1,3 @@
+# Copy to .dev.vars. Never put either secret in frontend code.
+IPINFO_TOKEN=""
+HMAC_SECRET="replace-with-at-least-32-random-characters"

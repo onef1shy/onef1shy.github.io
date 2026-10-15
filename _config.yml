@@ -1,0 +1,20 @@
+# Development files remain in Git for maintenance but are not published as pages.
+exclude:
+  - analytics
+  - scripts
+  - node_modules
+  - package.json
+  - package-lock.json
+  - README.md
+  - "**/README.md"
+  - test-results
+  - playwright-report
+  - coverage
+  - .wrangler
+  - .sass-cache
+  - .jekyll-cache
+  - .jekyll-metadata
+  - Gemfile
+  - Gemfile.lock
+  - gemfiles
+  - vendor
