@@ -831,9 +831,7 @@ heading {
 .news-highlight {
   color: inherit;
   font-weight: 700;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
+  text-decoration: none;
 }
 .news-text {
   font: inherit;
@@ -944,6 +942,23 @@ heading2 {
 .publication-media {
   width: 30%;
   vertical-align: middle;
+}
+
+.publications-table tr[data-tags] > .publication-media {
+  padding: 16px 8px;
+}
+
+.publication-figure {
+  display: block;
+  width: 100%;
+  min-width: 180px;
+  line-height: 0;
+}
+
+.publication-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .publication-details {
@@ -1113,21 +1128,6 @@ abs {
   font-size: 16px;
   color: var(--accent);
 }
-.one {
-  width: 160px;
-  height: 160px;
-  position: relative;
-}
-
-.two {
-  width: 160px;
-  height: 160px;
-  position: absolute;
-  transition: opacity .2s ease-in-out;
-  -moz-transition: opacity .2s ease-in-out;
-  -webkit-transition: opacity .2s ease-in-out;
-}
-
 .fade {
   transition: opacity .2s ease-in-out;
   -moz-transition: opacity .2s ease-in-out;
