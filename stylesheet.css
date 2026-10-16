@@ -92,6 +92,7 @@ button {
   top: 0;
   z-index: 100;
   background: var(--page);
+  border-bottom: 1px solid #eeeeee;
 }
 
 .site-navigation-inner {
