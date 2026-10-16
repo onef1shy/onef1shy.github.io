@@ -47,7 +47,7 @@
 
 /* White background with cool text and blue-violet accents. */
 :root {
-  --content-width: 850px;
+  --content-width: 1280px;
   --navigation-height: 56px;
   color-scheme: light;
   --page-rgb: 255, 255, 255;
@@ -100,11 +100,11 @@ button {
   justify-content: space-between;
   gap: 24px;
   box-sizing: border-box;
-  width: calc(100% - 32px);
+  width: calc(100% - 64px);
   max-width: var(--content-width);
   min-height: var(--navigation-height);
   margin: 0 auto;
-  padding: 8px 16px;
+  padding: 8px 0;
 }
 
 .site-navigation-inner a {
@@ -180,6 +180,138 @@ button {
   }
 }
 
+.homepage-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(36px, 4vw, 64px);
+  width: calc(100% - 64px);
+  max-width: var(--content-width);
+  margin: 24px auto 0;
+}
+
+.homepage-main {
+  min-width: 0;
+}
+
+.profile-sidebar {
+  position: sticky;
+  top: calc(var(--navigation-height) + 24px);
+  align-self: start;
+  min-width: 0;
+  max-height: calc(100vh - var(--navigation-height) - 48px);
+  max-height: calc(100dvh - var(--navigation-height) - 48px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.profile-sidebar-avatar {
+  display: block;
+  width: min(220px, 25vh);
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.profile-sidebar-name {
+  margin: 24px 0 0;
+}
+
+.profile-sidebar .name-separator {
+  display: none;
+}
+
+.profile-sidebar .name-signature {
+  display: block;
+  margin-top: 12px;
+}
+
+.profile-sidebar .contact-links {
+  margin: 24px 0 0;
+}
+
+.profile-sidebar .contact-line {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.profile-sidebar .contact-links a {
+  gap: 8px;
+}
+
+.profile-bio {
+  width: 96%;
+  margin: 0 auto 24px;
+}
+
+.profile-bio > p:first-child {
+  margin-top: 0;
+}
+
+.profile-bio > p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 960px) {
+  .site-navigation-inner,
+  .homepage-layout {
+    width: calc(100% - 32px);
+  }
+
+  .homepage-layout {
+    display: block;
+    margin-top: 16px;
+  }
+
+  .profile-sidebar {
+    position: static;
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    align-items: start;
+    gap: 16px 28px;
+    max-height: none;
+    margin-bottom: 28px;
+    overflow: visible;
+  }
+
+  .profile-sidebar-avatar {
+    grid-row: 1 / span 2;
+    width: 140px;
+  }
+
+  .profile-sidebar-name,
+  .profile-sidebar .contact-links {
+    margin: 0;
+  }
+
+  .profile-sidebar .contact-line {
+    flex-direction: row;
+    gap: 6px 16px;
+  }
+}
+
+@media (max-width: 540px) {
+  .site-navigation-inner,
+  .homepage-layout {
+    width: calc(100% - 24px);
+  }
+
+  .profile-sidebar {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 16px 20px;
+  }
+
+  .profile-sidebar-avatar {
+    grid-row: 1;
+    width: 96px;
+  }
+
+  .profile-sidebar .contact-links {
+    grid-column: 1 / -1;
+  }
+}
+
 ::selection {
   background: var(--accent);
   color: #fff;
@@ -188,12 +320,6 @@ button {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
-}
-
-.profile-divider {
-  height: 1px;
-  margin: 10px 0;
-  background: linear-gradient(to right, transparent, var(--border) 20%, var(--border) 80%, transparent);
 }
 
 /* Blend the logo's white canvas into the page without redrawing the emblem. */
@@ -1170,24 +1296,6 @@ span.highlight {
 }
 
 @media (max-width: 540px) {
-  .profile-table > tbody > tr {
-    display: flex;
-    flex-direction: column-reverse;
-    align-items: center;
-  }
-
-  .profile-table > tbody > tr > td {
-    box-sizing: border-box;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  .profile-table > tbody > tr > td:last-child {
-    width: 120px !important;
-    padding-top: 20px !important;
-    text-align: center;
-  }
-
   name {
     font-size: 29px;
   }
