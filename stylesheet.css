@@ -45,9 +45,18 @@
   unicode-range: U+5B87, U+6CFD, U+95EB;
 }
 
+@font-face {
+  font-family: 'Zeyu Motto';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/ma-shan-zheng-motto.ttf') format('truetype');
+  unicode-range: U+5728, U+751F, U+81EA, U+957F;
+}
+
 /* White background with cool text and blue-violet accents. */
 :root {
-  --content-width: 1280px;
+  --content-width: 1200px;
   --navigation-height: 56px;
   color-scheme: light;
   --page-rgb: 255, 255, 255;
@@ -183,12 +192,12 @@ button {
 
 .homepage-layout {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-columns: 200px minmax(0, 1fr);
   align-items: start;
-  gap: clamp(36px, 4vw, 64px);
+  gap: 75px;
   width: calc(100% - 64px);
   max-width: var(--content-width);
-  margin: 24px auto 0;
+  margin: 30px auto 0;
 }
 
 .homepage-main {
@@ -197,13 +206,14 @@ button {
 
 .profile-sidebar {
   position: sticky;
-  top: calc(var(--navigation-height) + 24px);
+  top: calc(var(--navigation-height) + 30px);
   align-self: start;
   min-width: 0;
-  max-height: calc(100vh - var(--navigation-height) - 48px);
-  max-height: calc(100dvh - var(--navigation-height) - 48px);
+  max-height: calc(100vh - var(--navigation-height) - 54px);
+  max-height: calc(100dvh - var(--navigation-height) - 54px);
   overflow-y: auto;
   scrollbar-width: thin;
+  text-align: center;
 }
 
 .profile-sidebar-avatar {
@@ -211,6 +221,7 @@ button {
   width: min(180px, 25vh);
   max-width: 100%;
   height: auto;
+  margin: 0 auto;
   border-radius: 50%;
 }
 
@@ -219,7 +230,11 @@ button {
 }
 
 .profile-sidebar-name name {
-  font-size: 26px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 24px;
+  white-space: nowrap;
 }
 
 .profile-sidebar .name-separator {
@@ -227,12 +242,38 @@ button {
 }
 
 .profile-sidebar .name-signature {
-  display: block;
-  margin-top: 12px;
+  display: inline-block;
+  margin: 0;
+}
+
+.profile-motto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+
+.profile-motto-text {
+  color: var(--text);
+  font-family: 'Zeyu Motto', 'Kaiti SC', KaiTi, cursive;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+}
+
+.profile-sidebar .bio-copy-btn {
+  width: 28px;
+  height: 28px;
+  margin-left: 0;
+  padding: 2px;
 }
 
 .profile-sidebar .contact-links {
-  margin: 24px 0 0;
+  width: max-content;
+  max-width: 100%;
+  margin: 24px auto 0;
 }
 
 .profile-sidebar .contact-line {
@@ -250,7 +291,44 @@ button {
   margin: 0 auto 24px;
 }
 
-.profile-bio > p:first-child {
+.profile-welcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0 0.35em;
+  margin: 0 0 22px;
+  color: var(--accent);
+  font-family: 'Zeyu Navigation', var(--sans);
+  font-size: clamp(22px, 2.2vw, 28px);
+  font-style: normal;
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.profile-welcome-wave {
+  display: inline-block;
+  font-size: 0.9em;
+  transform-origin: 70% 70%;
+  animation: welcome-wave 2.4s ease-in-out infinite;
+}
+
+@keyframes welcome-wave {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  10%, 30% { transform: rotate(14deg); }
+  20%, 40% { transform: rotate(-8deg); }
+  50% { transform: rotate(10deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-welcome-wave {
+    animation: none;
+  }
+}
+
+.profile-bio > p:first-of-type {
   margin-top: 0;
 }
 
@@ -266,7 +344,7 @@ button {
 
   .homepage-layout {
     display: block;
-    margin-top: 16px;
+    margin-top: 24px;
   }
 
   .profile-sidebar {
@@ -288,13 +366,26 @@ button {
   }
 
   .profile-sidebar-name,
+  .profile-motto,
   .profile-sidebar .contact-links {
     margin: 0;
+  }
+
+  .profile-sidebar-name name {
+    display: inline;
+    font-size: 26px;
+    white-space: normal;
   }
 
   .profile-sidebar .name-signature {
     display: inline-block;
     margin: 0 0 0 12px;
+  }
+
+  .profile-sidebar .bio-copy-btn {
+    width: 32px;
+    height: 32px;
+    padding: 3px;
   }
 
   .profile-sidebar .contact-links {
@@ -608,7 +699,7 @@ heading {
   color: var(--heading);
   font-weight: 400;
   letter-spacing: 0.035em;
-  font-size: 27px;
+  font-size: 21.5px;
   line-height: 1.3;
 }
 
@@ -896,6 +987,7 @@ heading2 {
 .publication-authors {
   font-size: 14.5px;
   font-style: italic;
+  line-height: 1.5;
 }
 
 .publication-authors a,
@@ -934,53 +1026,6 @@ papertitle {
   font-family: var(--sans);
   font-size: 16px;
   font-weight: 700
-}
-
-.publication-authors-shell {
-  position: relative;
-  padding-right: 24px;
-  line-height: 1.5;
-}
-
-.publication-authors-shell:not(.expanded) .publication-authors {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  overflow: hidden;
-}
-
-.publication-authors-toggle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--accent-hover);
-  font-size: 13px;
-  line-height: 22px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.publication-authors-toggle:hover,
-.publication-authors-toggle:focus-visible {
-  color: var(--accent);
-  outline: none;
-}
-
-.publication-authors-toggle svg {
-  width: 11px;
-  height: 11px;
-  fill: currentColor;
-  vertical-align: middle;
-}
-
-.publication-authors-toggle[aria-expanded="true"] svg {
-  transform: rotate(90deg);
 }
 
 name {
@@ -1029,9 +1074,9 @@ name {
   white-space: nowrap;
 }
 
-/* Match the visible 泽宇 gap to 闫泽 in Ma Shan Zheng. */
+/* Optical spacing: pull 宇 closer to 泽. */
 .name-cn-last {
-  margin-left: 0.022em;
+  margin-left: -0.08em;
 }
 
 .bio-copy-btn {

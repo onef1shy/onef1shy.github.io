@@ -9,7 +9,7 @@
   <link rel="preload" href="fonts/kalam-navigation.ttf?v=2" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="fonts/caveat-name.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="fonts/ma-shan-zheng-name.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" type="text/css" href="stylesheet.css?v=20261016-centered-tablet-profile">
+  <link rel="stylesheet" type="text/css" href="stylesheet.css?v=20261016-section-title-21-5">
   <script type="module" src="assets/visitor-map/track.js?v=20261016-live-presence"></script>
   <script type="module" src="assets/visitor-map/map.js?v=20261016-no-antarctica"></script>
   <link rel="icon" type="image/png" href="images/favicon/favicon-32x32.png">
@@ -32,12 +32,16 @@
     <aside class="profile-sidebar" aria-label="Personal profile">
       <img class="profile-sidebar-avatar" src="images/about/avatar.jpg" alt="Zeyu Yan avatar" width="180" height="180">
       <p class="profile-sidebar-name">
-        <name><span class="name-en">Zeyu Yan</span><span class="name-separator" aria-hidden="true">|</span><span class="name-signature"><span class="name-cn" lang="zh-CN">闫泽<span class="name-cn-last">宇</span></span><button id="bio-copy-btn" class="bio-copy-btn" type="button" title="Copy bio" aria-label="Copy personal biography">
-                  <svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 6 15 13 23 3 21 16 27 13 31 15 26 16 21 23 14 20 5 26 8 17Z" fill="currentColor" fill-opacity="0.08"></path>
-                    <path d="m4 6 10 14L23 3M8 17l13 6M15 13l6 3"></path>
-                  </svg>
-                </button></span></name>
+        <name><span class="name-en">Zeyu Yan</span><span class="name-separator" aria-hidden="true">|</span><span class="name-signature"><span class="name-cn" lang="zh-CN">闫泽<span class="name-cn-last">宇</span></span></span></name>
+      </p>
+      <p class="profile-motto">
+        <span class="profile-motto-text" lang="zh-CN">自在生长</span>
+        <button id="bio-copy-btn" class="bio-copy-btn" type="button" title="Copy bio" aria-label="Copy personal biography">
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6 15 13 23 3 21 16 27 13 31 15 26 16 21 23 14 20 5 26 8 17Z" fill="currentColor" fill-opacity="0.08"></path>
+            <path d="m4 6 10 14L23 3M8 17l13 6M15 13l6 3"></path>
+          </svg>
+        </button>
       </p>
       <p class="contact-links">
                 <span class="contact-line">
@@ -47,14 +51,6 @@
                     <path d="m3 7 9 6 9-6"></path>
                   </svg>
                   Email
-                </a>
-                <a href="https://orcid.org/0009-0006-8001-5908" title="ORCID profile">
-                  <img class="contact-icon" src="images/orcid-icon.svg" alt="" aria-hidden="true" width="16" height="16">
-                  ORCID
-                </a>
-                <a href="https://huggingface.co/onef1shy" title="Hugging Face profile">
-                  <img class="contact-icon" src="images/hf-logo.svg" alt="" aria-hidden="true" width="16" height="16">
-                  Hugging Face
                 </a>
                 <a href="https://scholar.google.com/citations?user=fjLiFtgAAAAJ" title="Google Scholar profile">
                   <svg class="contact-icon contact-icon--scholar" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
@@ -69,6 +65,14 @@
                   </svg>
                   Github
                 </a>
+                <a href="https://huggingface.co/onef1shy" title="Hugging Face profile">
+                  <img class="contact-icon" src="images/hf-logo.svg" alt="" aria-hidden="true" width="16" height="16">
+                  Hugging Face
+                </a>
+                <a href="https://orcid.org/0009-0006-8001-5908" title="ORCID profile">
+                  <img class="contact-icon" src="images/orcid-icon.svg" alt="" aria-hidden="true" width="16" height="16">
+                  ORCID
+                </a>
                 </span>
 			  </p>
     </aside>
@@ -77,6 +81,10 @@
     <tr style="padding:0px">
       <td style="padding:0px">
         <section class="profile-table profile-bio" aria-label="About Zeyu Yan">
+          <h1 class="profile-welcome">
+            <span>Hi there <span class="profile-welcome-wave" aria-hidden="true">👋</span></span>
+            <span>Welcome to my homepage!</span>
+          </h1>
           <p>
 			  I am a Ph.D. student at the
 			  <span style="position:relative;display:inline-block;width:1.15em;height:1.15em;overflow:hidden;vertical-align:-0.2em;margin-right:4px;"><img class="zju-logo" src="images/school/zju-logo.png" alt="Zhejiang University logo" style="position:absolute;top:50%;left:50%;width:2em;height:auto;max-width:none;transform:translate(-50%,-50%);"></span>
@@ -186,7 +194,6 @@
               document.querySelectorAll('tr[data-tags]').forEach(function(row) {
                 row.style.display = (tag === 'all' || row.dataset.tags.split(',').includes(tag)) ? '' : 'none';
               });
-              document.dispatchEvent(new Event('publication-filter-change'));
             });
 
             function copyText(text, event) {
@@ -271,9 +278,7 @@
                     <div class="publication-title-line"><a href="https://doi.org/10.1109/TGRS.2026.3684831">
                       <papertitle>DFYP: A Dynamic Fusion Framework with Spectral Channel Attention and Adaptive Operator Learning for Crop Yield Prediction</papertitle>
                     </a></div>
-                    <div class="publication-authors-shell">
-                      <p class="publication-authors">Juli Zhang*, <strong>Zeyu Yan</strong>, Jing Zhang, Qiguang Miao*, Quan Wang</p>
-                    </div>
+                    <p class="publication-authors">Juli Zhang*, <strong>Zeyu Yan</strong>, Jing Zhang, Qiguang Miao*, Quan Wang</p>
                     <p class="publication-abstract">A dynamic CNN-ViT fusion framework with spectral channel attention and adaptive operator learning for crop yield prediction.</p>
                     <span class="publication-venue">ICML NewInML 2025 &amp; IEEE TGRS 2026</span>
                     <div class="publication-links">
@@ -309,9 +314,7 @@
                   <div class="publication-title-line"><a href="https://doi.org/10.1007/978-3-032-21171-2_11">
                     <papertitle>LADSG: Label-Anonymized Distillation and Similar Gradient Substitution for Label Privacy in Vertical Federated Learning</papertitle>
                   </a></div>
-                  <div class="publication-authors-shell">
-                    <p class="publication-authors"><strong>Zeyu Yan†</strong>, Yanfei Yao†, Xuanbing Wen, Shixiong Zhang, Juli Zhang*, Kai Fan</p>
-                  </div>
+                  <p class="publication-authors"><strong>Zeyu Yan†</strong>, Yanfei Yao†, Xuanbing Wen, Shixiong Zhang, Juli Zhang*, Kai Fan</p>
                   <p class="publication-abstract">A label privacy framework for vertical federated learning based on label-anonymized distillation and similar gradient substitution.</p>
                   <span class="publication-venue">CollaborateCom 2025 (Oral)</span>
                   <div class="publication-links">
@@ -323,75 +326,6 @@
           </tr>
 
 	        </tbody></table>
-	        <script>
-	          (function() {
-	            var rows = document.querySelectorAll('.publications-table tr[data-tags]');
-
-	            rows.forEach(function(row, index) {
-	              var shell = row.querySelector('.publication-authors-shell');
-	              if (!shell) return;
-	              var authors = shell.querySelector('.publication-authors');
-	              authors.id = 'publication-authors-' + index;
-
-	              var toggle = document.createElement('button');
-	              toggle.type = 'button';
-	              toggle.className = 'publication-authors-toggle';
-	              var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-	              icon.setAttribute('viewBox', '0 0 12 12');
-	              icon.setAttribute('aria-hidden', 'true');
-	              icon.setAttribute('focusable', 'false');
-	              var triangle = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-	              triangle.setAttribute('d', 'M3 1 10 6 3 11Z');
-	              icon.appendChild(triangle);
-	              toggle.appendChild(icon);
-	              toggle.setAttribute('aria-controls', authors.id);
-	              toggle.setAttribute('aria-expanded', 'false');
-	              toggle.setAttribute('aria-label', 'Expand author list');
-	              toggle.title = 'Expand author list';
-	              toggle.hidden = true;
-
-	              shell.appendChild(toggle);
-
-	              toggle.addEventListener('click', function() {
-	                var expanded = shell.classList.toggle('expanded');
-	                toggle.setAttribute('aria-expanded', String(expanded));
-	                toggle.setAttribute('aria-label', expanded ? 'Collapse author list' : 'Expand author list');
-	                toggle.title = expanded ? 'Collapse author list' : 'Expand author list';
-	              });
-	            });
-
-	            function updateAuthorToggles() {
-	              document.querySelectorAll('.publication-authors-shell').forEach(function(shell) {
-	                if (!shell.getClientRects().length) return;
-	                var authors = shell.querySelector('.publication-authors');
-	                var toggle = shell.querySelector('.publication-authors-toggle');
-	                var wasExpanded = shell.classList.contains('expanded');
-	                if (!wasExpanded) shell.classList.add('expanded');
-	                var naturalHeight = authors.getBoundingClientRect().height;
-	                var lineHeight = parseFloat(window.getComputedStyle(authors).lineHeight);
-	                var hasOverflow = naturalHeight > lineHeight * 1.5;
-	                if (!wasExpanded) shell.classList.remove('expanded');
-	                toggle.hidden = !hasOverflow;
-	              });
-	            }
-
-	            updateAuthorToggles();
-
-	            document.addEventListener('publication-filter-change', updateAuthorToggles);
-	            requestAnimationFrame(updateAuthorToggles);
-	            if (document.fonts && document.fonts.ready) {
-	              document.fonts.ready.then(function() {
-	                requestAnimationFrame(updateAuthorToggles);
-	              });
-	            }
-	            var resizeFrame;
-	            window.addEventListener('resize', function() {
-	              cancelAnimationFrame(resizeFrame);
-	              resizeFrame = requestAnimationFrame(updateAuthorToggles);
-	            }, { passive: true });
-	          })();
-	        </script>
-
 	        <table id="experience" class="page-section" width="96%" align="center" border="0" cellpadding="10"><tbody>
           <br>
               <heading id="experience-title" class="navigation-target"><span class="section-heading-mark" aria-hidden="true">✦</span><span class="section-heading-label">Experience</span></heading>
