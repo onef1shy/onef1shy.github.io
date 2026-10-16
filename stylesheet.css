@@ -295,24 +295,39 @@ button {
   }
 }
 
-@media (max-width: 540px) {
-  .site-navigation-inner,
-  .homepage-layout {
-    width: calc(100% - 24px);
-  }
-
+@media (max-width: 680px) {
   .profile-sidebar {
-    grid-template-columns: 88px minmax(0, 1fr);
-    gap: 16px 20px;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 16px;
+    text-align: center;
   }
 
   .profile-sidebar-avatar {
-    grid-row: 1;
-    width: 88px;
+    grid-row: auto;
+    width: 112px;
+  }
+
+  .profile-sidebar .name-signature {
+    display: inline-block;
+    margin: 0 0 0 12px;
   }
 
   .profile-sidebar .contact-links {
     grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .profile-sidebar .contact-line {
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+@media (max-width: 540px) {
+  .site-navigation-inner,
+  .homepage-layout {
+    width: calc(100% - 24px);
   }
 }
 
