@@ -258,7 +258,7 @@ button {
   margin-bottom: 0;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
   .site-navigation-inner,
   .homepage-layout {
     width: calc(100% - 32px);
@@ -272,41 +272,24 @@ button {
   .profile-sidebar {
     position: static;
     display: grid;
-    grid-template-columns: 120px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
     align-items: start;
-    gap: 16px 28px;
+    gap: 16px;
     max-height: none;
     margin-bottom: 28px;
     overflow: visible;
+    text-align: center;
   }
 
   .profile-sidebar-avatar {
-    grid-row: 1 / span 2;
+    grid-row: auto;
     width: 120px;
   }
 
   .profile-sidebar-name,
   .profile-sidebar .contact-links {
     margin: 0;
-  }
-
-  .profile-sidebar .contact-line {
-    flex-direction: row;
-    gap: 6px 16px;
-  }
-}
-
-@media (max-width: 680px) {
-  .profile-sidebar {
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: center;
-    gap: 16px;
-    text-align: center;
-  }
-
-  .profile-sidebar-avatar {
-    grid-row: auto;
-    width: 112px;
   }
 
   .profile-sidebar .name-signature {
@@ -320,8 +303,16 @@ button {
   }
 
   .profile-sidebar .contact-line {
+    flex-direction: row;
     justify-content: center;
     align-items: center;
+    gap: 6px 16px;
+  }
+}
+
+@media (max-width: 680px) {
+  .profile-sidebar-avatar {
+    width: 112px;
   }
 }
 
