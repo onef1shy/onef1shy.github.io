@@ -207,14 +207,18 @@ button {
 
 .profile-sidebar-avatar {
   display: block;
-  width: min(220px, 25vh);
+  width: min(180px, 25vh);
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 50%;
 }
 
 .profile-sidebar-name {
   margin: 24px 0 0;
+}
+
+.profile-sidebar-name name {
+  font-size: 26px;
 }
 
 .profile-sidebar .name-separator {
@@ -267,7 +271,7 @@ button {
   .profile-sidebar {
     position: static;
     display: grid;
-    grid-template-columns: 140px minmax(0, 1fr);
+    grid-template-columns: 120px minmax(0, 1fr);
     align-items: start;
     gap: 16px 28px;
     max-height: none;
@@ -277,7 +281,7 @@ button {
 
   .profile-sidebar-avatar {
     grid-row: 1 / span 2;
-    width: 140px;
+    width: 120px;
   }
 
   .profile-sidebar-name,
@@ -298,13 +302,13 @@ button {
   }
 
   .profile-sidebar {
-    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-columns: 88px minmax(0, 1fr);
     gap: 16px 20px;
   }
 
   .profile-sidebar-avatar {
     grid-row: 1;
-    width: 96px;
+    width: 88px;
   }
 
   .profile-sidebar .contact-links {
