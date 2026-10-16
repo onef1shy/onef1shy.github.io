@@ -1037,6 +1037,11 @@ name {
   white-space: nowrap;
 }
 
+/* Match the visible 泽宇 gap to 闫泽 in Ma Shan Zheng. */
+.name-cn-last {
+  margin-left: 0.022em;
+}
+
 .bio-copy-btn {
   display: inline-grid;
   place-items: center;
