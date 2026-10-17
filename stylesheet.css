@@ -50,8 +50,8 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('fonts/ma-shan-zheng-motto.ttf') format('truetype');
-  unicode-range: U+5728, U+751F, U+81EA, U+957F;
+  src: url('fonts/ma-shan-zheng-motto.ttf?v=20261017-qietingfengyin') format('truetype');
+  unicode-range: U+4E14, U+541F, U+542C, U+98CE;
 }
 
 /* White background with cool text and blue-violet accents. */
